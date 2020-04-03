@@ -1,0 +1,54 @@
+id,label
+AUS,Australia
+AUT,Austria
+BEL,Belgium
+CAN,Canada
+CZE,Czech Republic
+DNK,Denmark
+EST,Estonia
+FIN,Finland
+FRA,France
+DEU,Germany
+GRC,Greece
+HUN,Hungary
+ISL,Iceland
+IRL,Ireland
+ISR,Israel
+ITA,Italy
+JPN,Japan
+KOR,Korea
+LVA,Latvia
+LTU,Lithuania
+LUX,Luxembourg
+MEX,Mexico
+NLD,Netherlands
+NZL,New Zealand
+NOR,Norway
+POL,Poland
+PRT,Portugal
+SVK,Slovak Republic
+SVN,Slovenia
+ESP,Spain
+SWE,Sweden
+CHE,Switzerland
+TUR,Turkey
+GBR,United Kingdom
+USA,United States
+OECD,OECD countries
+CRI,Costa Rica
+EU22,European Union 22
+EU16,European Union 16
+EU28,European Union 28
+EUR,Europe
+G7,G7 countries
+NAM,North America
+OCE,Oceania
+BGR,Bulgaria
+HRV,Croatia
+CYP,Cyprus
+MKD,FYR of Macedonia
+MLT,Malta
+ROU,Romania
+RUS,Russian Federation
+ZAF,South Africa
+COL,Colombia
