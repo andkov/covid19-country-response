@@ -5,7 +5,7 @@ cat("\f") # clear console when working in RStudio
 # ---- load-sources ------------------------------------------------------------
 # Call `base::source()` on any repo file that defines functions needed below.  Ideally, no real operations are performed.
 config <- config::get()
-
+source("./scripts/common-functions.R")
 # ---- load-packages -----------------------------------------------------------
 # Attach these packages so their functions don't need to be qualified: http://r-pkgs.had.co.nz/namespace.html#search-path
 library(magrittr) #Pipes
@@ -29,7 +29,13 @@ for(i in seq_along(input_files_oecd_health)){
   ls_input_health[[file_name_i]] <- readr::read_rds(input_files_oecd_health[i])
 }
 
-dstruc <- ls_input_health$health_resources$structure
+# what countries should be in focus?
+ds_country <-
+  readr::read_csv(
+    config$path_country
+  ) %>%
+  dplyr::filter(desired)
+
 # ---- define-functions ----------------------------------
 # function to get a list of unique variables and units of measurement along with descriptive labels
 get_var_unit_lookup <- function(list_object){
@@ -47,6 +53,8 @@ get_var_unit_lookup <- function(list_object){
 # How to use
 dvars_health_resources <- ls_input_health$health_resources %>% get_var_unit_lookup()
 dvars_health_status <- ls_input_health$health_status %>% get_var_unit_lookup()
+
+dvars_health_resources %>% neat_DT()
 
 
 
