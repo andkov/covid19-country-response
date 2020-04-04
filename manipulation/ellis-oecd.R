@@ -12,7 +12,7 @@ library(magrittr) #Pipes
 library(utils)
 library(httr)
 library(dplyr)
-loadNamespace("dplyr")
+# loadNamespace("dplyr")
 library(OECD) # see vignette https://cran.r-project.org/web/packages/OECD/vignettes/oecd_vignette_main.html
 library(rsdmx)
 # ---- declare-globals ---------------------------------------------------------
@@ -51,10 +51,10 @@ get_var_unit_lookup <- function(list_object){
   return(d_var_unit)
 }
 # How to use
-dvars_health_resources <- ls_input_health$health_resources %>% get_var_unit_lookup()
-dvars_health_status <- ls_input_health$health_status %>% get_var_unit_lookup()
+# dvars_health_resources <- ls_input_health$health_resources %>% get_var_unit_lookup()
+# dvars_health_status <- ls_input_health$health_status %>% get_var_unit_lookup()
 
-dvars_health_resources %>% neat_DT()
+# dvars_health_resources %>% neat_DT()
 
 # ---- compute-rank-function --------------
 # function to compute ranks of countries for a given measure
