@@ -26,26 +26,37 @@ path_url <- "https://opendata.ecdc.europa.eu/covid19/casedistribution/csv"
 #download the dataset from the ECDC website to a local temporary file
 # GET(url = path_url, authenticate(":", ":", type="ntlm"), write_disk(tf <- tempfile(fileext = ".csv")))
 # ds_ocdc_raw <- read.csv(tf)
-# path_save <- paste0("./data-unshared/derived/ocdc-",Sys.Date(),".csv")
+path_save <- paste0("./data-unshared/derived/ocdc-",Sys.Date(),".csv")
 # readr::write_csv(ds_ocdc_raw,path_save)
 # # run above line once per update
 
 ds_covid <- readr::read_csv(path_save)
 ds_covid %>% glimpse()
-# ---- tweak-data -----------------------
-names(ds_covid) <- c("date", "day", "month", "year", "n_cases", "n_deaths", "country", "geo_id", "country_code","n_population_2018")
+
 # ---- reconcile-countries -------------------
 ds_country <-
   readr::read_csv(
     config$path_country
   ) %>%
   dplyr::filter(desired)
-
 ds_country <- ds_country %>%
   dplyr::left_join(
-    ds_covid %>% dplyr::distinct(country,country_code)
-    ,by = c("id" = "country_code")
+    ds_covid %>% dplyr::distinct(countriesAndTerritories,countryterritoryCode)
+    ,by = c("id" = "countryterritoryCode")
   )
+# sources can be joined by the three letter country code
+# ---- tweak-data -----------------------
+names(ds_covid) <- c("date", "day", "month", "year", "n_cases", "n_deaths", "country", "geo_id", "country_code","n_population_2018")
+ds_covid <- ds_covid %>%
+  dplyr::mutate(
+    date = lubridate::dmy(date)
+  )
+
+ds_covid <-  ds_covid %>%
+  dplyr::filter(country_code %in% unique(ds_country$id))
+
+
+
 
 # ---- define-utility-functions ---------------
 
