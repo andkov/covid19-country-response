@@ -50,7 +50,8 @@ names(ds_covid) <- c("date", "day", "month", "year", "n_cases", "n_deaths", "cou
 ds_covid <- ds_covid %>%
   dplyr::mutate(
     date = lubridate::dmy(date)
-  )
+  ) %>%
+  dplyr::arrange(country_code, date)
 
 ds_covid <-  ds_covid %>%
   dplyr::filter(country_code %in% unique(ds_country$id))
@@ -63,16 +64,20 @@ ds_covid <-  ds_covid %>%
 # 3) number of deaths increase at least three days in a row
 
 d <- ds_covid %>%
-  dplyr::filter(country_code == "AUT") %>%
+  # dplyr::filter(country_code == "AUT") %>%
   # dplyr::filter(country_code %in% c("AUT","CHE") ) %>%
   dplyr::select(country_code, date, n_deaths) %>%
-  dplyr::filter(date > "2020-03-01", date < "2020-04-10") %>%
-  dplyr::arrange(date) %>%
-  # dplyr::group_by(country_code) %>%
+  # dplyr::filter(date > "2020-03-01", date < "2020-04-10") %>%
+  # dplyr::arrange(date) %>%
+  dplyr::group_by(country_code) %>%
   dplyr::mutate(
-    # epi_timeline = ifelse(n_deaths == 1, 1, 0)
-    epi_timeline = match(n_deaths > 0, n_deaths)
-  )
+    # this solution might be vulnerable to cases where some intermediate dates are missed
+    n_deaths_cum = cumsum(n_deaths)
+    ,cutoff = n_deaths_cum > 0
+    ,epi_timeline = cumsum(cutoff)
+  ) %>%
+  dplyr::ungroup() %>%
+  dplyr::filter(epi_timeline > 0)
 d %>% print(n = nrow(.))
 
 
