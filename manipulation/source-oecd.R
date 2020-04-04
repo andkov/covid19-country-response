@@ -35,7 +35,7 @@ ls_health_resources <- list(
   ,"data" = data
 )
 pryr::object_size(ls_health_resources)
-readr::write_rds(ls_health_resources,"./data-unshared/raw/oecd/health_resources.rds")
+readr::write_rds(ls_health_resources,"./data-unshared/raw/oecd/health/health_resources.rds")
 
 
 # Health Status
@@ -52,7 +52,7 @@ ls_health_status <- list(
   ,"data" = data
 )
 pryr::object_size(ls_health_status)
-readr::write_rds(ls_health_status,"./data-unshared/raw/oecd/health_status.rds")
+readr::write_rds(ls_health_status,"./data-unshared/raw/oecd/health/health_status.rds")
 
 # joining to the metadata in dstruc object
 # ds1 <- data %>%
