@@ -55,7 +55,25 @@ ds_covid <- ds_covid %>%
 ds_covid <-  ds_covid %>%
   dplyr::filter(country_code %in% unique(ds_country$id))
 
+# ---- prep-trajectory ------------------------------
+# create a function to compute the first date of observation for a country
+# We want to be able to left-center countries on a few different definitions of "start of epidemic"
+# 1) the first recorded death = day 1
+# 2) the third recorded death = day 1
+# 3) number of deaths increase at least three days in a row
 
+d <- ds_covid %>%
+  dplyr::filter(country_code == "AUT") %>%
+  # dplyr::filter(country_code %in% c("AUT","CHE") ) %>%
+  dplyr::select(country_code, date, n_deaths) %>%
+  dplyr::filter(date > "2020-03-01", date < "2020-04-10") %>%
+  dplyr::arrange(date) %>%
+  # dplyr::group_by(country_code) %>%
+  dplyr::mutate(
+    # epi_timeline = ifelse(n_deaths == 1, 1, 0)
+    epi_timeline = match(n_deaths > 0, n_deaths)
+  )
+d %>% print(n = nrow(.))
 
 
 # ---- define-utility-functions ---------------
