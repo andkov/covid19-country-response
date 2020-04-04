@@ -56,6 +56,47 @@ dvars_health_status <- ls_input_health$health_status %>% get_var_unit_lookup()
 
 dvars_health_resources %>% neat_DT()
 
+# ---- compute-rank-function --------------
+# function to compute ranks of countries for a given measure
+
+compute_rank <- function(list_object, var_name, unit_name, d_country = ds_country){
+  # list_object <- ls_input_health$health_resources
+  # var_name <- "HOPITBED"
+  # unit_name     <- "RTOINPNB"
+
+  var_unit <- list_object %>%
+    get_var_unit_lookup() %>%
+    dplyr::filter(VAR == var_name, UNIT == unit_name)
+
+  d_measure <- list_object$data %>%
+    dplyr::filter(VAR == var_name, UNIT == unit_name ) %>%
+    dplyr::filter(COU %in% (d_country %>% dplyr::filter(desired) %>%  dplyr::pull(id)) ) %>%
+    dplyr::group_by(COU) %>%
+    dplyr::summarize(
+      min_year = min(obsTime,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+      ,max_year = max(obsTime,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+      ,mean = mean(obsValue, na.rm = T)
+      ,median = median(obsValue, na.rm = T)
+      ,value = sum(mean, median)/2
+
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(
+      rank_percentile = dplyr::percent_rank(value)
+      ,rank = dplyr::dense_rank(value)
+      ,n_tile = dplyr::ntile(value, 5)
+    )
+  var_unit <- dplyr::bind_rows(
+    var_unit,
+    tibble::as_tibble(  as.data.frame(matrix(nrow = nrow(d_measure)-1, ncol=ncol(var_unit))) )
+  ) %>%
+    dplyr::select(names(var_unit)) %>%
+    tidyr::fill(names(var_unit))
+  d_out <- var_unit %>% dplyr::bind_cols(d_measure)
+  return(d_out)
+}
+# How to use
+d_measure <- ls_input_health$health_resources %>% compute_rank("HOPITBED","RTOINPNB")
 
 
 
