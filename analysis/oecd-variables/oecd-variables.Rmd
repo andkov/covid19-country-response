@@ -1,0 +1,93 @@
+---
+title: "OECD variables"
+output:
+  html_document:
+    keep_md: yes
+    toc: yes
+    float_toc: yes
+    code_folding: hide
+---
+
+<!-- These two chunks should be added in the beginning of every .Rmd that you want to source an .R script -->
+<!--  The 1st mandatory chunck  -->
+<!--  Set the working directory to the repository's base directory -->
+```{r, echo=F, message=F} 
+#Don't combine this call with any other chunk 
+# cat("Working directory: ", getwd()) # check where you are
+  library(knitr)
+# Rmd is in "./reports/reportA/reportA.Rmd", but now the root is "./"
+  knitr::opts_knit$set(root.dir='../../') 
+```
+
+<!--  The 2nd mandatory chunck  -->
+<!-- Set the report-wide options, and point to the external code file. -->
+```{r set_options, echo=F}
+# set options shared by all chunks
+opts_chunk$set(
+  results='show', 
+  message = TRUE,
+  comment = NA, 
+  tidy = FALSE,
+  fig.height = 4, 
+  fig.width = 5.5, 
+  out.width = "550px",
+  fig.path = 'figure_rmd/',     
+  dev = "png",
+  dpi = 400
+  # fig.path = 'figure_pdf/',     
+  # dev = "pdf"#,
+  # dev.args=list(pdf = list(colormodel = 'cmyk'))
+)
+echoChunks <- TRUE
+messageChunks <- FALSE
+warningChunks <- FALSE
+options(width=120) #So the output is 50% wider than the default.
+# connect to the file with the underlying R script  
+read_chunk("./manipulation/ellis-oecd.R") 
+```
+
+```{r load-sources, echo=echoChunks, message=messageChunks,warning=warningChunks}
+```
+
+```{r load-packages, echo=echoChunks, message=messageChunks,warning=warningChunks}
+```
+
+```{r declare-globals, echo=echoChunks, results='show', message=messageChunks,warning=warningChunks}
+```
+
+```{r load-data, echo=echoChunks, results='show', message=messageChunks,warning=warningChunks}
+path_folder_oecd_health <- "./data-unshared/raw/oecd/health/"
+
+input_files_oecd_health <- list.files(path_folder_oecd_health, pattern = ".rds$",  full.names = T)
+file_names <- gsub(".rds$","", basename(input_files_oecd_health))
+
+ls_input_health <- list()
+for(i in seq_along(input_files_oecd_health)){
+  file_name_i <- gsub(".rds$","", basename(input_files_oecd_health[i]))
+  ls_input_health[[file_name_i]] <- readr::read_rds(input_files_oecd_health[i])
+}
+
+# what countries should be in focus?
+ds_country <-
+  readr::read_csv(
+    config$path_country
+  ) %>%
+  dplyr::filter(desired)
+```
+
+# Health Resources
+<!-- Inspect the datasets.   -->
+```{r health-resources, echo=echoChunks, results='show', message=messageChunks,warning=warningChunks}
+ls_input_health$health_resources %>% get_var_unit_lookup() %>% neat_DT(filter_ = "top")
+```
+
+# Health Status
+<!-- Inspect the datasets.   -->
+```{r health-status, echo=echoChunks, results='show', message=messageChunks,warning=warningChunks}
+ls_input_health$health_status %>% get_var_unit_lookup() %>% neat_DT(filter_ = "top")
+```
+
+
+
+
+
