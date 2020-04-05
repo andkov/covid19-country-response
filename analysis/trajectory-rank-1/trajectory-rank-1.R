@@ -51,6 +51,7 @@ for(i in seq_along(input_files_oecd_health)){
 # ---- tweak-data --------------------------------------------------------------
 # to help look for relevant variables and measures in this chaptert
 # d_meta <- ls_input_health$health_resources %>% get_var_unit_lookup()
+# d_meta <- ls_input_health$health_status %>% get_var_unit_lookup()
 
 var_name <- "HOPITBED"
 unit_name     <- "RTOINPNB"
@@ -81,13 +82,14 @@ d_measure %>% glimpse()
 var_label <- d_measure %>%  dplyr::filter(!is.na(var_label)) %>% dplyr::pull(var_label) %>% unique(na.rm=T)
 unit_label <- d_measure %>%  dplyr::filter(!is.na(unit_label)) %>% dplyr::pull(unit_label) %>% unique(na.rm=T)
 g <- d_measure %>%
-  dplyr::filter(epi_timeline <=30) %>%
-  ggplot(aes(x = epi_timeline, y = n_deaths, color = rank_percentile)) +
+  # dplyr::filter(epi_timeline <=30) %>%
+  # ggplot(aes(x = epi_timeline, y = n_deaths, color = rank_percentile)) +
+  ggplot(aes(x = epi_timeline, y = n_deaths, color = factor(n_tile))) +
   geom_line(aes(group = country_code))+
   theme_minimal()+
   facet_wrap(~n_tile)+
   labs(
-    title = paste0()
+    title = paste0(var_label," - ", unit_label)
   )
 g <- plotly::ggplotly(g)
 g
