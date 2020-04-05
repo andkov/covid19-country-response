@@ -1,10 +1,10 @@
 id,label,desired
-AUS,Australia,FALSE
+AUS,Australia,TRUE
 AUT,Austria,TRUE
 BEL,Belgium,TRUE
-CAN,Canada,FALSE
+CAN,Canada,TRUE
 CZE,Czech Republic,TRUE
-DNK,Denmark,FALSE
+DNK,Denmark,TRUE
 EST,Estonia,TRUE
 FIN,Finland,TRUE
 FRA,France,TRUE
@@ -12,8 +12,8 @@ DEU,Germany,TRUE
 GRC,Greece,TRUE
 HUN,Hungary,TRUE
 ISL,Iceland,TRUE
-IRL,Ireland,FALSE
-ISR,Israel,FALSE
+IRL,Ireland,TRUE
+ISR,Israel,TRUE
 ITA,Italy,TRUE
 JPN,Japan,FALSE
 KOR,Korea,FALSE
@@ -21,7 +21,7 @@ LVA,Latvia,TRUE
 LTU,Lithuania,TRUE
 LUX,Luxembourg,FALSE
 MEX,Mexico,FALSE
-NLD,Netherlands,FALSE
+NLD,Netherlands,TRUE
 NZL,New Zealand,TRUE
 NOR,Norway,TRUE
 POL,Poland,TRUE
@@ -31,9 +31,9 @@ SVN,Slovenia,TRUE
 ESP,Spain,TRUE
 SWE,Sweden,TRUE
 CHE,Switzerland,TRUE
-TUR,Turkey,FALSE
+TUR,Turkey,TRUE
 GBR,United Kingdom,TRUE
-USA,United States,FALSE
+USA,United States,TRUE
 OECD,OECD countries,FALSE
 CRI,Costa Rica,FALSE
 EU22,European Union 22,FALSE
@@ -44,11 +44,11 @@ G7,G7 countries,FALSE
 NAM,North America,FALSE
 OCE,Oceania,FALSE
 BGR,Bulgaria,FALSE
-HRV,Croatia,TRUE
+HRV,Croatia,FALSE
 CYP,Cyprus,FALSE
 MKD,FYR of Macedonia,FALSE
 MLT,Malta,FALSE
 ROU,Romania,FALSE
-RUS,Russian Federation,FALSE
-ZAF,South Africa,FALSE
+RUS,Russian Federation,TRUE
+ZAF,South Africa,TRUE
 COL,Colombia,FALSE
