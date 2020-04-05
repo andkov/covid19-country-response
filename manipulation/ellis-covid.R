@@ -53,6 +53,8 @@ ds_covid <- ds_covid %>%
   ) %>%
   dplyr::arrange(country_code, date)
 
+readr::write_csv(ds_covid,path_save)
+
 ds_covid <-  ds_covid %>%
   dplyr::filter(country_code %in% unique(ds_country$id))
 
