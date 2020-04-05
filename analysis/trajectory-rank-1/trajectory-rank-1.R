@@ -49,32 +49,48 @@ for(i in seq_along(input_files_oecd_health)){
 # ---- inspect-data -------------------------------------------------------------
 
 # ---- tweak-data --------------------------------------------------------------
-d_covid <- ds_covid %>%
-  # dplyr::select(country_code, date, n_deaths) %>%
-  dplyr::filter(country_code %in% unique(ds_country$id)) %>%
-  dplyr::group_by(country_code) %>%
-  dplyr::mutate(
-    # this solution might be vulnerable to cases where some intermediate dates are missed
-    n_deaths_cum = cumsum(n_deaths)
-    ,cutoff = n_deaths_cum > 0
-    ,epi_timeline = cumsum(cutoff)
-  ) %>%
-  dplyr::ungroup() %>%
-  dplyr::filter(epi_timeline > 0)
-d_covid %>% print(n = nrow(.))
-
-# ---- basic-table --------------------------------------------------------------
-
-# ---- basic-graph -------------------------------------------------------------
-d_meta <- ls_input_health$health_resources %>% get_var_unit_lookup()
+# to help look for relevant variables and measures in this chaptert
+# d_meta <- ls_input_health$health_resources %>% get_var_unit_lookup()
 
 var_name <- "HOPITBED"
 unit_name     <- "RTOINPNB"
 
-d_measure <- ls_input_health$health_resources %>% compute_rank(var_name, unit_name)
+prep_data_trajectory <- function(ls_oecd, df_covid, n_deaths_first_day = 1, var_name, unit_name){
+  # browser()
 
+  d_covid <- compute_epi_timeline(df_covid, n_deaths_first_day = n_deaths_first_day)
+  d_oecd  <- ls_oecd %>% compute_rank(var_name = var_name, unit_name = unit_name)
+  d_out <-   dplyr::left_join(
+    d_covid, d_oecd, by = c("country_code" = "COU")
+  )
+  return(d_out)
+}
+# how to use
+d_measure <- prep_data_trajectory(
+  ls_oecd = ls_input_health$health_resources
+  ,df_covid = ds_covid
+  ,n_deaths_first_day = 1
+  ,var_name = var_name
+  ,unit_name = unit_name
+)
 
+# ---- basic-table --------------------------------------------------------------
 
+# ---- basic-graph -------------------------------------------------------------
+d_measure %>% glimpse()
+var_label <- d_measure %>%  dplyr::filter(!is.na(var_label)) %>% dplyr::pull(var_label) %>% unique(na.rm=T)
+unit_label <- d_measure %>%  dplyr::filter(!is.na(unit_label)) %>% dplyr::pull(unit_label) %>% unique(na.rm=T)
+g <- d_measure %>%
+  dplyr::filter(epi_timeline <=30) %>%
+  ggplot(aes(x = epi_timeline, y = n_deaths, color = rank_percentile)) +
+  geom_line(aes(group = country_code))+
+  theme_minimal()+
+  facet_wrap(~n_tile)+
+  labs(
+    title = paste0()
+  )
+g <- plotly::ggplotly(g)
+g
 # Sonata form report structure
 # ---- dev-a-0 ---------------------------------
 # ---- dev-a-1 ---------------------------------

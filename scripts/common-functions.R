@@ -111,4 +111,21 @@ compute_rank <- function(list_object, var_name, unit_name, d_country = ds_countr
 # How to use
 # d_measure <- ls_input_health$health_resources %>% compute_rank("HOPITBED","RTOINPNB")
 
+compute_epi_timeline <- function(d, n_deaths_first_day = 1){
+  d_out <- d %>%
+    # dplyr::select(country_code, date, n_deaths) %>%
+    dplyr::filter(country_code %in% unique(ds_country$id)) %>%
+    dplyr::group_by(country_code) %>%
+    dplyr::mutate(
+      # this solution might be vulnerable to cases where some intermediate dates are missed
+      n_deaths_cum = cumsum(n_deaths)
+      ,cutoff = n_deaths_cum > n_deaths_first_day
+      ,epi_timeline = cumsum(cutoff)
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(epi_timeline > 0)
+  return(d_out)
+}
+# how to use
+# d_covid <- ds_covid %>% compute_epi_timeline(n_deaths_first_day = 1)
 
