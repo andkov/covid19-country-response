@@ -23,6 +23,9 @@ path_folder_oecd_health <- "./data-unshared/raw/oecd/health/"
 input_files_oecd_health <- list.files(path_folder_oecd_health, pattern = ".rds$",  full.names = T)
 file_names <- gsub(".rds$","", basename(input_files_oecd_health))
 
+if (nrow(input_files_oecd_health) == 0L)
+  stop(paste0("No rds files were found in `", path_folder_oecd_health, "`."))
+
 ls_input_health <- list()
 for(i in seq_along(input_files_oecd_health)){
   file_name_i <- gsub(".rds$","", basename(input_files_oecd_health[i]))

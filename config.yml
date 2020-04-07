@@ -1,5 +1,6 @@
 default:
 
     path_country      : "data-public/metadata/oecd/country.csv"
+    path_input_oecd   : !expr strftime(Sys.Date(), "data-unshared/derived/ocdc-%Y-%m-%d.csv")
     oced_genders      : !expr c("MEN", "WOMEN")
     oced_ages         : !expr c("1519", "2024", "2554", "5564", "6599")

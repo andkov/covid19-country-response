@@ -21,16 +21,17 @@ library(dplyr)
 
 # ---- declare-globals ---------------------------------------------------------
 path_url <- "https://opendata.ecdc.europa.eu/covid19/casedistribution/csv"
+
 # ---- load-data ---------------------------------------------------------------
 
 #download the dataset from the ECDC website to a local temporary file
 # GET(url = path_url, authenticate(":", ":", type="ntlm"), write_disk(tf <- tempfile(fileext = ".csv")))
 # ds_ocdc_raw <- read.csv(tf)
-path_save <- paste0("./data-unshared/derived/ocdc-",Sys.Date(),".csv")
+checkmate::assert_file(config$path_input_oecd)
 # readr::write_csv(ds_ocdc_raw,path_save)
 # # run above line once per update
 
-ds_covid <- readr::read_csv(path_save)
+ds_covid <- readr::read_csv(config$path_input_oecd)
 ds_covid %>% glimpse()
 
 # ---- reconcile-countries -------------------
@@ -39,10 +40,13 @@ ds_country <-
     config$path_country
   ) %>%
   dplyr::filter(desired)
-ds_country <- ds_country %>%
+
+ds_country <-
+  ds_country %>%
   dplyr::left_join(
-    ds_covid %>% dplyr::distinct(countriesAndTerritories,countryterritoryCode)
-    ,by = c("id" = "countryterritoryCode")
+    ds_covid %>%
+      dplyr::distinct(countriesAndTerritories,countryterritoryCode),
+    by = c("id" = "countryterritoryCode")
   )
 # sources can be joined by the three letter country code
 # ---- tweak-data -----------------------
