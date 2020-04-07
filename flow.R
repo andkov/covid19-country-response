@@ -42,9 +42,12 @@ if( interactive() ) {
 ds_rail  <- tibble::tribble(
   ~fx               , ~path,
 
+  # Download the current data to the local machine
+  # "run_r"     , "manipulation/source-oecd.R",
+
+  # Read & groom the files
   "run_r"     , "manipulation/ellis-covid.R",
-  "run_r"     , "manipulation/ellis-oecd.R",
-  "run_r"     , "manipulation/source-oecd.R"
+  # "run_r"     , "manipulation/ellis-oecd.R"
 )
 
 run_r <- function( minion ) {

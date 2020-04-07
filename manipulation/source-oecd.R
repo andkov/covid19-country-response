@@ -15,12 +15,17 @@ loadNamespace("dplyr")
 library(OECD) # see vignette https://cran.r-project.org/web/packages/OECD/vignettes/oecd_vignette_main.html
 library(rsdmx)
 # ---- declare-globals ---------------------------------------------------------
+config <- config::get()
 
 # ---- load-data ---------------------------------------------------------------
 dataset_list <- OECD::get_datasets()
 search_dataset("health", data = dataset_list)
 
 # ---- define-queries ---------------------
+
+if( !fs::dir_exists(config$path_oecd_health_chapter) )
+  fs::dir_create(config$path_oecd_health_chapter)
+
 # Health Care Resources
 dataset <- "HEALTH_REAC"
 dstruc <- OECD::get_data_structure(dataset)
@@ -35,7 +40,7 @@ ls_health_resources <- list(
   ,"data" = data
 )
 pryr::object_size(ls_health_resources)
-readr::write_rds(ls_health_resources,"./data-unshared/raw/oecd/health/health_resources.rds")
+readr::write_rds(ls_health_resources, fs::path(config$path_oecd_health_chapter, "health_resources.rds"))
 
 
 # Health Status
@@ -52,7 +57,7 @@ ls_health_status <- list(
   ,"data" = data
 )
 pryr::object_size(ls_health_status)
-readr::write_rds(ls_health_status,"./data-unshared/raw/oecd/health/health_status.rds")
+readr::write_rds(ls_health_status, fs::path(config$path_oecd_health_chapter, "health_status.rds"))
 
 # joining to the metadata in dstruc object
 # ds1 <- data %>%
