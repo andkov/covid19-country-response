@@ -57,27 +57,6 @@ for(i in seq_along(input_files_oecd_health)){
 # d_meta <- ls_input_health$health_resources %>% get_var_unit_lookup()
 # d_meta <- ls_input_health$health_status %>% get_var_unit_lookup()
 
-var_name <- "HOPITBED"
-unit_name     <- "RTOINPNB"
-
-prep_data_trajectory <- function(ls_oecd, df_covid, n_deaths_first_day = 1, var_name, unit_name){
-    # browser()
-
-    d_covid <- compute_epi_timeline(df_covid, n_deaths_first_day = n_deaths_first_day)
-    d_oecd  <- ls_oecd %>% compute_rank(var_name = var_name, unit_name = unit_name)
-    d_out <-   dplyr::left_join(
-        d_covid, d_oecd, by = c("country_code" = "COU")
-    )
-    return(d_out)
-}
-# how to use
-d_measure <- prep_data_trajectory(
-    ls_oecd = ls_input_health$health_resources
-    ,df_covid = ds_covid
-    ,n_deaths_first_day = 1
-    ,var_name = var_name
-    ,unit_name = unit_name
-)
 
 
 #
@@ -93,8 +72,48 @@ library(shiny)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
+    output$var_name <- renderText({
+        paste("You chose", input$var_name)
+    })
+
+    slidersLayout <- reactive({
+        return(list(
+            var_name = (input$var_name),
+            unit_name = (input$unit_name)
+            # DriveTimeOuter = as.integer(input$driveTimeOuter),
+            # RadiusFactorCity = (100 * 2^(-1+input$radiusFactorCity)), #Control how big the city circles are.
+            # RadiusFactorCompetitor = (200 * 2^(-1+input$radiusFactorCompetitor)), #Control how big the competitor circles are.
+            # ExistingStoreOpacity = input$existingStoreOpacity,
+            # ProposedStoreOpacity = input$proposedStoreOpacity,
+            # LongitudinalLines = input$longitudinalLines,
+            # InflatedGraphs = (input$inflatedGraphs=="1")
+        ))
+    })
+
+    # var_name    <- c("HOPITBED", "HOPITBED2")[1]
+    # unit_name   <- "RTOINPNB"
+
+    prep_data_trajectory <- function(ls_oecd, df_covid, n_deaths_first_day = 1, var_name, unit_name){
+        # browser()
+
+        d_covid <- compute_epi_timeline(df_covid, n_deaths_first_day = n_deaths_first_day)
+        d_oecd  <- ls_oecd %>% compute_rank(var_name = slidersLayout()$var_name, unit_name = slidersLayout()$unit_name)
+        d_out <-   dplyr::left_join(
+            d_covid, d_oecd, by = c("country_code" = "COU")
+        )
+        return(d_out)
+    }
 
     output$spaghetti_1 <- renderPlotly({
+    # how to use
+        d_measure <- prep_data_trajectory(
+            ls_oecd = ls_input_health$health_resources
+            ,df_covid = ds_covid
+            ,n_deaths_first_day = 1
+            ,var_name = var_name
+            ,unit_name = unit_name
+        )
+
         g <- d_measure %>%
             # dplyr::filter(epi_timeline <=30) %>%
             # ggplot(aes(x = epi_timeline, y = n_deaths, color = rank_percentile)) +

@@ -19,6 +19,18 @@ shinyUI(fluidPage(
     # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
+            selectInput(
+                inputId='var_name',
+                label='Variable',
+                choices=c("HOPITBED", "EMPLPSYS"),
+                selected=1
+            ),
+            selectInput(
+                inputId='unit_name',
+                label='Unit Name',
+                choices=c("RTOINPNB", "PERSMYNB"),
+                selected=1
+            ),
             sliderInput("bins",
                         "Number of bins:",
                         min = 1,
