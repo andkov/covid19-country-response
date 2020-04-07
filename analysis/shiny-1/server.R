@@ -53,12 +53,12 @@ for(i in seq_along(input_files_oecd_health)){
 # d_meta <- ls_input_health$health_resources %>% get_var_unit_lookup()
 # d_meta <- ls_input_health$health_status %>% get_var_unit_lookup()
 
-ls_input_health$health_resources %>%
-    get_var_unit_lookup() %>%
-    # pull(VAR) %>%
-    pull(UNIT) %>%
-    unique() %>%
-    dput()
+# ls_input_health$health_resources %>%
+#     get_var_unit_lookup() %>%
+#     # pull(VAR) %>%
+#     pull(UNIT) %>%
+#     unique() %>%
+#     dput()
 
 #
 # This is the server logic of a Shiny web application. You can run the
@@ -87,13 +87,6 @@ shinyServer(function(input, output) {
         return(list(
             var_name = (input$var_name),
             unit_name = (input$unit_name)
-            # DriveTimeOuter = as.integer(input$driveTimeOuter),
-            # RadiusFactorCity = (100 * 2^(-1+input$radiusFactorCity)), #Control how big the city circles are.
-            # RadiusFactorCompetitor = (200 * 2^(-1+input$radiusFactorCompetitor)), #Control how big the competitor circles are.
-            # ExistingStoreOpacity = input$existingStoreOpacity,
-            # ProposedStoreOpacity = input$proposedStoreOpacity,
-            # LongitudinalLines = input$longitudinalLines,
-            # InflatedGraphs = (input$inflatedGraphs=="1")
         ))
     })
 
@@ -114,7 +107,7 @@ shinyServer(function(input, output) {
     }
 
     output$spaghetti_1 <- renderPlotly({
-    # how to use
+    # output$spaghetti_1 <- renderPlot({
         d_measure <- prep_data_trajectory(
             ls_oecd = ls_input_health$health_resources
             ,df_covid = ds_covid
@@ -122,19 +115,22 @@ shinyServer(function(input, output) {
             ,var_name = var_name
             ,unit_name = unit_name
         )
+        # browser()
+
 
         g <- d_measure %>%
             # dplyr::filter(epi_timeline <=30) %>%
             # ggplot(aes(x = epi_timeline, y = n_deaths, color = rank_percentile)) +
             ggplot(aes(x = epi_timeline, y = n_deaths, color = factor(n_tile))) +
-            geom_line(aes(group = country_code))+
+            geom_line(aes(group = country_code)) +
             theme_minimal()+
             facet_wrap(~n_tile)+
+            geom_smooth(aes(x = epi_timeline, y = n_deaths, group = 1), inherit.aes=F, method = "loess", color = "gray70") +
             labs(
                 title = paste0(slidersLayout()$var_name," - ", slidersLayout()$unit_name)
             )
         spaghetti_1 <- plotly::ggplotly(g)
-        # spaghetti_1 <-
+        # spaghetti_1 <- g
     })
 
     output$distPlot <- renderPlot({
