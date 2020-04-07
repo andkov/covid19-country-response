@@ -57,7 +57,12 @@ for(i in seq_along(input_files_oecd_health)){
 # d_meta <- ls_input_health$health_resources %>% get_var_unit_lookup()
 # d_meta <- ls_input_health$health_status %>% get_var_unit_lookup()
 
-
+ls_input_health$health_resources %>%
+    get_var_unit_lookup() %>%
+    # pull(VAR) %>%
+    pull(UNIT) %>%
+    unique() %>%
+    dput()
 
 #
 # This is the server logic of a Shiny web application. You can run the
