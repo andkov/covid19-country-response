@@ -112,6 +112,8 @@ compute_rank <- function(list_object, var_name, unit_name, d_country = ds_countr
 # d_measure <- ls_input_health$health_resources %>% compute_rank("HOPITBED","RTOINPNB")
 
 compute_epi_timeline <- function(d, n_deaths_first_day = 1){
+  # browser()
+
   d_out <- d %>%
     # dplyr::select(country_code, date, n_deaths) %>%
     dplyr::filter(country_code %in% unique(ds_country$id)) %>%
