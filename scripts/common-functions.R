@@ -77,6 +77,13 @@ compute_rank <- function(list_object, var_name, unit_name, d_country = ds_countr
   # var_name <- "HOPITBED"
   # unit_name     <- "RTOINPNB"
 
+  d_country <-
+    readr::read_csv(
+      # config$path_country
+      "data-public/metadata/oecd/country.csv"
+    ) %>%
+    dplyr::filter(desired)
+
   var_unit <- list_object %>%
     get_var_unit_lookup() %>%
     dplyr::filter(VAR == var_name, UNIT == unit_name)
@@ -111,12 +118,18 @@ compute_rank <- function(list_object, var_name, unit_name, d_country = ds_countr
 # How to use
 # d_measure <- ls_input_health$health_resources %>% compute_rank("HOPITBED","RTOINPNB")
 
-compute_epi_timeline <- function(d, n_deaths_first_day = 1){
+compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
   # browser()
+  d_country <-
+    readr::read_csv(
+      # config$path_country
+      "data-public/metadata/oecd/country.csv"
+    ) %>%
+    dplyr::filter(desired)
 
   d_out <- d %>%
     # dplyr::select(country_code, date, n_deaths) %>%
-    dplyr::filter(country_code %in% unique(ds_country$id)) %>%
+    dplyr::filter(country_code %in% unique(d_country$id)) %>%
     dplyr::group_by(country_code) %>%
     dplyr::mutate(
       # this solution might be vulnerable to cases where some intermediate dates are missed
