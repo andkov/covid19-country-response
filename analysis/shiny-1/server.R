@@ -29,11 +29,7 @@ source("./scripts/graphing/graph-presets.R") # font and color conventions
 source("./scripts/graphing/graph-support.R") # font and color conventions
 
 # ---- load-data -------------------------------------------------------------
-ds_country <-
-    readr::read_csv(
-        config$path_country
-    ) %>%
-    dplyr::filter(desired)
+
 
 # COVID
 # path_save <- paste0("./data-unshared/derived/ocdc-",Sys.Date(),".csv")
@@ -77,6 +73,12 @@ library(shiny)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
+    # ds_country <-
+    #     readr::read_csv(
+    #         config$path_country
+    #     ) %>%
+    #     dplyr::filter(desired)
+
     output$var_name <- renderText({
         paste("You chose", input$var_name)
     })
@@ -100,9 +102,11 @@ shinyServer(function(input, output) {
 
     prep_data_trajectory <- function(ls_oecd, df_covid, n_deaths_first_day = 1, var_name, unit_name){
         # browser()
+        var_name <- slidersLayout()$var_name
+        unit_name <- slidersLayout()$unit_name
 
-        d_covid <- compute_epi_timeline(df_covid, n_deaths_first_day = n_deaths_first_day)
-        d_oecd  <- ls_oecd %>% compute_rank(var_name = slidersLayout()$var_name, unit_name = slidersLayout()$unit_name)
+        d_covid <- compute_epi_timeline(df_covid, n_deaths_first_day = n_deaths_first_day)#, d_country = ds_country)
+        d_oecd  <- ls_oecd %>% compute_rank(var_name = var_name, unit_name =unit_name)
         d_out <-   dplyr::left_join(
             d_covid, d_oecd, by = c("country_code" = "COU")
         )
@@ -127,7 +131,7 @@ shinyServer(function(input, output) {
             theme_minimal()+
             facet_wrap(~n_tile)+
             labs(
-                title = paste0(var_label," - ", unit_label)
+                title = paste0(slidersLayout()$var_name," - ", slidersLayout()$unit_name)
             )
         spaghetti_1 <- plotly::ggplotly(g)
         # spaghetti_1 <-
