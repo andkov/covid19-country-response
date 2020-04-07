@@ -32,13 +32,13 @@ ds_country <-
   dplyr::filter(desired)
 
 # COVID
-path_save <- paste0("./data-unshared/derived/ocdc-",Sys.Date(),".csv")
-ds_covid <- readr::read_csv(path_save)
+# path_save <- paste0("./data-unshared/derived/ocdc-",Sys.Date(),".csv")
+ds_covid <- readr::read_csv(config$path_input_covid)
 ds_covid %>% glimpse()
 
 # OEDC
-path_folder_oecd_health <- "./data-unshared/raw/oecd/health/"
-input_files_oecd_health <- list.files(path_folder_oecd_health, pattern = ".rds$",  full.names = T)
+# path_folder_oecd_health <- "./data-unshared/raw/oecd/health/"
+input_files_oecd_health <- list.files(config$path_oecd_health_chapter, pattern = ".rds$",  full.names = T)
 file_names <- gsub(".rds$","", basename(input_files_oecd_health))
 
 ls_input_health <- list()
