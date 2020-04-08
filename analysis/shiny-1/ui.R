@@ -69,6 +69,7 @@ shinyUI(fluidPage(
         mainPanel(
             # plotOutput("distPlot"),
             plotlyOutput("spaghetti_1")
+            # plotOutput("spaghetti_1")
         )
     )
 ))
