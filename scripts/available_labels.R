@@ -1,4 +1,4 @@
-var_label_availabe <- c(
+var_label_available <- c(
  "Practising caring personnel"
 ,"Professionally active caring personnel"
 ,"Practising dentists"
