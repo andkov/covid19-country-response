@@ -45,7 +45,7 @@ shinyUI(fluidPage(
         mainPanel(
             # plotOutput("distPlot"),
             # plotlyOutput("spaghetti_1")
-            plotlyOutput("spaghetti_bar_1")
+            plotlyOutput("spaghetti_bar_1", height = 800, width = 1200)
             # plotOutput("spaghetti_1")
             # plotOutput("test1")
         )
