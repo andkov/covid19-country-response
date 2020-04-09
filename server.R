@@ -93,19 +93,33 @@ shinyServer(function(input, output) {
 
     # var_name    <- c("HOPITBED", "HOPITBED2")[1]
     # unit_name   <- "RTOINPNB"
+    # var_name_slider <- slidersLayout()$var_name
+    # unit_name_slider <- slidersLayout()$unit_name
 
     prep_data_trajectory <- function(ls_oecd, df_covid, n_deaths_first_day = 1, var_name, unit_name){
+    # prep_data_trajectory <- function(ls_oecd, df_covid, n_deaths_first_day = 1, var_label, unit_label){
         # browser()
         var_name <- slidersLayout()$var_name
         unit_name <- slidersLayout()$unit_name
 
         d_covid <- compute_epi_timeline(df_covid, n_deaths_first_day = n_deaths_first_day)#, d_country = ds_country)
         d_oecd  <- ls_oecd %>% compute_rank(var_name = var_name, unit_name =unit_name)
+        # d_oecd  <- ls_oecd %>% compute_rank(var_label_i = var_name, unit_label_i =unit_name)
         d_out <-   dplyr::left_join(
             d_covid, d_oecd, by = c("country_code" = "COU")
         )
         return(d_out)
     }
+
+    # to retrieve labels
+    # var_ref_table <- ls_input_health$health_resources %>% get_var_unit_lookup()
+    # var_label_available <- var_ref_table %>% dplyr::distinct(var_label) %>% dplyr::pull(var_label)
+    # var_label_i <- "Practising caring personnel"
+    # unit_label_available <- var_ref_table %>% dplyr::filter(var_label == var_label_i) %>%
+    #     dplyr::pull(unit_label)
+    # unit_label_i <- "Number of persons (head counts)"
+    # creating dynamic inputs:
+    # https://mastering-shiny.org/action-dynamic.html
 
     output$spaghetti_bar_1 <- renderPlotly({
     # output$spaghetti_1 <- renderPlotly({
