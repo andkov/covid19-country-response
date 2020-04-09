@@ -26,12 +26,12 @@ path_url <- "https://opendata.ecdc.europa.eu/covid19/casedistribution/csv"
 # ---- load-data ---------------------------------------------------------------
 
 #download the dataset from the ECDC website to a local temporary file
-# GET(url = path_url, authenticate(":", ":", type="ntlm"), write_disk(tf <- tempfile(fileext = ".csv")))
-# ds_ocdc_raw <- read.csv(tf)
-# if (!fs::dir_exists(fs::path_dir(config$path_input_covid))) fs::dir_create(fs::path_dir(config$path_input_covid))
-# readr::write_csv(ds_ocdc_raw, config$path_input_covid)
-# checkmate::assert_file(config$path_input_covid)
-# # # run above line once per update
+GET(url = path_url, authenticate(":", ":", type="ntlm"), write_disk(tf <- tempfile(fileext = ".csv")))
+ds_ocdc_raw <- read.csv(tf)
+if (!fs::dir_exists(fs::path_dir(config$path_input_covid))) fs::dir_create(fs::path_dir(config$path_input_covid))
+readr::write_csv(ds_ocdc_raw, config$path_input_covid)
+checkmate::assert_file(config$path_input_covid)
+# # run above line once per update
 
 ds_covid <- readr::read_csv(config$path_input_covid)
 ds_covid %>% glimpse()
