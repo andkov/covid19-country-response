@@ -22,15 +22,15 @@ shinyUI(fluidPage(
             selectInput(
                 inputId='var_name',
                 label='Variable',
-                choices=var_name_available,
-                # choices=var_label_available,
+                # choices=var_name_available,
+                choices=var_label_available,
                 selected=1
             ),
             selectInput(
                 inputId='unit_name',
                 label='Unit Name',
-                # choices=unit_label_available,
-                choices=unit_name_available,
+                choices=unit_label_available,
+                # choices=unit_name_available,
                 selected=1
             )#,
             # sliderInput("bins",

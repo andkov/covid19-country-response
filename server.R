@@ -47,6 +47,8 @@ for(i in seq_along(input_files_oecd_health)){
     file_name_i <- gsub(".rds$","", basename(input_files_oecd_health[i]))
     ls_input_health[[file_name_i]] <- readr::read_rds(input_files_oecd_health[i])
 }
+
+
 # ---- inspect-data -------------------------------------------------------------
 
 # ---- tweak-data --------------------------------------------------------------
@@ -73,13 +75,11 @@ for(i in seq_along(input_files_oecd_health)){
 library(shiny)
 
 # Define server logic required to draw a histogram
-shinyServer(function(input, output) {
-    # ds_country <-
-    #     readr::read_csv(
-    #         config$path_country
-    #     ) %>%
-    #     dplyr::filter(desired)
+shinyServer(function(session, input, output) {
 
+    # observe({
+    #     variable_name <-
+    # })
     output$var_name <- renderText({
         paste("You chose", input$var_name)
     })
@@ -96,15 +96,15 @@ shinyServer(function(input, output) {
     # var_name_slider <- slidersLayout()$var_name
     # unit_name_slider <- slidersLayout()$unit_name
 
-    prep_data_trajectory <- function(ls_oecd, df_covid, n_deaths_first_day = 1, var_name, unit_name){
-    # prep_data_trajectory <- function(ls_oecd, df_covid, n_deaths_first_day = 1, var_label, unit_label){
+    # prep_data_trajectory <- function(ls_oecd, df_covid, n_deaths_first_day = 1, var_name, unit_name){
+    prep_data_trajectory <- function(ls_oecd, df_covid, n_deaths_first_day = 1, var_label_i, unit_label_i){
         # browser()
         var_name <- slidersLayout()$var_name
         unit_name <- slidersLayout()$unit_name
 
         d_covid <- compute_epi_timeline(df_covid, n_deaths_first_day = n_deaths_first_day)#, d_country = ds_country)
-        d_oecd  <- ls_oecd %>% compute_rank(var_name = var_name, unit_name =unit_name)
-        # d_oecd  <- ls_oecd %>% compute_rank(var_label_i = var_name, unit_label_i =unit_name)
+        # d_oecd  <- ls_oecd %>% compute_rank(var_name = var_name, unit_name =unit_name)
+        d_oecd  <- ls_oecd %>% compute_rank(var_label_i = var_name, unit_label_i =unit_name)
         d_out <-   dplyr::left_join(
             d_covid, d_oecd, by = c("country_code" = "COU")
         )
@@ -128,8 +128,10 @@ shinyServer(function(input, output) {
             ls_oecd = ls_input_health$health_resources
             ,df_covid = ds_covid
             ,n_deaths_first_day = 1
-            ,var_name = var_name
-            ,unit_name = unit_name
+            # ,var_name = var_name
+            # ,unit_name = unit_name
+            ,var_label_i = var_name
+            ,unit_label_i = unit_name
         )
         # browser()
 
@@ -177,15 +179,6 @@ shinyServer(function(input, output) {
         # spaghetti_1 <- g
     })
 
-    # output$distPlot <- renderPlot({
-    #
-    #     # generate bins based on input$bins from ui.R
-    #     x    <- faithful[, 2]
-    #     bins <- seq(min(x), max(x), length.out = input$bins + 1)
-    #
-    #     # draw the histogram with the specified number of bins
-    #     hist(x, breaks = bins, col = 'darkgray', border = 'white')
-    #
-    # })
+
 
 })
