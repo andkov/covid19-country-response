@@ -75,6 +75,31 @@ d_measure <- prep_data_trajectory(
   ,unit_name = unit_name
 )
 
+# ----- ranking-graph  ----------------------------
+
+d_measure %>% glimpse()
+
+d_rank <- d_measure %>%
+  dplyr::distinct(country, VAR, UNIT, var_label, unit_label,
+                  value, rank, n_tile)
+
+country_order <- d_rank %>%
+  dplyr::arrange(rank) %>%
+  pull(country)
+
+g <- d_rank %>%
+  dplyr::mutate(
+    country = factor(country,levels = country_order)
+  ) %>%
+  ggplot(aes(x = country, y = value, fill = factor(n_tile)))+
+  geom_col()+
+  geom_text(aes(label = round(value,1) ))+
+  coord_flip()+
+  theme_minimal()
+g
+
+
+
 # ---- basic-table --------------------------------------------------------------
 
 # ---- basic-graph -------------------------------------------------------------

@@ -107,7 +107,8 @@ shinyServer(function(input, output) {
         return(d_out)
     }
 
-    output$spaghetti_1 <- renderPlotly({
+    output$spaghetti_bar_1 <- renderPlotly({
+    # output$spaghetti_1 <- renderPlotly({
     # output$spaghetti_1 <- renderPlot({
         d_measure <- prep_data_trajectory(
             ls_oecd = ls_input_health$health_resources
@@ -118,8 +119,8 @@ shinyServer(function(input, output) {
         )
         # browser()
 
-
-        g <- d_measure %>%
+        # spaghetti 1
+        g1 <- d_measure %>%
             # dplyr::filter(epi_timeline <=30) %>%
             # ggplot(aes(x = epi_timeline, y = n_deaths, color = rank_percentile)) +
             ggplot(aes(x = epi_timeline, y = n_deaths, color = factor(n_tile))) +
@@ -130,7 +131,35 @@ shinyServer(function(input, output) {
             labs(
                 title = paste0(slidersLayout()$var_name," - ", slidersLayout()$unit_name)
             )
-        spaghetti_1 <- plotly::ggplotly(g)
+        spaghetti_1 <- plotly::ggplotly(g1)
+
+        # bar 1
+        d_rank <- d_measure %>%
+            dplyr::distinct(country, VAR, UNIT, var_label, unit_label,
+                            value, rank, n_tile)
+
+        country_order <- d_rank %>%
+            dplyr::arrange(rank) %>%
+            pull(country)
+
+        g2 <- d_rank %>%
+            dplyr::mutate(
+                country = factor(country,levels = country_order)
+            ) %>%
+            ggplot(aes(x = country, y = value, fill = factor(n_tile)))+
+            geom_col()+
+            geom_text(aes(label = round(value,1) ))+
+            coord_flip()+
+            theme_minimal()+
+            labs(
+                x = ""
+                ,y = paste0(slidersLayout()$var_name," - ", slidersLayout()$unit_name)
+            )
+        # g
+        bar_1 <- plotly::ggplotly(g2)
+
+        spaghetti_bar_1 <- plotly::subplot(spaghetti_1, bar_1,nrows = 2)
+
         # spaghetti_1 <- g
     })
 
