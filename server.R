@@ -26,8 +26,8 @@ requireNamespace("DT", quietly=TRUE) # for dynamic tables
 # config <- config::get(config="../../config.yml")
 config <- config::get(config="config.yml")
 source("./scripts/common-functions.R")        # reporting functions and quick views
-source("./scripts/graphing/graph-presets.R") # font and color conventions
-source("./scripts/graphing/graph-support.R") # font and color conventions
+# source("./scripts/graphing/graph-presets.R") # font and color conventions
+# source("./scripts/graphing/graph-support.R") # font and color conventions
 
 # ---- load-data -------------------------------------------------------------
 

@@ -14,7 +14,7 @@ library(plotly)
 shinyUI(fluidPage(
 
     # Application title
-    titlePanel("Old Faithful Geyser Data"),
+    titlePanel("COVID-19 Country Response"),
 
     # Sidebar with a slider input for number of bins
     sidebarLayout(
