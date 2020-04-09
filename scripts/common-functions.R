@@ -72,13 +72,14 @@ get_var_unit_lookup <- function(list_object){
 # dvars_health_resources <- ls_input_health$health_resources %>% get_var_unit_lookup()
 # dvars_health_status <- ls_input_health$health_status %>% get_var_unit_lookup()
 
-compute_rank <- function(list_object, var_name, unit_name, d_country = ds_country){
-# compute_rank <- function(list_object, var_label_i, unit_label_i, d_country = ds_country){
+# compute_rank <- function(list_object, var_name, unit_name, d_country = ds_country){
+compute_rank <- function(list_object, var_label_i, unit_label_i, d_country = ds_country){
   # list_object <- ls_input_health$health_resources
   # var_name <- "HOPITBED"
   # unit_name     <- "RTOINPNB"
   # var_label_i <- "Practising caring personnel"
   # unit_label_i <- "Density per 1 000 population (head counts)"
+
   d_country <-
     readr::read_csv(
       # config$path_country
@@ -88,8 +89,11 @@ compute_rank <- function(list_object, var_name, unit_name, d_country = ds_countr
 
   var_unit <- list_object %>%
     get_var_unit_lookup() %>%
-    dplyr::filter(VAR == var_name, UNIT == unit_name)
-    # dplyr::filter(var_label == var_label_i, unit_label == unit_label_i)
+    # dplyr::filter(VAR == var_name, UNIT == unit_name)
+    dplyr::filter(var_label == var_label_i, unit_label == unit_label_i)
+
+  var_name <- var_unit %>% dplyr::pull(VAR)
+  unit_name <- var_unit %>% dplyr::pull(UNIT)
 
   d_measure <- list_object$data %>%
     dplyr::filter(VAR == var_name, UNIT == unit_name ) %>%
