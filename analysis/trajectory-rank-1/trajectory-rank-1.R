@@ -66,14 +66,52 @@ prep_data_trajectory <- function(ls_oecd, df_covid, n_deaths_first_day = 1, var_
   )
   return(d_out)
 }
-# how to use
-d_measure <- prep_data_trajectory(
-  ls_oecd = ls_input_health$health_resources
-  ,df_covid = ds_covid
-  ,n_deaths_first_day = 1
-  ,var_name = var_name
-  ,unit_name = unit_name
-)
+# # how to use
+# d_measure <- prep_data_trajectory(
+#   ls_oecd = ls_input_health$health_resources
+#   ,df_covid = ds_covid
+#   ,n_deaths_first_day = 1
+#   ,var_name = var_name
+#   ,unit_name = unit_name
+# )
+compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
+  # browser()
+  d_country <-
+    readr::read_csv(
+      # config$path_country
+      "data-public/metadata/oecd/country.csv"
+    ) %>%
+    dplyr::filter(desired)
+
+  d_out <- d %>%
+    # dplyr::select(country_code, date, n_deaths) %>%
+    dplyr::filter(country_code %in% unique(d_country$id)) %>%
+    dplyr::group_by(country_code) %>%
+    dplyr::mutate(
+      # this solution might be vulnerable to cases where some intermediate dates are missed
+      n_deaths_cum = cumsum(n_deaths)
+      ,cutoff = n_deaths_cum > n_deaths_first_day
+      ,epi_timeline = cumsum(cutoff)
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(epi_timeline > 0)
+  return(d_out)
+}
+d_covid <- ds_covid %>% compute_epi_timeline(n_deaths_first_day = 1)
+
+g <- d_covid %>%
+  # dplyr::filter(!country_code %in% c("USA","ITA","FRA","ESP","GBR") ) %>%
+  # ggplot(aes(x = epi_timeline, y = log(n_deaths)))  +
+  ggplot(aes(x = epi_timeline, y = n_deaths))  +
+  geom_line(aes(group = country_code)) +
+  theme_minimal()+
+  # facet_wrap(~n_tile)+
+  # geom_smooth(aes(x = epi_timeline, y = n_deaths, group = 1), inherit.aes=F, method = "loess", color = "gray70") +
+  labs(
+    # title = paste0(var_name," - ", unit_name)
+  )
+g <- ggplotly(g)
+g
 
 # ----- ranking-graph  ----------------------------
 
