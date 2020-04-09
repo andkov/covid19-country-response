@@ -73,10 +73,12 @@ get_var_unit_lookup <- function(list_object){
 # dvars_health_status <- ls_input_health$health_status %>% get_var_unit_lookup()
 
 compute_rank <- function(list_object, var_name, unit_name, d_country = ds_country){
+# compute_rank <- function(list_object, var_label_i, unit_label_i, d_country = ds_country){
   # list_object <- ls_input_health$health_resources
   # var_name <- "HOPITBED"
   # unit_name     <- "RTOINPNB"
-
+  # var_label_i <- "Practising caring personnel"
+  # unit_label_i <- "Density per 1 000 population (head counts)"
   d_country <-
     readr::read_csv(
       # config$path_country
@@ -87,9 +89,11 @@ compute_rank <- function(list_object, var_name, unit_name, d_country = ds_countr
   var_unit <- list_object %>%
     get_var_unit_lookup() %>%
     dplyr::filter(VAR == var_name, UNIT == unit_name)
+    # dplyr::filter(var_label == var_label_i, unit_label == unit_label_i)
 
   d_measure <- list_object$data %>%
     dplyr::filter(VAR == var_name, UNIT == unit_name ) %>%
+    # dplyr::filter(var_label == var_label_i, unit_label == unit_label_i ) %>%
     dplyr::filter(COU %in% (d_country %>% dplyr::filter(desired) %>%  dplyr::pull(id)) ) %>%
     dplyr::group_by(COU) %>%
     dplyr::summarize(
@@ -117,6 +121,7 @@ compute_rank <- function(list_object, var_name, unit_name, d_country = ds_countr
 }
 # How to use
 # d_measure <- ls_input_health$health_resources %>% compute_rank("HOPITBED","RTOINPNB")
+# d_measure <- ls_input_health$health_resources %>% compute_rank("Practising caring personnel","Density per 1 000 population (head counts)")
 
 compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
   # browser()
