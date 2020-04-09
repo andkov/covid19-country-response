@@ -29,6 +29,7 @@ shinyUI(fluidPage(
             selectInput(
                 inputId='unit_name',
                 label='Unit Name',
+                # choices=NULL,
                 choices=unit_label_available,
                 # choices=unit_name_available,
                 selected=1
@@ -46,6 +47,7 @@ shinyUI(fluidPage(
             # plotlyOutput("spaghetti_1")
             plotlyOutput("spaghetti_bar_1")
             # plotOutput("spaghetti_1")
+            # plotOutput("test1")
         )
     )
 ))

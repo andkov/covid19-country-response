@@ -80,15 +80,27 @@ shinyServer(function(session, input, output) {
     # observe({
     #     variable_name <-
     # })
-    output$var_name <- renderText({
-        paste("You chose", input$var_name)
+    # output$var_name <- renderText({
+    #     paste("You chose", input$var_name)
+    # })
+    #
+    # slidersLayout <- reactive({
+    #     return(list(
+    #         var_name = (input$var_name),
+    #         unit_name = (input$unit_name)
+    #     ))
+    # })
+
+    observe({
+        v_var_names <- ls_input_health$health_resources %>% get_var_unit_lookup() %>%
+            dplyr::distinct(var_label) %>% dplyr::pull()
+        updateSelectInput(session,"var_name", "Choose Variable", choices = v_var_names, selected = v_var_names[1])
     })
 
-    slidersLayout <- reactive({
-        return(list(
-            var_name = (input$var_name),
-            unit_name = (input$unit_name)
-        ))
+    observe({
+        v_unit_names <- ls_input_health$health_resources %>% get_var_unit_lookup() %>%
+            dplyr::filter(var_label == input$var_name) %>% dplyr::distinct(unit_label) %>% dplyr::pull()
+        updateSelectInput(session,"unit_name", "Choose Metric", choices = v_unit_names, selected = v_unit_names[1])
     })
 
     # var_name    <- c("HOPITBED", "HOPITBED2")[1]
@@ -99,9 +111,10 @@ shinyServer(function(session, input, output) {
     # prep_data_trajectory <- function(ls_oecd, df_covid, n_deaths_first_day = 1, var_name, unit_name){
     prep_data_trajectory <- function(ls_oecd, df_covid, n_deaths_first_day = 1, var_label_i, unit_label_i){
         # browser()
-        var_name <- slidersLayout()$var_name
-        unit_name <- slidersLayout()$unit_name
-
+        # var_name <- slidersLayout()$var_name
+        # unit_name <- slidersLayout()$unit_name
+        var_name <- input$var_name
+        unit_name <- input$unit_name
         d_covid <- compute_epi_timeline(df_covid, n_deaths_first_day = n_deaths_first_day)#, d_country = ds_country)
         # d_oecd  <- ls_oecd %>% compute_rank(var_name = var_name, unit_name =unit_name)
         d_oecd  <- ls_oecd %>% compute_rank(var_label_i = var_name, unit_label_i =unit_name)
@@ -121,9 +134,41 @@ shinyServer(function(session, input, output) {
     # creating dynamic inputs:
     # https://mastering-shiny.org/action-dynamic.html
 
+    output$test1 <- renderPlot({
+
+        var_name <- input$var_name
+        unit_name <- input$unit_name
+        # var_name <- slidersLayout()$var_name
+        # unit_name <- slidersLayout()$unit_name
+
+        d_measure <- prep_data_trajectory(
+            ls_oecd = ls_input_health$health_resources
+            ,df_covid = ds_covid
+            ,n_deaths_first_day = 1
+            # ,var_name = var_name
+            # ,unit_name = unit_name
+            ,var_label_i = var_name
+            ,unit_label_i = unit_name
+        )
+
+        # title_top <- paste0(var_name, "---", unit_name)
+        d_measure %>%
+            dplyr::filter(var_label == var_name, unit_label == unit_name) %>%
+            ggplot(aes(x = country, y = value))+
+            geom_col()+
+            labs(
+                title = paste0(var_name," - ", unit_name)
+            )
+
+    })
+
     output$spaghetti_bar_1 <- renderPlotly({
     # output$spaghetti_1 <- renderPlotly({
     # output$spaghetti_1 <- renderPlot({
+
+        var_name <- input$var_name
+        unit_name <- input$unit_name
+
         d_measure <- prep_data_trajectory(
             ls_oecd = ls_input_health$health_resources
             ,df_covid = ds_covid
@@ -145,7 +190,7 @@ shinyServer(function(session, input, output) {
             facet_wrap(~n_tile)+
             geom_smooth(aes(x = epi_timeline, y = n_deaths, group = 1), inherit.aes=F, method = "loess", color = "gray70") +
             labs(
-                title = paste0(slidersLayout()$var_name," - ", slidersLayout()$unit_name)
+                title = paste0(var_name," - ", unit_name)
             )
         spaghetti_1 <- plotly::ggplotly(g1)
 
@@ -169,7 +214,7 @@ shinyServer(function(session, input, output) {
             theme_minimal()+
             labs(
                 x = ""
-                ,y = paste0(slidersLayout()$var_name," - ", slidersLayout()$unit_name)
+                ,y = paste0(var_name," - ", unit_name)
             )
         # g
         bar_1 <- plotly::ggplotly(g2)
