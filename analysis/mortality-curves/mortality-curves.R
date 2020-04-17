@@ -1,3 +1,6 @@
+# run ellis to get the data, disable after first use
+# base:::source("./manipulation/ellis-covid.R")
+
 rm(list=ls(all=TRUE)) #Clear the memory
 cat("\f") # clear console when working in RStudio
 
@@ -18,6 +21,7 @@ requireNamespace("DT", quietly=TRUE) # for dynamic tables
 config <- config::get()
 
 # ---- load-data ------------------------------------------------
+# list of countries in the focus
 ds_country <-
   readr::read_csv(
     config$path_country
@@ -25,21 +29,25 @@ ds_country <-
   dplyr::filter(desired)
 
 # COVID
-# path_save <- paste0("./data-unshared/derived/ocdc-",Sys.Date(),".csv")
 ds_covid <- readr::read_csv(config$path_input_covid)
 ds_covid %>% glimpse()
 
 # ---- inspect-data ------------------------------------------
 
-# ---- tweak-data -----------------------------------------------
-
+# ---- define-functions --------------------------------------
+# computes cumulative number of deaths since the first death
 compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
   # browser()
-
+  # d_country <-
+  #   readr::read_csv(
+  #     # config$path_country
+  #     "data-public/metadata/oecd/country.csv"
+  #   ) %>%
+  #   dplyr::filter(desired)
 
   d_out <- d %>%
     # dplyr::select(country_code, date, n_deaths) %>%
-    dplyr::filter(country_code %in% unique(d_country$id)) %>%
+    # dplyr::filter(country_code %in% unique(d_country$id)) %>%
     dplyr::group_by(country_code) %>%
     dplyr::mutate(
       # this solution might be vulnerable to cases where some intermediate dates are missed
@@ -51,9 +59,30 @@ compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
     dplyr::filter(epi_timeline > 0)
   return(d_out)
 }
-d_covid <- ds_covid %>% compute_epi_timeline(n_deaths_first_day = 1)
+# d_covid <- ds_covid %>%
+#   compute_epi_timeline(n_deaths_first_day = 1)
+#
 
+
+# ---- tweak-data -----------------------------------------------
+# compute the epidemiological trajectory for each country
+ds <- ds_covid %>% compute_epi_timeline(n_deaths_first_day = 0)
+ds %>% glimpse()
+# ---- basic-questions ----------------------
+ds %>%
+  dplyr::group_by(country) %>%
+  dplyr::summarize(
+    days_since_first_death = max(epi_timeline, na.rm =T)
+    ,total_deaths = sum(n_deaths, na.rm = T)
+    ,n_pop = unique(n_population_2018)
+    ,deaths_per_1m = total_deaths/n_pop*1000000
+  ) %>%
+  dplyr::select(-n_pop) %>%
+  dplyr::arrange(desc(deaths_per_1m))
+
+# ---- trajectory-1 -------------
 g <- d_covid %>%
+  # dplyr::filter(country_code == "CHN") %>%
   # dplyr::filter(!country_code %in% c("USA","ITA","FRA","ESP","GBR") ) %>%
   # ggplot(aes(x = epi_timeline, y = log(n_deaths)))  +
   ggplot(aes(x = epi_timeline, y = n_deaths))  +
@@ -64,8 +93,8 @@ g <- d_covid %>%
   labs(
     # title = paste0(var_name," - ", unit_name)
   )
-g <- ggplotly(g)
-g
+gp <- plotly::ggplotly(g)
+gp
 
 
 # Sonata form report structure
