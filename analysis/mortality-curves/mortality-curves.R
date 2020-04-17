@@ -19,7 +19,8 @@ requireNamespace("DT", quietly=TRUE) # for dynamic tables
 
 # ---- load-sources ----------------------------------------------
 config <- config::get()
-
+#set default ggplot theme
+ggplot2::theme_set(ggplot2::theme_bw())
 # ---- load-data ------------------------------------------------
 # list of countries in the focus
 ds_country <-
@@ -66,10 +67,17 @@ compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
 
 # ---- tweak-data -----------------------------------------------
 # compute the epidemiological trajectory for each country
+ds_covid <- ds_covid %>%
+  dplyr::filter(
+    country != c(
+      "Cases_on_an_international_conveyance_Japan"
+    )
+  )
 ds <- ds_covid %>% compute_epi_timeline(n_deaths_first_day = 0)
 ds %>% glimpse()
 # ---- basic-questions ----------------------
-ds %>%
+d <- ds_covid %>%
+  compute_epi_timeline(n_deaths_first_day = 0) %>%
   dplyr::group_by(country) %>%
   dplyr::summarize(
     days_since_first_death = max(epi_timeline, na.rm =T)
@@ -80,6 +88,22 @@ ds %>%
   dplyr::select(-n_pop) %>%
   dplyr::arrange(desc(deaths_per_1m))
 
+g1 <- d %>%
+  dplyr::filter(country != "San_Marino") %>%
+  ggplot(aes(
+    group = country
+    , x = total_deaths
+    # , x = deaths_per_1m
+    # , x = days_since_first_death
+    # , y = total_deaths
+    , y = deaths_per_1m
+    # , y = total_deaths
+    , size = days_since_first_death
+    # , size = deaths_per_1m
+    ))+
+  geom_point(shape = 21, )
+g1 <- plotly::ggplotly(g1)
+g1
 # ---- trajectory-1 -------------
 g <- d_covid %>%
   # dplyr::filter(country_code == "CHN") %>%
