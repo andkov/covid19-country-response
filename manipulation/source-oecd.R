@@ -20,12 +20,79 @@ config <- config::get()
 # ---- load-data ---------------------------------------------------------------
 dataset_list <- OECD::get_datasets()
 search_dataset("health", data = dataset_list)
-search_dataset("population", data = dataset_list)
+search_dataset("ethn", data = dataset_list)
+search_dataset("Educational attainment", data = dataset_list) %>% print(n = nrow(.))
+
+# ---- define-query-function -------------------
+
+get_oecd_data <- function(
+  url_dsmx
+  ,dataset_name
+  ,list_label
+){
+  dstruc <- OECD::get_data_structure(dataset_name)
+  data <- rsdmx::readSDMX(url_dsmx) %>% as.data.frame()
+  ls_object <- list(
+    "name" = dataset_name
+    ,"structure" = dstruc
+    ,"url" = url_dsmx
+    ,"data" = data
+  )
+  str(dstruc, max.level = 1) %>% print()
+  pryr::object_size(ls_object) %>% print()
+  readr::write_rds(ls_object, fs::path(config$path_oecd_out, paste0(list_label,".rds")))
+}
+
+# ALFS Summary tables
+"https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/ALFS_SUMTAB/AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EA19+EU28+G-7+OECD+BRA+COL+CRI+RUS.YG+YGTT07L1_ST+YGTT07L1_IXOB+YGFE07L1_ST+YGMA07L1_ST+YGTT08L1_ST+YGTT08L1_IXOB+YGFE08L1_ST+YGFE08PE_ST+YGMA08L1_ST+YGMA08PE_ST+YGTT09L1_ST+YGTT09L1_IXOB+YGTT09PE_ST+YGTT10L1_ST+YGTT10L1_IXOB+YGTT10PE_ST+YGTT11L1_ST+YGTT11L1_IXOB+YGTT11PE_ST+YGTT22L1_ST+YGTT22P1_ST+YGFE22P1_ST+YGMA22P1_ST+YGTT06L1_ST+YGFE06L1_ST+YGMA06L1_ST+YGTT06PC_ST+YGFE06P2_ST+YGMA06P2_ST.A/all?startTime=2014&endTime=2018" %>%
+  get_oecd_data("ALFS_SUMTAB", "employment")
+
+
+# Immigrants by citizenship and age
+"https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/DIOC_CITIZEN_AGE/AFRI+ASIA+EURO+NOAM+OCEA+SCAC+OTHER+ALL_COUB.1+0+99+ALL_FBORN.1+2+3_4+99+ALL_EDU.1_2+3_10+11_12+99+ALL_AGE.1+2+99+ALL_NAT.AUS+AUT+BEL+CAN+CZE+DNK+FIN+FRA+GRC+HUN+IRL+ITA+JPN+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+ESP+SWE+CHE+TUR+GBR+USA+OTO/all?" %>%
+  get_oecd_data("DIOC_CITIZEN_AGE", "immigration")
+
+# Education attainment of 25 - 65 year olds
+"https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/EAG_NEAC/AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+OAVG+G20+NMEC+ARG+BRA+CHN+COL+CRI+IND+IDN+RUS+SAU+ZAF.L0T2+L0+L1_T_SC3T4+L2_T_SC2+L2_T_SC3T4+L3_T_SC2+L3T4+L3+L4+L5T8+L5+L6+L7+L8.T+F+M.Y25T64.T.VALUE+SE.NEAC_SHARE_EA/all?startTime=9999&endTime=9999" %>%
+  get_oecd_data("EAG_NEAC", "educational_attainment")
+
+
+### Contextual Predisposing Characteristics ####
+
+# Family
+"https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/FAMILY/AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+NMEC+BRA+BGR+CHN+COL+CRI+HRV+CYP+IND+IDN+MLT+ROU+RUS+ZAF.TOTAL+MALE+FEMALE.D1+FAM1+FAM2+FAM3+FAM4+FAM4A+FAM4B+FAM5+FAM5A+FAM5B+FAM5C+D2+FAM6+FAM6A+FAM6B+FAM7+FAM8+FAM8A+FAM8B+FAM8C+FAM9+FAM9A+FAM9B+FAM9C+FAM10+FAM10A+FAM10B+FAM10C+D3+FAM11+FAM11A+FAM11B+FAM11C+FAM11D+FAM12+FAM12A+FAM12B+FAM13+FAM14+FAM15+FAM15A+FAM15B+D4+FAM16+FAM16A+FAM16B+FAM17+FAM18+FAM18A+FAM18B+FAM18C+FAM19+FAM19A+FAM19B+FAM19C+FAM19D+FAM20/all?startTime=2014&endTime=2018" %>%
+  get_oecd_data("FAMILY","family")
+
+
+# Population
+"https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/HISTPOP/AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EU28+G20+OECD+WLD+NMEC+ARG+BRA+BGR+CHN+COL+CRI+HRV+CYP+IND+IDN+MLT+ROU+RUS+SAU+SGP+ZAF.W+M+T.TOTAL+0_4+05_9+10_14+15_19+20_24+25_29+30_34+35_39+40_44+45_49+50_54+55_59+60_64+65_69+70_74+75_79+80_84+85_OVER+50_OVER+LESS_20+15-64+20-64+65_OVER+65_OVER_SHARE+LESS_15_SHARE+15-24_SHARE+OAD15-64+TOTD20-64+15-64_SHARE+POP_GR/all?startTime=2008&endTime=2018" %>%
+  get_oecd_data("HISTPOP","population")
+
+# Population projection
+"https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/POPPROJ/AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EU28+G20+OECD+WLD+NMEC+ARG+BRA+BGR+CHN+COL+CRI+HRV+CYP+IND+IDN+MLT+ROU+RUS+SAU+SGP+ZAF.W+M+T.TOTAL+0_4+05_9+10_14+15_19+20_24+25_29+30_34+35_39+40_44+45_49+50_54+55_59+60_64+65_69+70_74+75_79+80_84+85_OVER+50_OVER+LESS_20+15-64+20-64+65_OVER+65_OVER_SHARE+LESS_15_SHARE+15-24_SHARE+OAD15-64+TOTD20-64/all?startTime=2018&endTime=2020" %>%
+  get_oecd_data("POPPROJ","population_projections")
 
 # ---- define-queries ---------------------
 
 if( !fs::dir_exists(config$path_oecd_health_chapter) )
   fs::dir_create(config$path_oecd_health_chapter)
+
+# Population
+dataset <- "HISTPOP"
+dstruc <- OECD::get_data_structure(dataset)
+str(dstruc, max.level = 1)
+query_url_SDMX <- "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/HISTPOP/AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EU28+G20+OECD+WLD+NMEC+ARG+BRA+BGR+CHN+COL+CRI+HRV+CYP+IND+IDN+MLT+ROU+RUS+SAU+SGP+ZAF.W+M+T.TOTAL+0_4+05_9+10_14+15_19+20_24+25_29+30_34+35_39+40_44+45_49+50_54+55_59+60_64+65_69+70_74+75_79+80_84+85_OVER+50_OVER+LESS_20+15-64+20-64+65_OVER+65_OVER_SHARE+LESS_15_SHARE+15-24_SHARE+OAD15-64+TOTD20-64+15-64_SHARE+POP_GR/all?startTime=2008&endTime=2018"
+data <- rsdmx::readSDMX(query_url_SDMX) %>% as.data.frame()
+ls_population <- list(
+  "name" = dataset
+  ,"structure" = dstruc
+  ,"url" = query_url_SDMX
+  ,"data" = data
+)
+pryr::object_size(ls_population)
+readr::write_rds(ls_population, fs::path(config$path_oecd_health_chapter, "population.rds"))
+
+
 
 # Population
 dataset <- "HISTPOP"
