@@ -20,11 +20,29 @@ config <- config::get()
 # ---- load-data ---------------------------------------------------------------
 dataset_list <- OECD::get_datasets()
 search_dataset("health", data = dataset_list)
+search_dataset("population", data = dataset_list)
 
 # ---- define-queries ---------------------
 
 if( !fs::dir_exists(config$path_oecd_health_chapter) )
   fs::dir_create(config$path_oecd_health_chapter)
+
+# Population
+dataset <- "HISTPOP"
+dstruc <- OECD::get_data_structure(dataset)
+str(dstruc, max.level = 1)
+query_url_SDMX <- "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/HISTPOP/AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EU28+G20+OECD+WLD+NMEC+ARG+BRA+BGR+CHN+COL+CRI+HRV+CYP+IND+IDN+MLT+ROU+RUS+SAU+SGP+ZAF.W+M+T.TOTAL+0_4+05_9+10_14+15_19+20_24+25_29+30_34+35_39+40_44+45_49+50_54+55_59+60_64+65_69+70_74+75_79+80_84+85_OVER+50_OVER+LESS_20+15-64+20-64+65_OVER+65_OVER_SHARE+LESS_15_SHARE+15-24_SHARE+OAD15-64+TOTD20-64+15-64_SHARE+POP_GR/all?startTime=2008&endTime=2018"
+data <- rsdmx::readSDMX(query_url_SDMX) %>% as.data.frame()
+ls_population <- list(
+  "name" = dataset
+  ,"structure" = dstruc
+  ,"url" = query_url_SDMX
+  ,"data" = data
+)
+pryr::object_size(ls_population)
+readr::write_rds(ls_population, fs::path(config$path_oecd_health_chapter, "population.rds"))
+
+
 
 # Health Care Resources
 dataset <- "HEALTH_REAC"
