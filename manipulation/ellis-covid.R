@@ -52,7 +52,7 @@ ds_country <-
   )
 # sources can be joined by the three letter country code
 # ---- tweak-data -----------------------
-names(ds_covid) <- c("date", "day", "month", "year", "n_cases", "n_deaths", "country", "geo_id", "country_code","n_population_2018")
+names(ds_covid) <- c("date", "day", "month", "year", "n_cases", "n_deaths", "country", "geo_id", "country_code","n_population_2018", "continent")
 ds_covid <- ds_covid %>%
   dplyr::mutate(
     date = lubridate::dmy(date)
