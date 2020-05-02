@@ -5,6 +5,8 @@ cat("\f") # clear console when working in RStudio
 # ---- load-sources ------------------------------------------------------------
 # Call `base::source()` on any repo file that defines functions needed below.  Ideally, no real operations are performed.
 source("./scripts/common-functions.R")
+# dvars_health_resources <- ls_input_health$health_resources %>% get_var_unit_lookup()
+# d_covid <- ds_covid %>% compute_epi_timeline(n_deaths_first_day = 1)
 # ---- load-packages -----------------------------------------------------------
 # Attach these packages so their functions don't need to be qualified: http://r-pkgs.had.co.nz/namespace.html#search-path
 library(magrittr) #Pipes
@@ -21,6 +23,9 @@ path_folder_oecd_health <- "./data-unshared/raw/oecd/health/"
 
 
 # ---- load-data ---------------------------------------------------------------
+ds_covid <- readr::read_csv(config$path_input_covid)
+
+
 input_files_oecd_health <- list.files(path_folder_oecd_health, pattern = ".rds$",  full.names = T)
 file_names <- gsub(".rds$","", basename(input_files_oecd_health))
 
@@ -73,7 +78,53 @@ ds0 <- ls$data %>% tibble::as_tibble() %>%
 ds0 %>% distinct(IND, UNIT, SEX) %>% arrange(IND) %>% print(n=Inf)
 
 
+# ---- employment  --------------------------
+ls <- readr::read_rds(paste0(config$path_oecd_out,"employment.rds"))
+list_object <- ls
+ds0 <- ls$data %>% tibble::as_tibble()
+lsmeta <- ls$structure
 
+ds0 %>% glimpse()
+lsmeta  %>% str(1)
+lsmeta$SUBJECT
+lsmeta$UNIT
+lsmeta$OBS_STATUS
+#
+ds0 %>% group_by(SUBJECT,FREQUENCY, TIME_FORMAT, POWERCODE, OBS_STATUS) %>% count()
+ds0 %>% group_by(SUBJECT,OBS_STATUS) %>% count()
+lsmeta$OBS_STATUS
+
+ds1 <- ds0 %>%
+  dplyr::group_by(LOCATION, SUBJECT) %>%
+  dplyr::summarize(
+    min_year = min(obsTime,na.rm=T)
+    ,max_year = max(obsTime,na.rm=T)
+    # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+    ,mean = mean(obsValue, na.rm = T)
+    ,median = median(obsValue, na.rm = T)
+    ,value = sum(mean, median)/2
+  ) %>%
+  dplyr::left_join(lsmeta$SUBJECT, by = c("SUBJECT"="id" ) )
+ds1 %>% glimpse()
+ds2 <- ds_covid %>%
+  compute_epi_timeline(n_deaths_first_day = 0) %>%
+  filter(epi_timeline == 30) %>%
+  dplyr::right_join()
+
+
+
+g1 <- ds1 %>%
+  ggplot(aes(x=value, y = n_deaths_per_1m, label = country_code))+
+  geom_point()+
+  geom_smooth(method = "lm", se = F)+
+  facet_wrap(~IND, scales = "free")+
+  ggpmisc::stat_poly_eq(
+    formula = y ~ + x
+    ,aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~"))
+    ,parse = TRUE
+    , vjust = 3
+  )
+g1
 
 # ---- define-functions ----------------------------------
 # function to get a list of unique variables and units of measurement along with descriptive labels
