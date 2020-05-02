@@ -40,6 +40,41 @@ ds_country <-
   ) %>%
   dplyr::filter(desired)
 
+# ----- family ----------------------
+
+ls <- readr::read_rds(paste0(config$path_oecd_out,"family.rds"))
+list_object <- ls
+ds_meta <-  list_object$data %>% dplyr::distinct(IND,UNIT) %>% tibble::as_tibble()
+ds_meta <- ds_meta %>%
+  dplyr::left_join(list_object$structure[["IND"]], by = c("IND" = "id")) %>%
+  dplyr::rename(var_label = label) %>%
+  dplyr::left_join(list_object$structure$UNIT, by = c("UNIT" = "id")) %>%
+  dplyr::rename(unit_label = label) %>%
+  # dplyr::rename( VAR = IND ) %>%
+  dplyr::arrange(IND,UNIT)
+# d_var_unit %>% neat_DT()
+ds_meta %>% glimpse()
+# divorce - FAM4B
+# marriage - FAM4A
+ds0 <- ls$data %>% tibble::as_tibble() %>%
+  # filter(IND %in% c("FAM4A","FAM4B")) %>%
+  filter(COU %in% (ds_country %>% pull(id)) ) %>%
+  dplyr::group_by(COU, IND, SEX) %>%
+  dplyr::summarize(
+    min_year = min(obsTime,na.rm=T)
+    ,max_year = max(obsTime,na.rm=T)
+    # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+    ,mean = mean(obsValue, na.rm = T)
+    ,median = median(obsValue, na.rm = T)
+    ,value = sum(mean, median)/2
+  ) %>%
+  dplyr::left_join(ds_meta, by = "IND")
+
+ds0 %>% distinct(IND, UNIT, SEX) %>% arrange(IND) %>% print(n=Inf)
+
+
+
+
 # ---- define-functions ----------------------------------
 # function to get a list of unique variables and units of measurement along with descriptive labels
 # get_var_unit_lookup <- function(list_object){
