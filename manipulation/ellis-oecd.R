@@ -132,6 +132,41 @@ g1 <- ds2 %>%
   )
 g1
 
+# ----- immigration -----------------
+# Immigrants by citizenship and age
+ls <- readr::read_rds(paste0(config$path_oecd_out,"immigration.rds"))
+list_object <- ls
+ds0 <- ls$data %>% tibble::as_tibble()
+lsmeta <- ls$structure
+
+ds0 %>% glimpse()
+ds0 %>% head()
+lsmeta  %>% str(1)
+lsmeta$VAR_DESC
+lsmeta$COUB
+lsmeta$FBORN
+lsmeta$EDU
+lsmeta$AGE
+lsmeta$NAT
+lsmeta$OBS_STATUS
+#
+ds1 <- ds0 %>%
+  dplyr::mutate(
+    FBORN  = factor(FBORN, levels = lsmeta$FBORN$id, labels = lsmeta$FBORN$label)
+    ,EDU   = factor(EDU, levels = lsmeta$EDU$id, labels = lsmeta$EDU$label)
+    ,AGE   = factor(AGE, levels = lsmeta$AGE$id, labels = lsmeta$AGE$label)
+    ,NAT   = factor(NAT, levels = lsmeta$NAT$id, labels = lsmeta$NAT$label)
+  )
+# maybe too old ( data from 2000, only 15yo and older)
+ds1 %>%
+  filter(
+    COU   == "AUT",
+    FBORN == "All places of birth",
+    EDU   == "All levels of education",
+    NAT   == "All citizenships",
+    AGE   == "All ages"
+  )
+
 
 
 # ---- define-functions ----------------------------------
