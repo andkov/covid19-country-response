@@ -19,24 +19,25 @@ library(rsdmx)
 # ---- declare-globals ---------------------------------------------------------
 config <- config::get()
 
-path_folder_oecd_health <- "./data-unshared/raw/oecd/health/"
+# path_folder_oecd_health <- "./data-unshared/raw/oecd/health/"
 
 
 # ---- load-data ---------------------------------------------------------------
-ds_covid <- readr::read_csv(config$path_input_covid)
-
-
-input_files_oecd_health <- list.files(path_folder_oecd_health, pattern = ".rds$",  full.names = T)
-file_names <- gsub(".rds$","", basename(input_files_oecd_health))
-
-if (length(input_files_oecd_health) == 0L)
-  stop("No rds files were found in `", path_folder_oecd_health, "`.")
-
-ls_input_health <- list()
-for(i in seq_along(input_files_oecd_health)){
-  file_name_i <- gsub(".rds$","", basename(input_files_oecd_health[i]))
-  ls_input_health[[file_name_i]] <- readr::read_rds(input_files_oecd_health[i])
-}
+ds_covid <- readr::read_csv(config$path_input_covid) %>%
+  compute_epi_timeline()
+ds_covid %>% glimpse()
+#
+# input_files_oecd_health <- list.files(path_folder_oecd_health, pattern = ".rds$",  full.names = T)
+# file_names <- gsub(".rds$","", basename(input_files_oecd_health))
+#
+# if (length(input_files_oecd_health) == 0L)
+#   stop("No rds files were found in `", path_folder_oecd_health, "`.")
+#
+# ls_input_health <- list()
+# for(i in seq_along(input_files_oecd_health)){
+#   file_name_i <- gsub(".rds$","", basename(input_files_oecd_health[i]))
+#   ls_input_health[[file_name_i]] <- readr::read_rds(input_files_oecd_health[i])
+# }
 
 # what countries should be in focus?
 ds_country <-
@@ -77,6 +78,7 @@ ds0 <- ls$data %>% tibble::as_tibble() %>%
 
 ds0 %>% distinct(IND, UNIT, SEX) %>% arrange(IND) %>% print(n=Inf)
 
+ds0 %>% glimpse()
 
 # ---- employment  --------------------------
 ls <- readr::read_rds(paste0(config$path_oecd_out,"employment.rds"))
@@ -106,18 +108,22 @@ ds1 <- ds0 %>%
   ) %>%
   dplyr::left_join(lsmeta$SUBJECT, by = c("SUBJECT"="id" ) )
 ds1 %>% glimpse()
-ds2 <- ds_covid %>%
-  compute_epi_timeline(n_deaths_first_day = 0) %>%
+
+
+ds2 <- readr::read_csv(config$path_input_covid) %>%
+  compute_epi_timeline() %>%
+  filter(country_code %in% (ds1 %>% distinct("LOCATION") %>% pull()) ) %>%
   filter(epi_timeline == 30) %>%
-  dplyr::right_join()
+    dplyr::right_join(ds1, by = c("country_code" = "LOCATION"))
+ds2 %>% glimpse()
+ds2 %>% distinct(label) %>% print(n = Inf)
 
-
-
-g1 <- ds1 %>%
-  ggplot(aes(x=value, y = n_deaths_per_1m, label = country_code))+
-  geom_point()+
+g1 <- ds2 %>%
+  ggplot(aes(x=value, y = n_deaths_cum, label = country_code))+
+  # geom_point()+
+  geom_text(aes(label = geo_id))+
   geom_smooth(method = "lm", se = F)+
-  facet_wrap(~IND, scales = "free")+
+  facet_wrap(~label, scales = "free")+
   ggpmisc::stat_poly_eq(
     formula = y ~ + x
     ,aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~"))
@@ -125,6 +131,8 @@ g1 <- ds1 %>%
     , vjust = 3
   )
 g1
+
+
 
 # ---- define-functions ----------------------------------
 # function to get a list of unique variables and units of measurement along with descriptive labels
