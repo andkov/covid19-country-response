@@ -59,7 +59,7 @@ ds_covid <- ds_covid %>%
   ) %>%
   dplyr::arrange(country_code, date)
 
-readr::write_csv(ds_covid, config$path_input_covid) # Overwrite the download (temp hack)
+readr::write_csv(ds_covid, config$path_input_covid)
 
 ds_covid <-  ds_covid %>%
   dplyr::filter(country_code %in% unique(ds_country$id))
