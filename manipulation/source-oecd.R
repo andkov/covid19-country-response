@@ -49,6 +49,8 @@ get_oecd_data <- function(
 
 
 # Immigrants by citizenship and age
+# Demography and Population --> Migration Statistics --> DIOC --> Immigrants by citizenship and age
+# This database contains information on several demographic and labour market characteristics of the population of 28 OECD countries around the year 2000, by country of birth. (maybe too old)
 "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/DIOC_CITIZEN_AGE/AFRI+ASIA+EURO+NOAM+OCEA+SCAC+OTHER+ALL_COUB.1+0+99+ALL_FBORN.1+2+3_4+99+ALL_EDU.1_2+3_10+11_12+99+ALL_AGE.1+2+99+ALL_NAT.AUS+AUT+BEL+CAN+CZE+DNK+FIN+FRA+GRC+HUN+IRL+ITA+JPN+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+ESP+SWE+CHE+TUR+GBR+USA+OTO/all?" %>%
   get_oecd_data("DIOC_CITIZEN_AGE", "immigration")
 
