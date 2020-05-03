@@ -46,13 +46,12 @@ compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
     dplyr::filter(desired)
 
   d_out <- d %>%
-    # dplyr::select(country_code, date, n_deaths) %>%
     dplyr::filter(country_code %in% unique(d_country$id)) %>%
     dplyr::group_by(country_code) %>%
     dplyr::mutate(
       # this solution might be vulnerable to cases where some intermediate dates are missed
-      n_deaths_cum = cumsum(n_deaths)
-      ,cutoff = n_deaths_cum > n_deaths_first_day
+      n_deaths_cum  = cumsum(n_deaths)
+      ,cutoff       = n_deaths_cum > n_deaths_first_day
       ,epi_timeline = cumsum(cutoff)
     ) %>%
     dplyr::ungroup() %>%
@@ -63,7 +62,7 @@ compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
   return(d_out)
 }
 # how to use
-# d_covid <- ds_covid %>% compute_epi_timeline(n_deaths_first_day = 1)
+d_covid <- ds_covid %>% compute_epi_timeline(n_deaths_first_day = 1)
 
 
 g <- d_covid %>%
