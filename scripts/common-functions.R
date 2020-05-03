@@ -129,11 +129,11 @@ compute_rank <- function(list_object, var_label_i, unit_label_i, d_country = ds_
 
 compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
   # browser()
+  d <- ds_covid
+  n_deaths_first_day = 1
+
   d_country <-
-    readr::read_csv(
-      # config$path_country
-      "data-public/metadata/oecd/country.csv"
-    ) %>%
+    readr::read_csv(config$path_country) %>%
     dplyr::filter(desired)
 
   d_out <- d %>%
@@ -147,7 +147,10 @@ compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
       ,epi_timeline = cumsum(cutoff)
     ) %>%
     dplyr::ungroup() %>%
-    dplyr::filter(epi_timeline > 0)
+    dplyr::filter(epi_timeline > 0) %>%
+    dplyr::mutate(
+      time_since_exodus = date - lubridate::date("2020-01-13")
+    )
   return(d_out)
 }
 # how to use
