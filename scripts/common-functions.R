@@ -129,7 +129,7 @@ compute_rank <- function(list_object, var_label_i, unit_label_i, d_country = ds_
 
 compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
   # browser()
-  d <- ds_covid
+  # d <- ds_covid
   n_deaths_first_day = 1
 
   d_country <-
@@ -142,7 +142,7 @@ compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
     dplyr::mutate(
       # this solution might be vulnerable to cases where some intermediate dates are missed
       n_deaths_cum  = cumsum(n_deaths)
-      ,cutoff       = n_deaths_cum > n_deaths_first_day
+      ,cutoff       = n_deaths_cum >= n_deaths_first_day
       ,epi_timeline = cumsum(cutoff)
     ) %>%
     dplyr::ungroup() %>%
