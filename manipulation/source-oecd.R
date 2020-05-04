@@ -55,6 +55,8 @@ get_oecd_data <- function(
   get_oecd_data("DIOC_CITIZEN_AGE", "immigration")
 
 # Education attainment of 25 - 65 year olds
+# Education and Training --> Education at a Glance --> Educational attainment and outcomes -->
+# Educational attainment and labour-force status --> Educational attainment and duration of employment
 "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/EAG_NEAC/AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+OAVG+G20+NMEC+ARG+BRA+CHN+COL+CRI+IND+IDN+RUS+SAU+ZAF.L0T2+L0+L1_T_SC3T4+L2_T_SC2+L2_T_SC3T4+L3_T_SC2+L3T4+L3+L4+L5T8+L5+L6+L7+L8.T+F+M.Y25T64.T.VALUE+SE.NEAC_SHARE_EA/all?startTime=9999&endTime=9999" %>%
   get_oecd_data("EAG_NEAC", "educational_attainment")
 
