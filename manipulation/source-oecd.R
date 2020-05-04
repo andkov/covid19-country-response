@@ -33,10 +33,10 @@ get_oecd_data <- function(
   dstruc <- OECD::get_data_structure(dataset_name)
   data <- rsdmx::readSDMX(url_dsmx) %>% as.data.frame()
   ls_object <- list(
-    "name" = dataset_name
+    "name"       = dataset_name
     ,"structure" = dstruc
-    ,"url" = url_dsmx
-    ,"data" = data
+    ,"url"       = url_dsmx
+    ,"data"      = data
   )
   str(dstruc, max.level = 1) %>% print()
   pryr::object_size(ls_object) %>% print()
@@ -64,24 +64,37 @@ get_oecd_data <- function(
 ### Contextual Predisposing Characteristics ####
 
 # Family
+# Social Protection and Well-Being --> Family --> Familty Database
 "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/FAMILY/AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+NMEC+BRA+BGR+CHN+COL+CRI+HRV+CYP+IND+IDN+MLT+ROU+RUS+ZAF.TOTAL+MALE+FEMALE.D1+FAM1+FAM2+FAM3+FAM4+FAM4A+FAM4B+FAM5+FAM5A+FAM5B+FAM5C+D2+FAM6+FAM6A+FAM6B+FAM7+FAM8+FAM8A+FAM8B+FAM8C+FAM9+FAM9A+FAM9B+FAM9C+FAM10+FAM10A+FAM10B+FAM10C+D3+FAM11+FAM11A+FAM11B+FAM11C+FAM11D+FAM12+FAM12A+FAM12B+FAM13+FAM14+FAM15+FAM15A+FAM15B+D4+FAM16+FAM16A+FAM16B+FAM17+FAM18+FAM18A+FAM18B+FAM18C+FAM19+FAM19A+FAM19B+FAM19C+FAM19D+FAM20/all?startTime=2014&endTime=2018" %>%
   get_oecd_data("FAMILY","family")
 
 
 # Population
+# Demography and Population --> Population Statistics --> Historical Population Data
 "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/HISTPOP/AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EU28+G20+OECD+WLD+NMEC+ARG+BRA+BGR+CHN+COL+CRI+HRV+CYP+IND+IDN+MLT+ROU+RUS+SAU+SGP+ZAF.W+M+T.TOTAL+0_4+05_9+10_14+15_19+20_24+25_29+30_34+35_39+40_44+45_49+50_54+55_59+60_64+65_69+70_74+75_79+80_84+85_OVER+50_OVER+LESS_20+15-64+20-64+65_OVER+65_OVER_SHARE+LESS_15_SHARE+15-24_SHARE+OAD15-64+TOTD20-64+15-64_SHARE+POP_GR/all?startTime=2008&endTime=2018" %>%
   get_oecd_data("HISTPOP","population")
 
 # Population projection
+# Demography and Population --> Population Statistics --> Population projections
 "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/POPPROJ/AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EU28+G20+OECD+WLD+NMEC+ARG+BRA+BGR+CHN+COL+CRI+HRV+CYP+IND+IDN+MLT+ROU+RUS+SAU+SGP+ZAF.W+M+T.TOTAL+0_4+05_9+10_14+15_19+20_24+25_29+30_34+35_39+40_44+45_49+50_54+55_59+60_64+65_69+70_74+75_79+80_84+85_OVER+50_OVER+LESS_20+15-64+20-64+65_OVER+65_OVER_SHARE+LESS_15_SHARE+15-24_SHARE+OAD15-64+TOTD20-64/all?startTime=2018&endTime=2020" %>%
   get_oecd_data("POPPROJ","population_projections")
 
+# Serving citizens
+# Public Sector, Taxation and Market Regulation --> Government at a Glance --> 2019 edition --> Serving Citizenz
+"https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/GOV_2019/AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+OAVG+EU+OECDE+OECD+NMEC+BRA+BGR+CHN+COL+CRI+HRV+CYP+IND+IDN+MLT+ROU+RUS+ZAF.CS_HC+CS_ES+CONF_JS+CONF_LPS+AH_UNMETN_NA+AH_UNMETN_LI+AH_UNMETN_HI+AH_OOPME+AE_PE_P+AE_PE_NT+AE_PE_T+AE_ENRRU_3+AE_ENRRU_4+AE_ER_T+AE_ER_EXIS+AE_ER_B25_EXIS+AJ_I_AD+AJ_I_LA+AJ_TNALA_NIP+AJ_TNALA_AB+AJ_TNALA_OT+AJ_RNA_SS+AJ_RNA_NI+AJ_RNA_LP+RH_PINVT_RD+RH_DS_2M+RH_HF_AH+RE_EL+RE_SQTSN_LSE_SD+RE_SQTSN_LSE_MS+RE_SQTSN_LSE_SN+RE_DSL_FA_LSE+RE_DSL_AC_LSE+RE_DSL_FHA_LSE+RE_DSL_OTL_LSE+RE_DSL_OT_LSE+RJ_T_CCA+RJ_T_CC+RJ_T_A+QH_30M_AMI+QH_ADMRASTH+QH_ADMRCOPD+QH_CHF+PEE_PIRLS+PEE_PIRLS_SASHSP+PEE_PIRLS_SSHSP+PEE_PIRLS_HB+PEE_PIRLS_SB+PEE_PIRLS_LB+PEE_PIRLS_PERHB+EFJ_RLCJ_EE+EFJ_RLCJ_FGI+EFJ_RLCJ_CATE+EFJ_RLOS_PNRV+EFJ_RLOS_CEC/all?startTime=2015&endTime=2020" %>%
+  get_oecd_data("GOV_2019","serving_citizens")
+
+# Better Life Index
+# SOcial Protection and Well-being --> Better Life Index
+"https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/BLI/AUS+AUT+BEL+CAN+CHL+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+OECD+NMEC+BRA+COL+RUS+ZAF.HO+HO_BASE+HO_HISH+HO_NUMR+IW+IW_HADI+IW_HNFW+JE+JE_LMIS+JE_EMPL+JE_LTUR+JE_PEARN+SC+SC_SNTWS+ES+ES_EDUA+ES_STCS+ES_EDUEX+EQ+EQ_AIRP+EQ_WATER+CG+CG_SENG+CG_VOTO+HS+HS_LEB+HS_SFRH+SW+SW_LIFS+PS+PS_FSAFEN+PS_REPH+WL+WL_EWLH+WL_TNOW.L.TOT+MN+WMN+HGH+LW/all?" %>%
+  get_oecd_data("BLI","better_life_index")
 # ---- define-queries ---------------------
 
 if( !fs::dir_exists(config$path_oecd_health_chapter) )
   fs::dir_create(config$path_oecd_health_chapter)
 
 # Population
+# Demography and Population --> Population Statistics --> Historical Population Data
 dataset <- "HISTPOP"
 dstruc <- OECD::get_data_structure(dataset)
 str(dstruc, max.level = 1)
