@@ -71,9 +71,29 @@ ds1 <- ds0 %>%
     ,POWERCODE = factor(POWERCODE, levels = lsmeta$POWERCODE$id, labels = lsmeta$POWERCODE$label)
   )
 ds1 %>% glimpse()
-ds1 %>% readr::write_rds(path_write)
 
-
+# what defines a row?
+ds1 %>% group_by(COU,SEX,indicator,UNIT) %>% count()
+ds1 %>% group_by(TIME_FORMAT) %>% count() # single = Annual
+ds1 %>% group_by(POWERCODE) %>% count() # single = Units
+grouping_set <- c("location","indicator","unit","SEX")
+ds2 <- ds1 %>%
+  dplyr::rename(
+    location = COU
+  ) %>%
+  dplyr::group_by(.dots = grouping_set) %>%
+  dplyr::summarize(
+    min_year = min(obsTime,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+    ,max_year = max(obsTime,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+    ,mean = mean(obsValue, na.rm = T)
+    ,median = median(obsValue, na.rm = T)
+    ,value = sum(mean, median)/2
+  ) %>%
+  dplyr::ungroup()
+ds2 %>% glimpse()
+ls[["data_clean"]] <- ds1
+ls[["data_agg"]] <- ds2
+ls %>%  readr::write_rds(path_write)
 
 
 # ---- employment  --------------------------
@@ -89,8 +109,8 @@ ds0 %>% head()
 lsmeta  %>% str(1)
 lsmeta$SUBJECT
 lsmeta$FREQUENCY
-lsmeta$TIME_FORMAT
-lsmeta$POWERCODE
+lsmeta$TIME_FORMAT; ds0$TIME_FORMAT %>% unique()
+lsmeta$POWERCODE;ds0$POWERCODE %>% unique()
 
 #
 ds1 <- ds0 %>%
@@ -102,47 +122,64 @@ ds1 <- ds0 %>%
     ,OBS_STATUS = factor(OBS_STATUS, levels = lsmeta$OBS_STATUS$id, labels = lsmeta$OBS_STATUS$label)
   )
 ds1 %>% glimpse()
-ds1 %>% readr::write_rds(path_write)
 
+# what defines a row?
+ds1 %>% group_by(LOCATION,indicator,obsTime) %>% count() %>% arrange(desc(n))
+grouping_set <- c("location","indicator")
+ds2 <- ds1 %>%
+  dplyr::rename(location = LOCATION) %>%
+  dplyr::group_by(.dots = grouping_set) %>%
+  dplyr::summarize(
+    min_year = min(obsTime,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+    ,max_year = max(obsTime,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+    ,mean = mean(obsValue, na.rm = T)
+    ,median = median(obsValue, na.rm = T)
+    ,value = sum(mean, median)/2
+  ) %>%
+  dplyr::ungroup()
+ds2 %>% glimpse()
+ls[["data_clean"]] <- ds1
+ls[["data_agg"]] <- ds2
+ls %>%  readr::write_rds(path_write)
 
 # ----- immigration -----------------
-# Immigrants by citizenship and age
-file_keyword <- "immigration"
-(path_read  <- paste0(config$path_oecd_raw,file_keyword,".rds"))
-(path_write <- paste0(config$path_oecd_clean,file_keyword,".rds"))
-ls <- readr::read_rds(path_read)
-
-ds0 <- ls$data %>% tibble::as_tibble()
-lsmeta <- ls$structure
-
-ds0 %>% glimpse()
-ds0 %>% head()
-lsmeta  %>% str(1)
-lsmeta$VAR_DESC
-lsmeta$COUB
-lsmeta$FBORN
-lsmeta$EDU
-lsmeta$AGE
-lsmeta$NAT
-lsmeta$OBS_STATUS
+# # Immigrants by citizenship and age
+# file_keyword <- "immigration"
+# (path_read  <- paste0(config$path_oecd_raw,file_keyword,".rds"))
+# (path_write <- paste0(config$path_oecd_clean,file_keyword,".rds"))
+# ls <- readr::read_rds(path_read)
 #
-ds1 <- ds0 %>%
-  dplyr::mutate(
-    FBORN  = factor(FBORN, levels = lsmeta$FBORN$id, labels = lsmeta$FBORN$label)
-    ,EDU   = factor(EDU, levels = lsmeta$EDU$id, labels = lsmeta$EDU$label)
-    ,AGE   = factor(AGE, levels = lsmeta$AGE$id, labels = lsmeta$AGE$label)
-    ,NAT   = factor(NAT, levels = lsmeta$NAT$id, labels = lsmeta$NAT$label)
-  )
-# maybe too old ( data from 2000, only 15yo and older)
-ds1 %>%
-  filter(
-    COU   == "AUT",
-    FBORN == "All places of birth",
-    EDU   == "All levels of education",
-    NAT   == "All citizenships",
-    AGE   == "All ages"
-  )
-ds1 %>% readr::write_rds(path_write)
+# ds0 <- ls$data %>% tibble::as_tibble()
+# lsmeta <- ls$structure
+#
+# ds0 %>% glimpse()
+# ds0 %>% head()
+# lsmeta  %>% str(1)
+# lsmeta$VAR_DESC
+# lsmeta$COUB
+# lsmeta$FBORN
+# lsmeta$EDU
+# lsmeta$AGE
+# lsmeta$NAT
+# lsmeta$OBS_STATUS
+# #
+# ds1 <- ds0 %>%
+#   dplyr::mutate(
+#     FBORN  = factor(FBORN, levels = lsmeta$FBORN$id, labels = lsmeta$FBORN$label)
+#     ,EDU   = factor(EDU, levels = lsmeta$EDU$id, labels = lsmeta$EDU$label)
+#     ,AGE   = factor(AGE, levels = lsmeta$AGE$id, labels = lsmeta$AGE$label)
+#     ,NAT   = factor(NAT, levels = lsmeta$NAT$id, labels = lsmeta$NAT$label)
+#   )
+# # maybe too old ( data from 2000, only 15yo and older)
+# ds1 %>%
+#   filter(
+#     COU   == "AUT",
+#     FBORN == "All places of birth",
+#     EDU   == "All levels of education",
+#     NAT   == "All citizenships",
+#     AGE   == "All ages"
+#   )
+# ds1 %>% readr::write_rds(path_write)
 # ---- education --------------------------
 # Education attainment of 25 - 65 year olds
 file_keyword <- "educational_attainment"
@@ -172,10 +209,33 @@ ds1 <- ds0 %>%
     ,AGE       = factor(AGE, levels = lsmeta$AGE$id, labels = lsmeta$AGE$label)
     ,FIELD     = factor(FIELD, levels = lsmeta$FIELD$id, labels = lsmeta$FIELD$label)
     ,MEASURE   = factor(MEASURE, levels = lsmeta$MEASURE$id, labels = lsmeta$MEASURE$label)
-    ,INDICATOR = factor(INDICATOR, levels = lsmeta$INDICATOR$id, labels = lsmeta$INDICATOR$label)
     ,OBS_STATUS = factor(OBS_STATUS, levels = lsmeta$OBS_STATUS$id, labels = lsmeta$OBS_STATUS$label)
+    ,indicator = factor(INDICATOR, levels = lsmeta$INDICATOR$id, labels = lsmeta$INDICATOR$label)
+    ,unit = factor(UNIT, levels = lsmeta$UNIT$id, labels = lsmeta$UNIT$label)
+
   )
-ds1 %>% readr::write_rds(path_write)
+ds1 %>% glimpse()
+# what defines a row?
+ds1 %>% group_by(COUNTRY, indicator, SEX, AGE,ISC11A, MEASURE, obsTime ) %>% count() %>% arrange(desc(n))
+grouping_set <- c("location", "indicator","unit", "MEASURE", "ISC11A", "SEX","AGE")
+ds2 <- ds1 %>%
+  dplyr::rename(location = COUNTRY) %>%
+  dplyr::filter(MEASURE == "Value") %>%
+  dplyr::group_by(.dots = grouping_set) %>%
+  dplyr::summarize(
+    min_year = min(REFERENCEPERIOD,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+    ,max_year = max(REFERENCEPERIOD,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+    ,mean = mean(obsValue, na.rm = T)
+    ,median = median(obsValue, na.rm = T)
+    ,value = sum(mean, median)/2
+  ) %>%
+  dplyr::ungroup()
+ds2 %>% glimpse()
+ls[["data_clean"]] <- ds1
+ls[["data_agg"]] <- ds2
+ls %>%  readr::write_rds(path_write)
+
+
 # ---- population -------
 file_keyword <- "population"
 (path_read  <- paste0(config$path_oecd_raw,file_keyword,".rds"))
@@ -200,9 +260,27 @@ ds1 <- ds0 %>%
   )
 
 ds1 %>% glimpse()
-ds1 %>% readr::write_rds(path_write)
-# ---- serving_citizens -------
 
+# what defines a row?
+ds1 %>% group_by(LOCATION,SEX,AGE,obsTime) %>% count() %>% arrange(desc(n))
+grouping_set <- c("location", "SEX","AGE")
+ds2 <- ds1 %>%
+  dplyr::rename(location = LOCATION) %>%
+  dplyr::group_by(.dots = grouping_set) %>%
+  dplyr::summarize(
+    min_year = min(obsTime,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+    ,max_year = max(obsTime,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+    ,mean = mean(obsValue, na.rm = T)
+    ,median = median(obsValue, na.rm = T)
+    ,value = sum(mean, median)/2
+  ) %>%
+  dplyr::ungroup()
+ds2 %>% glimpse()
+ls[["data_clean"]] <- ds1
+ls[["data_agg"]] <- ds2
+ls %>%  readr::write_rds(path_write)
+
+# ---- serving_citizens -------
 file_keyword <- "serving_citizens"
 (path_read  <- paste0(config$path_oecd_raw,file_keyword,".rds"))
 (path_write <- paste0(config$path_oecd_clean,file_keyword,".rds"))
@@ -225,7 +303,25 @@ ds1 <- ds0 %>%
   )
 
 ds1 %>% glimpse()
-ds1 %>% readr::write_rds(path_write)
+# what defines a row?
+ds1 %>% group_by(COU,indicator, obsTime) %>% count() %>% arrange(desc(n))
+grouping_set <- c("location", "indicator")
+ds2 <- ds1 %>%
+  dplyr::rename(location = COU) %>%
+  dplyr::group_by(.dots = grouping_set) %>%
+  dplyr::summarize(
+    min_year = min(obsTime,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+    ,max_year = max(obsTime,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+    ,mean = mean(obsValue, na.rm = T)
+    ,median = median(obsValue, na.rm = T)
+    ,value = sum(mean, median)/2
+  ) %>%
+  dplyr::ungroup()
+ds2 %>% glimpse()
+ls[["data_clean"]] <- ds1
+ls[["data_agg"]] <- ds2
+ls %>%  readr::write_rds(path_write)
+
 # ---- better_life_index -------
 file_keyword <- "better_life_index"
 (path_read  <- paste0(config$path_oecd_raw,file_keyword,".rds"))
@@ -254,7 +350,25 @@ ds1 <- ds0 %>%
     ,POWERCODE = factor(POWERCODE, levels = lsmeta$POWERCODE$id, labels = lsmeta$POWERCODE$label)
   )
 ds1 %>% glimpse()
-ds1 %>% readr::write_rds(path_write)
+# what defines a row?
+ds1 %>% group_by(LOCATION,indicator, INEQUALITY) %>% count() %>% arrange(desc(n))
+grouping_set <- c("location", "indicator","INEQUALITY")
+ds2 <- ds1 %>%
+  dplyr::rename(location = LOCATION) %>%
+  dplyr::group_by(.dots = grouping_set) %>%
+  dplyr::summarize(
+    # min_year = min(obsTime,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+    # ,max_year = max(obsTime,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+     mean = mean(obsValue, na.rm = T)
+    ,median = median(obsValue, na.rm = T)
+    ,value = sum(mean, median)/2
+  ) %>%
+  dplyr::ungroup()
+ds2 %>% glimpse()
+ls[["data_clean"]] <- ds1
+ls[["data_agg"]] <- ds2
+ls %>%  readr::write_rds(path_write)
+
 # ---- health_resources -------
 file_keyword <- "health_resources"
 (path_read  <- paste0(config$path_oecd_raw,file_keyword,".rds"))
@@ -281,7 +395,25 @@ ds1 <- ds0 %>%
     ,OBS_STATUS = factor(OBS_STATUS, levels = lsmeta$OBS_STATUS$id, labels = lsmeta$OBS_STATUS$label)
   )
 ds1 %>% glimpse()
-ds1 %>% readr::write_rds(path_write)
+
+# what defines a row?
+ds1 %>% group_by(COU, indicator, unit, obsTime) %>% count() %>% arrange(desc(n))
+grouping_set <- c("location", "indicator","unit")
+ds2 <- ds1 %>%
+  dplyr::rename(location = COU) %>%
+  dplyr::group_by(.dots = grouping_set) %>%
+  dplyr::summarize(
+    min_year = min(obsTime,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+    ,max_year = max(obsTime,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+    ,mean = mean(obsValue, na.rm = T)
+    ,median = median(obsValue, na.rm = T)
+    ,value = sum(mean, median)/2
+  ) %>%
+  dplyr::ungroup()
+ds2 %>% glimpse()
+ls[["data_clean"]] <- ds1
+ls[["data_agg"]] <- ds2
+ls %>%  readr::write_rds(path_write)
 # ---- health_status -------
 file_keyword <- "health_status"
 (path_read  <- paste0(config$path_oecd_raw,file_keyword,".rds"))
@@ -308,8 +440,36 @@ ds1 <- ds0 %>%
     ,OBS_STATUS = factor(OBS_STATUS, levels = lsmeta$OBS_STATUS$id, labels = lsmeta$OBS_STATUS$label)
   )
 ds1 %>% glimpse()
-ds1 %>% readr::write_rds(path_write)
-# ---- serving_citizens -------------
+# what defines a row?
+ds1 %>% group_by(COU, indicator, unit, obsTime) %>% count() %>% arrange(desc(n))
+d <- ds1 %>%
+  filter(
+    COU == "AUS",
+    indicator == "Good/very good health, females aged 15+",
+    unit == "% of population (crude rate)",
+    obsTime == "2017"
+  ) %>% distinct()
+dt <- d %>% t() %>% as_tibble()
+dt %>% mutate(same = (V1 == V2))
+# looks like the same label is assigned to different VAR (difference in methodology?)
+ds1 %>% group_by(COU,VAR, indicator, unit, obsTime) %>% count() %>% arrange(desc(n))
+
+grouping_set <- c("location","VAR", "indicator","unit")
+ds2 <- ds1 %>%
+  dplyr::rename(location = COU) %>%
+  dplyr::group_by(.dots = grouping_set) %>%
+  dplyr::summarize(
+    min_year = min(obsTime,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+    ,max_year = max(obsTime,na.rm=T) # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
+    ,mean = mean(obsValue, na.rm = T)
+    ,median = median(obsValue, na.rm = T)
+    ,value = sum(mean, median)/2
+  ) %>%
+  dplyr::ungroup()
+ds2 %>% glimpse()
+ls[["data_clean"]] <- ds1
+ls[["data_agg"]] <- ds2
+ls %>%  readr::write_rds(path_write)
 
 # ---- define-functions ----------------------------------
 # function to get a list of unique variables and units of measurement along with descriptive labels
