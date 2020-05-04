@@ -47,95 +47,71 @@ ds_country <-
   dplyr::filter(desired)
 
 # ----- family ----------------------
-
-ls <- readr::read_rds(paste0(config$path_oecd_out,"family.rds"))
-list_object <- ls
-ds_meta <-  list_object$data %>% dplyr::distinct(IND,UNIT) %>% tibble::as_tibble()
-ds_meta <- ds_meta %>%
-  dplyr::left_join(list_object$structure[["IND"]], by = c("IND" = "id")) %>%
-  dplyr::rename(var_label = label) %>%
-  dplyr::left_join(list_object$structure$UNIT, by = c("UNIT" = "id")) %>%
-  dplyr::rename(unit_label = label) %>%
-  # dplyr::rename( VAR = IND ) %>%
-  dplyr::arrange(IND,UNIT)
-# d_var_unit %>% neat_DT()
-ds_meta %>% glimpse()
-# divorce - FAM4B
-# marriage - FAM4A
-ds0 <- ls$data %>% tibble::as_tibble() %>%
-  # filter(IND %in% c("FAM4A","FAM4B")) %>%
-  filter(COU %in% (ds_country %>% pull(id)) ) %>%
-  dplyr::group_by(COU, IND, SEX) %>%
-  dplyr::summarize(
-    min_year = min(obsTime,na.rm=T)
-    ,max_year = max(obsTime,na.rm=T)
-    # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
-    ,mean = mean(obsValue, na.rm = T)
-    ,median = median(obsValue, na.rm = T)
-    ,value = sum(mean, median)/2
-  ) %>%
-  dplyr::left_join(ds_meta, by = "IND")
-
-ds0 %>% distinct(IND, UNIT, SEX) %>% arrange(IND) %>% print(n=Inf)
-
-ds0 %>% glimpse()
-
-# ---- employment  --------------------------
-ls <- readr::read_rds(paste0(config$path_oecd_out,"employment.rds"))
-list_object <- ls
+file_keyword <- "family"
+(path_read  <- paste0(config$path_oecd_raw,file_keyword,".rds"))
+(path_write <- paste0(config$path_oecd_clean,file_keyword,".rds"))
+ls <- readr::read_rds(path_read)
 ds0 <- ls$data %>% tibble::as_tibble()
 lsmeta <- ls$structure
 
 ds0 %>% glimpse()
+ds0 %>% head()
+lsmeta  %>% str(1)
+lsmeta$IND
+lsmeta$UNIT
+lsmeta$SEX
+lsmeta$TIME_FORMAT
+lsmeta$POWERCODE
+ds1 <- ds0 %>%
+  dplyr::mutate(
+    indicator = factor(IND, levels = lsmeta$IND$id, labels = lsmeta$IND$label)
+    ,unit     = factor(UNIT, levels = lsmeta$UNIT$id, labels = lsmeta$UNIT$label)
+    ,SEX = factor(SEX, levels = lsmeta$SEX$id, labels = lsmeta$SEX$label)
+    ,TIME_FORMAT = factor(TIME_FORMAT, levels = lsmeta$TIME_FORMAT$id, labels = lsmeta$TIME_FORMAT$label)
+    ,POWERCODE = factor(POWERCODE, levels = lsmeta$POWERCODE$id, labels = lsmeta$POWERCODE$label)
+  )
+ds1 %>% glimpse()
+ds1 %>% readr::write_rds(path_write)
+
+
+
+
+# ---- employment  --------------------------
+file_keyword <- "employment"
+(path_read  <- paste0(config$path_oecd_raw,file_keyword,".rds"))
+(path_write <- paste0(config$path_oecd_clean,file_keyword,".rds"))
+ls <- readr::read_rds(path_read)
+ds0 <- ls$data %>% tibble::as_tibble()
+lsmeta <- ls$structure
+
+ds0 %>% glimpse()
+ds0 %>% head()
 lsmeta  %>% str(1)
 lsmeta$SUBJECT
-lsmeta$UNIT
-lsmeta$OBS_STATUS
+lsmeta$FREQUENCY
+lsmeta$TIME_FORMAT
+lsmeta$POWERCODE
+
 #
-ds0 %>% group_by(SUBJECT,FREQUENCY, TIME_FORMAT, POWERCODE, OBS_STATUS) %>% count()
-ds0 %>% group_by(SUBJECT,OBS_STATUS) %>% count()
-lsmeta$OBS_STATUS
-
 ds1 <- ds0 %>%
-  dplyr::group_by(LOCATION, SUBJECT) %>%
-  dplyr::summarize(
-    min_year = min(obsTime,na.rm=T)
-    ,max_year = max(obsTime,na.rm=T)
-    # TODO: MUST MACH ONLY YEARS FOR WHICH MEASURE VALUE IS NA!!!
-    ,mean = mean(obsValue, na.rm = T)
-    ,median = median(obsValue, na.rm = T)
-    ,value = sum(mean, median)/2
-  ) %>%
-  dplyr::left_join(lsmeta$SUBJECT, by = c("SUBJECT"="id" ) )
-ds1 %>% glimpse()
-
-
-ds2 <- readr::read_csv(config$path_input_covid) %>%
-  compute_epi_timeline() %>%
-  filter(country_code %in% (ds1 %>% distinct("LOCATION") %>% pull()) ) %>%
-  filter(epi_timeline == 30) %>%
-    dplyr::right_join(ds1, by = c("country_code" = "LOCATION"))
-ds2 %>% glimpse()
-ds2 %>% distinct(label) %>% print(n = Inf)
-
-g1 <- ds2 %>%
-  ggplot(aes(x=value, y = n_deaths_cum, label = country_code))+
-  # geom_point()+
-  geom_text(aes(label = geo_id))+
-  geom_smooth(method = "lm", se = F)+
-  facet_wrap(~label, scales = "free")+
-  ggpmisc::stat_poly_eq(
-    formula = y ~ + x
-    ,aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~"))
-    ,parse = TRUE
-    , vjust = 3
+  dplyr::mutate(
+    indicator = factor(SUBJECT, levels = lsmeta$SUBJECT$id, labels = lsmeta$SUBJECT$label)
+    ,FREQUENCY = factor(FREQUENCY, levels = lsmeta$FREQUENCY$id, labels = lsmeta$FREQUENCY$label)
+    ,TIME_FORMAT = factor(TIME_FORMAT, levels = lsmeta$TIME_FORMAT$id, labels = lsmeta$TIME_FORMAT$label)
+    ,POWERCODE = factor(POWERCODE, levels = lsmeta$POWERCODE$id, labels = lsmeta$POWERCODE$label)
+    ,OBS_STATUS = factor(OBS_STATUS, levels = lsmeta$OBS_STATUS$id, labels = lsmeta$OBS_STATUS$label)
   )
-g1
+ds1 %>% glimpse()
+ds1 %>% readr::write_rds(path_write)
+
 
 # ----- immigration -----------------
 # Immigrants by citizenship and age
-ls <- readr::read_rds(paste0(config$path_oecd_out,"immigration.rds"))
-list_object <- ls
+file_keyword <- "immigration"
+(path_read  <- paste0(config$path_oecd_raw,file_keyword,".rds"))
+(path_write <- paste0(config$path_oecd_clean,file_keyword,".rds"))
+ls <- readr::read_rds(path_read)
+
 ds0 <- ls$data %>% tibble::as_tibble()
 lsmeta <- ls$structure
 
@@ -166,11 +142,14 @@ ds1 %>%
     NAT   == "All citizenships",
     AGE   == "All ages"
   )
-
+ds1 %>% readr::write_rds(path_write)
 # ---- education --------------------------
 # Education attainment of 25 - 65 year olds
-ls <- readr::read_rds(paste0(config$path_oecd_out,"educational_attainment.rds"))
-list_object <- ls
+file_keyword <- "educational_attainment"
+(path_read  <- paste0(config$path_oecd_raw,file_keyword,".rds"))
+(path_write <- paste0(config$path_oecd_clean,file_keyword,".rds"))
+ls <- readr::read_rds(path_read)
+
 ds0 <- ls$data %>% tibble::as_tibble()
 lsmeta <- ls$structure
 
@@ -196,11 +175,13 @@ ds1 <- ds0 %>%
     ,INDICATOR = factor(INDICATOR, levels = lsmeta$INDICATOR$id, labels = lsmeta$INDICATOR$label)
     ,OBS_STATUS = factor(OBS_STATUS, levels = lsmeta$OBS_STATUS$id, labels = lsmeta$OBS_STATUS$label)
   )
-
+ds1 %>% readr::write_rds(path_write)
 # ---- population -------
-ls <- readr::read_rds(paste0(config$path_oecd_out,"population.rds"))
-# ls <- readr::read_rds(paste0(config$path_oecd_out,"population_projection.rds"))
-list_object <- ls
+file_keyword <- "population"
+(path_read  <- paste0(config$path_oecd_raw,file_keyword,".rds"))
+(path_write <- paste0(config$path_oecd_clean,file_keyword,".rds"))
+ls <- readr::read_rds(path_read)
+
 ds0 <- ls$data %>% tibble::as_tibble()
 lsmeta <- ls$structure
 
@@ -215,14 +196,18 @@ ds1 <- ds0 %>%
   dplyr::mutate(
      SEX       = factor(SEX, levels = lsmeta$SEX$id, labels = lsmeta$SEX$label)
     ,AGE       = factor(AGE, levels = lsmeta$AGE$id, labels = lsmeta$AGE$label)
+    ,TIME_FORMAT = factor(TIME_FORMAT, levels = lsmeta$TIME_FORMAT$id, labels = lsmeta$TIME_FORMAT$label)
   )
 
 ds1 %>% glimpse()
-
+ds1 %>% readr::write_rds(path_write)
 # ---- serving_citizens -------
-ls <- readr::read_rds(paste0(config$path_oecd_out,"serving_citizens.rds"))
-# ls <- readr::read_rds(paste0(config$path_oecd_out,"population_projection.rds"))
-list_object <- ls
+
+file_keyword <- "serving_citizens"
+(path_read  <- paste0(config$path_oecd_raw,file_keyword,".rds"))
+(path_write <- paste0(config$path_oecd_clean,file_keyword,".rds"))
+ls <- readr::read_rds(path_read)
+
 ds0 <- ls$data %>% tibble::as_tibble()
 lsmeta <- ls$structure
 
@@ -240,11 +225,13 @@ ds1 <- ds0 %>%
   )
 
 ds1 %>% glimpse()
-
+ds1 %>% readr::write_rds(path_write)
 # ---- better_life_index -------
-ls <- readr::read_rds(paste0(config$path_oecd_out,"better_life_index.rds"))
-# ls <- readr::read_rds(paste0(config$path_oecd_out,"population_projection.rds"))
-list_object <- ls
+file_keyword <- "better_life_index"
+(path_read  <- paste0(config$path_oecd_raw,file_keyword,".rds"))
+(path_write <- paste0(config$path_oecd_clean,file_keyword,".rds"))
+ls <- readr::read_rds(path_read)
+
 ds0 <- ls$data %>% tibble::as_tibble()
 lsmeta <- ls$structure
 
@@ -267,11 +254,13 @@ ds1 <- ds0 %>%
     ,POWERCODE = factor(POWERCODE, levels = lsmeta$POWERCODE$id, labels = lsmeta$POWERCODE$label)
   )
 ds1 %>% glimpse()
-
+ds1 %>% readr::write_rds(path_write)
 # ---- health_resources -------
-ls <- readr::read_rds(paste0(config$path_oecd_out,"health/health_resources.rds"))
-# ls <- readr::read_rds(paste0(config$path_oecd_out,"population_projection.rds"))
-list_object <- ls
+file_keyword <- "health_resources"
+(path_read  <- paste0(config$path_oecd_raw,file_keyword,".rds"))
+(path_write <- paste0(config$path_oecd_clean,file_keyword,".rds"))
+ls <- readr::read_rds(path_read)
+
 ds0 <- ls$data %>% tibble::as_tibble()
 lsmeta <- ls$structure
 
@@ -292,11 +281,13 @@ ds1 <- ds0 %>%
     ,OBS_STATUS = factor(OBS_STATUS, levels = lsmeta$OBS_STATUS$id, labels = lsmeta$OBS_STATUS$label)
   )
 ds1 %>% glimpse()
-
+ds1 %>% readr::write_rds(path_write)
 # ---- health_status -------
-ls <- readr::read_rds(paste0(config$path_oecd_out,"health/health_status.rds"))
-# ls <- readr::read_rds(paste0(config$path_oecd_out,"population_projection.rds"))
-list_object <- ls
+file_keyword <- "health_status"
+(path_read  <- paste0(config$path_oecd_raw,file_keyword,".rds"))
+(path_write <- paste0(config$path_oecd_clean,file_keyword,".rds"))
+ls <- readr::read_rds(path_read)
+
 ds0 <- ls$data %>% tibble::as_tibble()
 lsmeta <- ls$structure
 
@@ -317,7 +308,7 @@ ds1 <- ds0 %>%
     ,OBS_STATUS = factor(OBS_STATUS, levels = lsmeta$OBS_STATUS$id, labels = lsmeta$OBS_STATUS$label)
   )
 ds1 %>% glimpse()
-
+ds1 %>% readr::write_rds(path_write)
 # ---- serving_citizens -------------
 
 # ---- define-functions ----------------------------------
