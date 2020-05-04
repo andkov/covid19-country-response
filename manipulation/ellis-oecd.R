@@ -167,7 +167,158 @@ ds1 %>%
     AGE   == "All ages"
   )
 
+# ---- education --------------------------
+# Education attainment of 25 - 65 year olds
+ls <- readr::read_rds(paste0(config$path_oecd_out,"educational_attainment.rds"))
+list_object <- ls
+ds0 <- ls$data %>% tibble::as_tibble()
+lsmeta <- ls$structure
 
+ds0 %>% glimpse()
+ds0 %>% head()
+lsmeta  %>% str(1)
+lsmeta$VAR_DESC
+lsmeta$ISC11A
+lsmeta$SEX
+lsmeta$AGE
+lsmeta$FIELD
+lsmeta$MEASURE
+lsmeta$INDICATOR
+lsmeta$OBS_STATUS
+#
+ds1 <- ds0 %>%
+  dplyr::mutate(
+    ISC11A     = factor(ISC11A, levels = lsmeta$ISC11A$id, labels = lsmeta$ISC11A$label)
+    ,SEX       = factor(SEX, levels = lsmeta$SEX$id, labels = lsmeta$SEX$label)
+    ,AGE       = factor(AGE, levels = lsmeta$AGE$id, labels = lsmeta$AGE$label)
+    ,FIELD     = factor(FIELD, levels = lsmeta$FIELD$id, labels = lsmeta$FIELD$label)
+    ,MEASURE   = factor(MEASURE, levels = lsmeta$MEASURE$id, labels = lsmeta$MEASURE$label)
+    ,INDICATOR = factor(INDICATOR, levels = lsmeta$INDICATOR$id, labels = lsmeta$INDICATOR$label)
+    ,OBS_STATUS = factor(OBS_STATUS, levels = lsmeta$OBS_STATUS$id, labels = lsmeta$OBS_STATUS$label)
+  )
+
+# ---- population -------
+ls <- readr::read_rds(paste0(config$path_oecd_out,"population.rds"))
+# ls <- readr::read_rds(paste0(config$path_oecd_out,"population_projection.rds"))
+list_object <- ls
+ds0 <- ls$data %>% tibble::as_tibble()
+lsmeta <- ls$structure
+
+ds0 %>% glimpse()
+ds0 %>% head()
+lsmeta  %>% str(1)
+lsmeta$LOCATION
+lsmeta$SEX
+lsmeta$AGE
+#
+ds1 <- ds0 %>%
+  dplyr::mutate(
+     SEX       = factor(SEX, levels = lsmeta$SEX$id, labels = lsmeta$SEX$label)
+    ,AGE       = factor(AGE, levels = lsmeta$AGE$id, labels = lsmeta$AGE$label)
+  )
+
+ds1 %>% glimpse()
+
+# ---- serving_citizens -------
+ls <- readr::read_rds(paste0(config$path_oecd_out,"serving_citizens.rds"))
+# ls <- readr::read_rds(paste0(config$path_oecd_out,"population_projection.rds"))
+list_object <- ls
+ds0 <- ls$data %>% tibble::as_tibble()
+lsmeta <- ls$structure
+
+ds0 %>% glimpse()
+ds0 %>% head()
+lsmeta  %>% str(1)
+lsmeta$IND
+lsmeta$TIME_FORMAT
+
+#
+ds1 <- ds0 %>%
+  dplyr::mutate(
+    indicator    = factor(IND, levels = lsmeta$IND$id, labels = lsmeta$IND$label)
+    ,TIME_FORMAT = factor(TIME_FORMAT, levels = lsmeta$TIME_FORMAT$id, labels = lsmeta$TIME_FORMAT$label)
+  )
+
+ds1 %>% glimpse()
+
+# ---- better_life_index -------
+ls <- readr::read_rds(paste0(config$path_oecd_out,"better_life_index.rds"))
+# ls <- readr::read_rds(paste0(config$path_oecd_out,"population_projection.rds"))
+list_object <- ls
+ds0 <- ls$data %>% tibble::as_tibble()
+lsmeta <- ls$structure
+
+ds0 %>% glimpse()
+ds0 %>% head()
+lsmeta  %>% str(1)
+lsmeta$INDICATOR
+lsmeta$MEASURE
+lsmeta$INEQUALITY
+lsmeta$UNIT
+lsmeta$POWERCODE
+
+#
+ds1 <- ds0 %>%
+  dplyr::mutate(
+    indicator    = factor(INDICATOR, levels = lsmeta$INDICATOR$id, labels = lsmeta$INDICATOR$label)
+    ,MEASURE = factor(MEASURE, levels = lsmeta$MEASURE$id, labels = lsmeta$MEASURE$label)
+    ,INEQUALITY = factor(INEQUALITY, levels = lsmeta$INEQUALITY$id, labels = lsmeta$INEQUALITY$label)
+    ,UNIT = factor(UNIT, levels = lsmeta$UNIT$id, labels = lsmeta$UNIT$label)
+    ,POWERCODE = factor(POWERCODE, levels = lsmeta$POWERCODE$id, labels = lsmeta$POWERCODE$label)
+  )
+ds1 %>% glimpse()
+
+# ---- health_resources -------
+ls <- readr::read_rds(paste0(config$path_oecd_out,"health/health_resources.rds"))
+# ls <- readr::read_rds(paste0(config$path_oecd_out,"population_projection.rds"))
+list_object <- ls
+ds0 <- ls$data %>% tibble::as_tibble()
+lsmeta <- ls$structure
+
+ds0 %>% glimpse()
+ds0 %>% head()
+lsmeta  %>% str(1)
+lsmeta$VAR
+lsmeta$UNIT
+lsmeta$TIME_FORMAT
+lsmeta$OBS_STATUS
+
+#
+ds1 <- ds0 %>%
+  dplyr::mutate(
+    indicator    = factor(VAR, levels = lsmeta$VAR$id, labels = lsmeta$VAR$label)
+    ,unit    = factor(UNIT, levels = lsmeta$UNIT$id, labels = lsmeta$UNIT$label)
+    ,TIME_FORMAT = factor(TIME_FORMAT, levels = lsmeta$TIME_FORMAT$id, labels = lsmeta$TIME_FORMAT$label)
+    ,OBS_STATUS = factor(OBS_STATUS, levels = lsmeta$OBS_STATUS$id, labels = lsmeta$OBS_STATUS$label)
+  )
+ds1 %>% glimpse()
+
+# ---- health_status -------
+ls <- readr::read_rds(paste0(config$path_oecd_out,"health/health_status.rds"))
+# ls <- readr::read_rds(paste0(config$path_oecd_out,"population_projection.rds"))
+list_object <- ls
+ds0 <- ls$data %>% tibble::as_tibble()
+lsmeta <- ls$structure
+
+ds0 %>% glimpse()
+ds0 %>% head()
+lsmeta  %>% str(1)
+lsmeta$VAR
+lsmeta$UNIT
+lsmeta$TIME_FORMAT
+lsmeta$OBS_STATUS
+
+#
+ds1 <- ds0 %>%
+  dplyr::mutate(
+    indicator    = factor(VAR, levels = lsmeta$VAR$id, labels = lsmeta$VAR$label)
+    ,unit    = factor(UNIT, levels = lsmeta$UNIT$id, labels = lsmeta$UNIT$label)
+    ,TIME_FORMAT = factor(TIME_FORMAT, levels = lsmeta$TIME_FORMAT$id, labels = lsmeta$TIME_FORMAT$label)
+    ,OBS_STATUS = factor(OBS_STATUS, levels = lsmeta$OBS_STATUS$id, labels = lsmeta$OBS_STATUS$label)
+  )
+ds1 %>% glimpse()
+
+# ---- serving_citizens -------------
 
 # ---- define-functions ----------------------------------
 # function to get a list of unique variables and units of measurement along with descriptive labels
