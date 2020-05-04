@@ -4,7 +4,8 @@ default:
     path_input_oecd   : !expr strftime(Sys.Date(), "data-unshared/derived/oedc-%Y-%m-%d.csv")
     path_input_covid  : !expr strftime(Sys.Date(), "data-unshared/derived/covid-%Y-%m-%d.csv")
     path_oecd_health_chapter: "data-unshared/raw/oecd/health/"
-    path_oecd_out: "data-unshared/raw/oecd/"
+    path_oecd_raw: "data-unshared/raw/oecd/"
+    path_oecd_clean: "data-unshared/derived/oecd/"
 
     oced_genders      : !expr c("MEN", "WOMEN")
     oced_ages         : !expr c("1519", "2024", "2554", "5564", "6599")
