@@ -6,6 +6,7 @@ default:
     path_oecd_health_chapter: "data-unshared/raw/oecd/health/"
     path_oecd_raw: "data-unshared/raw/oecd/"
     path_oecd_clean: "data-unshared/derived/oecd/"
+    path_country_codes: "data-public/metadata/iso_3166_country_codes.csv"
 
     oced_genders      : !expr c("MEN", "WOMEN")
     oced_ages         : !expr c("1519", "2024", "2554", "5564", "6599")
