@@ -64,7 +64,8 @@ ds_covid <- ds_covid %>%
     n_cases,
     n_deaths,
     n_population_2018
-  )
+  ) %>%
+  dplyr::filter(!country_code == "N/A")
 ds_covid %>% glimpse()
 # stem to have the complete timeline
 dates     <- min(ds_covid$date):max(ds_covid$date)
