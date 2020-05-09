@@ -57,10 +57,11 @@ d <- ds_cgrt %>% filter(CountryCode == "AFG") %>% select(Date, CountryCode, Conf
 # some useful columns from the ECDC  covid source
 ds_cgrt <- ds_cgrt %>%
   dplyr::rename(
-    country_name = CountryName,
+    # country_name = CountryName,
     country_code = CountryCode,
     date = Date
-  )
+  ) %>%
+  dplyr::select(-CountryName)
 
 ds_cgrt %>% glimpse()
 
