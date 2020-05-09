@@ -104,19 +104,20 @@ ds_hr <- ls_health_resources$data_agg
 # OxCGRT
 ds_cgrt <- readr::read_rds("./data-unshared/derived/OxCGRT.rds")
 # ds_cgrt %>% glimpse()
-# n_distinct(ds_cgrt$country_name)
+# n_distinct(ds_cgrt$country_code)
 
 # ---- inspect-data ----------------------
 
 # ---- tweak-data-1 ---------------
-ds_covid <- ds_covid %>%
-  compute_epi_timeline()
-
-
 ds0 <- ds_covid %>%
+  compute_epi_timeline() %>%
   dplyr::left_join(
     ds_cgrt
     ,by = c("date", "country_code")
+  ) %>%
+  dplyr::left_join(
+    ds_country_codes,
+    by = c("country_code" = "country_code3")
   )
 
 d_out <- ds0 %>% filter(country_code == "ITA")
@@ -135,7 +136,7 @@ g1 <- d1 %>%
   ))+
   geom_line()+
   # geom_line(aes(y=StringencyIndex), color = "red")+
-  facet_wrap(~country_name, scale = "free")+
+  facet_wrap(~country_label, scale = "free")+
   geom_point(data = d1 %>% filter(days_since_1case == 1), size = 2, fill = "#1b9e77", color = "black", alpha = .5, shape = 21)+
   geom_point(data = d1 %>% filter(days_since_1death == 1), size = 2, fill = "#d95f02", color = "black", alpha = .5, shape = 21)+
   labs(
@@ -161,7 +162,7 @@ focal_vars <- c( "n_cases_cum", "n_cases_cum_per_1m", "n_deaths_cum", "n_deaths_
 ds1 <- ds0 %>%
   filter(country_code %in% ds_country$id) %>%
   # dplyr::filter(country_code %in% c("ITA","FRA")) %>%
-  dplyr::select(country_code, country_name, days_since_exodus, days_since_1case,
+  dplyr::select(country_code, country_label, days_since_exodus, days_since_1case,
                 days_since_1death,
                 n_cases_cum, n_cases_cum_per_1m, n_deaths_cum, n_deaths_cum_per_1m,
                 StringencyIndex
@@ -182,7 +183,7 @@ print_one_wrap <- function(d, country = "ITA"){
       data = d1 %>% filter(days_since_1death == 1),
       size = 2, fill = "#d95f02", color = "black", alpha = .5, shape = 21)+
     geom_vline(xintercept = 58, linetype = "dashed")+
-    facet_wrap(country_name ~ metric, scale = "free_y",ncol = 5)
+    facet_wrap(country_label ~ metric, scale = "free_y",ncol = 5)
   g1
 }
 
@@ -195,16 +196,6 @@ for(country_i in countries){
   cat("\n")
 }
 
-# ---- health-resources -----------------------------
-ds1 <- ds0 %>%
-  # filter(country_code %in% ds_country$id) %>%
-  filter(country_code == "ITA") %>%
-  dplyr::left_join(
-    ds_hr
-    ,by = c("country_code" = "location")
-  )
-
-
 # ----- q2-response-trend -----------------
 # What the trend response to COVID-10 by each country?
 
@@ -215,7 +206,7 @@ g1 <- d1 %>%
   geom_line()+
   geom_point(data = d1 %>% filter(days_since_1case == 1), size = 2, fill = "#1b9e77", color = "black", alpha = .5, shape = 21)+
   geom_point(data = d1 %>% filter(days_since_1death == 1), size = 2, fill = "#d95f02", color = "black", alpha = .5, shape = 21)+
-  facet_wrap(~country_name)+
+  facet_wrap(~country_label)+
   labs(
     title = "Timeline of OECD countries' respones to COVID-19 as measured by the Stringency Index"
     ,y = "Stringency Index", x = "Days since first case outside of China (Jan 13, 2020)"
@@ -225,14 +216,14 @@ g1 <- d1 %>%
 g1
 
 
-# ----- q2-response-trend-all -----------------
+# ----- q2-all -----------------
 
 d2 <- ds0 %>%
   filter(country_code %in% ds_country$id)
 g2 <- d2 %>%
   filter(country_code %in% ds_country$id) %>%
   # filter(country_code == "ITA") %>%
-  ggplot(aes(x = days_since_exodus, y = StringencyIndex, group = country_name))+
+  ggplot(aes(x = days_since_exodus, y = StringencyIndex, group = country_label))+
   geom_line( alpha = .2)+
   geom_point(data = d2 %>% filter(days_since_1case == 1), size = 2, fill = "#1b9e77", color = "black", alpha = .5, shape = 21)+
   geom_point(data = d2 %>% filter(days_since_1death == 1), size = 2, fill = "#d95f02", color = "black", alpha = .5, shape = 21)+
@@ -298,107 +289,10 @@ ds_response <- list(d1,d2,d3,d4) %>% Reduce(function(a,b) dplyr::full_join(a,b),
 ds_response <- ds_response %>%
   dplyr::left_join(
     ds_covid %>% distinct(country_code, geo_id, country)
-  )
-
-
-
-# ds0 %>% glimpse()
-ds1 <- ds_response %>%
-  dplyr::left_join(
-    ds_family %>% select(COU, IND, value, UNIT, var_label, unit_label)
-    , by = c("country_code" = "COU")
-  )
-# ds1 %>% glimpse()
-inds <- ds1 %>% pull(IND) %>% unique()
-length(inds)
-g1 <- ds1 %>%
-  # filter(IND %in% inds[1:C20x]) %>%
-  filter(IND %in% inds[21:41]) %>%
-  ggplot(aes(x=value, y = n_deaths_30days_since_1death_per100k, label = country_code))+
-  # ggplot(aes(x=value, y = n_deaths, label = country_code))+
-  # ggplot(aes(x=value, y = n_cases_per_1m, label = country_code))+
-  # ggplot(aes(x=value, y = n_cases, label = country_code))+
-  geom_point(shape = 21, fill = NA, alpha = 1, color = "salmon", size = 2)+
-  geom_text()+
-  geom_smooth(method = "lm", se = F)+
-  facet_wrap(~var_label, scales = "free")+
-  ggpmisc::stat_poly_eq(
-    formula = y ~ + x
-    ,aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~"))
-    ,parse = TRUE, color = "salmon", alpha = .6
-    , vjust = 1
-  )
-g1
-
-
-a <- c("FAM2","FAM4A","FAM4B","FAM10B","FAM10A", "FAM20")
-
-g1 <- ds1 %>%
-  filter(IND %in% a) %>%
-  filter(!country_code %in% c("BEL", "ESP")) %>%
-  # filter(IND %in% inds[21:41]) %>%
-  # ggplot(aes(x=value, y = n_deaths, label = country_code))+
-  ggplot(aes(x=value, y = n_deaths_30days_since_1death_per100k, label = country_code))+
-  geom_point(shape = 21, fill = NA, alpha = 1, color = "salmon", size = 2)+
-  geom_text()+
-  geom_smooth(method = "lm", se = F)+
-  facet_wrap(~var_label, scales = "free")+
-  ggpmisc::stat_poly_eq(
-    formula = y ~ + x
-    ,aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~"))
-    ,parse = TRUE
-    , vjust = 3
-  )
-g1
-
-
-
-# ---- health-resources ---------------
-
-
-ds_health_resources <- dto$health_resources$data_agg
-inds <- ds_health_resources %>% pull(indicator) %>% unique()
-length(inds)
-indicator_i <- inds[1]
-
-
-
-d_out <- ds_health_resources %>%
-  filter(
-    indicator == "Total health and social employment",
-    unit == "Density per 1 000 population (head counts)"
   ) %>%
-  dplyr::left_join(ds_response, by = c("location" = "country_code"))
+  dplyr::filter(!is.na(country_code))
 
-filter(country_code %in% ds_country$id)
-d$country_code %>% unique()
-ds_country$id %>% unique()
-
-d_out <- d1 %>%
-  filter(country_code %in% ds_country$id) %>%
-  dplyr::left_join(ds_hr, by = c("country_code" = "location"))
-d_out %>% glimpse(30)
-inds <- d_out %>% pull(indicator) %>% unique()
-length(inds)
-g1 <- d_out %>%
-  # filter(IND %in% inds[1:C20x]) %>%
-  filter(indicator %in% inds[21:41]) %>%
-  ggplot(aes(x=value, y = n_deaths_cum_30_days_since_1case, label = country_code))+
-  # ggplot(aes(x=value, y = n_deaths_per_1m, label = country_code))+
-  # ggplot(aes(x=value, y = n_deaths, label = country_code))+
-  # ggplot(aes(x=value, y = n_cases_per_1m, label = country_code))+
-  # ggplot(aes(x=value, y = n_cases, label = country_code))+
-  geom_point(shape = 21, fill = NA, alpha = 1, color = "salmon", size = 2)+
-  geom_text()+
-  geom_smooth(method = "lm", se = F)+
-  facet_wrap(~indicator, scales = "free")+
-  ggpmisc::stat_poly_eq(
-    formula = y ~ + x
-    ,aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~"))
-    ,parse = TRUE, color = "salmon", alpha = .6
-    , vjust = 1
-  )
-g1
+ds_response %>% neat_DT
 
 # ---- publish ---------------------------------------
 path_report <- "./analysis/response-stringency-1/response-stringency-1.Rmd"
