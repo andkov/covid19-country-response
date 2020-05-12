@@ -36,6 +36,32 @@ ds_country <-
 ds_covid <- readr::read_csv(config$path_input_covid)
 ds_covid %>% glimpse()
 
+
+# OECD
+file_path <- list.files(config$path_oecd_clean,full.names = T,recursive = T,pattern = ".rds$")
+dto <- list()
+for(i in seq_along(file_path)){
+  file_name <- basename(file_path[i]) %>% stringr::str_replace(".rds","")
+  dto[[file_name]] <- readr::read_rds(file_path[i])
+}
+
+str(dto,max.level = 1)
+
+
+
+
+# ---- bli -----------------------------
+d_covid <- ds_covid %>% compute_epi_timeline()
+d_covid %>% glimpse()
+
+ds_bli <- dto$better_life_index %>%
+
+ds_bli %>% glimpse()
+
+# ---- basic-table --------------------------------------------------------------
+
+# ---- basic-graph -------------------------------------------------------------
+
 g <- ds_covid %>%
   compute_epi_timeline() %>%
   # dplyr::filter(!country_code %in% c("USA","ITA","FRA","ESP","GBR") ) %>%
@@ -47,50 +73,6 @@ g <- ds_covid %>%
   # geom_smooth(aes(x = epi_timeline, y = n_deaths, group = 1), inherit.aes=F, method = "loess", color = "gray70") +
   labs(
     # title = paste0(var_name," - ", unit_name)
-  )
-g <- plotly::ggplotly(g)
-g
-
-# ----- ranking-graph  ----------------------------
-
-# d_measure %>% glimpse()
-#
-# d_rank <- d_measure %>%
-#   dplyr::distinct(country, VAR, UNIT, var_label, unit_label,
-#                   value, rank, n_tile)
-#
-# country_order <- d_rank %>%
-#   dplyr::arrange(rank) %>%
-#   pull(country)
-#
-# g <- d_rank %>%
-#   dplyr::mutate(
-#     country = factor(country,levels = country_order)
-#   ) %>%
-#   ggplot(aes(x = country, y = value, fill = factor(n_tile)))+
-#   geom_col()+
-#   geom_text(aes(label = round(value,1) ))+
-#   coord_flip()+
-#   theme_minimal()
-# g
-
-
-
-# ---- basic-table --------------------------------------------------------------
-
-# ---- basic-graph -------------------------------------------------------------
-# d_measure %>% glimpse()
-var_label <- d_measure %>%  dplyr::filter(!is.na(var_label)) %>% dplyr::pull(var_label) %>% unique(na.rm=T)
-unit_label <- d_measure %>%  dplyr::filter(!is.na(unit_label)) %>% dplyr::pull(unit_label) %>% unique(na.rm=T)
-g <- d_measure %>%
-  # dplyr::filter(epi_timeline <=30) %>%
-  # ggplot(aes(x = epi_timeline, y = n_deaths, color = rank_percentile)) +
-  ggplot(aes(x = epi_timeline, y = n_deaths, color = factor(n_tile))) +
-  geom_line(aes(group = country_code))+
-  theme_minimal()+
-  facet_wrap(~n_tile)+
-  labs(
-    title = paste0(var_label," - ", unit_label)
   )
 g <- plotly::ggplotly(g)
 g
