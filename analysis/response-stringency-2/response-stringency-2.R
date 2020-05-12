@@ -126,10 +126,22 @@ unique(ds0$country_code)
 d_out <- ds0 %>% filter(country_code == "ITA")
 
 # ----- q1 -------------------
-# what does trajectories for a single CGRT varaible look like?
+# when did the countries start responding to COVID?
 
+pandemic <- lubridate::as_date("2020-03-11")
+exodus <- lubridate::as_date("2020-01-13")
 g1 <- ds0 %>%
-  ggplot
+  # filter(country_code == "ITA") %>%
+  ggplot(aes(x = date, y = StringencyIndex,))+
+  geom_smooth( size = 3, color = "salmon", se = F, alpha = .1 )+
+  geom_line(aes(group = country_label), color = "black",alpha = .25)+
+  scale_y_continuous(breaks = seq(0,100,20))+
+  geom_vline(xintercept = exodus, linetype = "dashed")+
+  annotate("text", label ="First case outside China", y = 100, x = exodus, hjust = -.05, vjust = -1)+
+  geom_vline(xintercept = pandemic, linetype = "dashed")+
+  annotate("text", label ="Pandemic announced", y = 100, x = pandemic,hjust=-.1, ymax = 110, vjust = -1)
+g1
+plotly::ggplotly(g1)
 
 
 
