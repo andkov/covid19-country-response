@@ -123,12 +123,10 @@ ds0 <- ds_covid %>%
 ds0 %>% glimpse()
 unique(ds_covid$country_code)
 unique(ds0$country_code)
-d_out <- ds0 %>% filter(country_code == "ITA")
+# d_out <- ds0 %>% filter(country_code == "ITA")
+# d_out <- ds0 %>% filter(country_code == "LVA")
 
 # -----  -------------------
-
-
-
 
 # ---- performance-indicators -----------------------
 # d1 <- ds0 %>%
@@ -144,7 +142,7 @@ d1 <- ds0 %>%
   dplyr::rename(n_deaths_30days_since_1death = n_deaths_cum) %>%
   dplyr::mutate(n_deaths_30days_since_1death_per1m = n_deaths_30days_since_1death/n_population_2018*1000000 ) %>%
   dplyr::select(-n_population_2018)
-
+d1 %>% glimpse()
 # Deaths 60 days after 1st death
 d2 <- ds0 %>%
   group_by(country_code) %>%
