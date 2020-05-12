@@ -120,9 +120,15 @@ ds0 <- ds_covid %>%
     by = c("country_code" = "country_code3")
   )
 
+ds0 %>% glimpse()
 unique(ds_covid$country_code)
 unique(ds0$country_code)
 d_out <- ds0 %>% filter(country_code == "ITA")
+
+# -----  -------------------
+
+
+
 
 # ---- performance-indicators -----------------------
 # d1 <- ds0 %>%
