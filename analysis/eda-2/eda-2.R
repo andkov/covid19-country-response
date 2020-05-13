@@ -138,53 +138,93 @@ d_out <- ds0 %>%
 d1 <- ds0 %>%
   group_by(country_code) %>%
   dplyr::filter(days_since_1death == 30) %>%
-  dplyr::select(country_code, n_deaths_cum, n_population_2018) %>%
-  dplyr::rename(n_deaths_30days_since_1death = n_deaths_cum) %>%
-  dplyr::mutate(n_deaths_30days_since_1death_per1m = n_deaths_30days_since_1death/n_population_2018*1000000 ) %>%
-  dplyr::select(-n_population_2018)
+  dplyr::select(country_code, n_deaths_cum, n_deaths_cum_per_1m) %>%
+  dplyr::rename(n_deaths_30days_since_1death       = n_deaths_cum) %>%
+  dplyr::rename(n_deaths_30days_since_1death_per1m = n_deaths_cum_per_1m) %>%
+  ungroup()
 d1 %>% glimpse()
 # Deaths 60 days after 1st death
 d2 <- ds0 %>%
   group_by(country_code) %>%
   dplyr::filter(days_since_1death == 60) %>%
-  dplyr::select(country_code, n_deaths_cum,n_population_2018) %>%
-  dplyr::rename(n_deaths_60days_since_1death = n_deaths_cum) %>%
-  dplyr::mutate(
-    n_deaths_60days_since_1death_per1m = n_deaths_60days_since_1death/n_population_2018*1000000
-  ) %>%
-  dplyr::select(-n_population_2018)
+  dplyr::select(country_code, n_deaths_cum,n_deaths_cum_per_1m) %>%
+  dplyr::rename(n_deaths_60days_since_1death       = n_deaths_cum) %>%
+  dplyr::rename(n_deaths_60days_since_1death_per1m = n_deaths_cum_per_1m)%>%
+  ungroup()
 
 # Cases 30 days after 1st case
 d3 <- ds0 %>%
   group_by(country_code) %>%
   dplyr::filter(days_since_1case == 30) %>%
-  dplyr::select(country_code, n_cases_cum, n_population_2018) %>%
-  dplyr::rename(n_cases_30days_since_1case = n_cases_cum) %>%
-  dplyr::mutate(
-    n_cases_30days_since_1case_per1m = n_cases_30days_since_1case/n_population_2018*1000000
-  ) %>%
-  dplyr::select(-n_population_2018)
+  dplyr::select(country_code, n_cases_cum, n_cases_cum_per_1m) %>%
+  dplyr::rename(n_cases_30days_since_1case       = n_cases_cum) %>%
+  dplyr::rename(n_cases_30days_since_1case_per1m = n_cases_cum_per_1m)%>%
+  ungroup()
 
 # Cases 60 days after 1st case
 d4 <- ds0 %>%
   group_by(country_code) %>%
   dplyr::filter(days_since_1case == 60) %>%
-  dplyr::select(country_code, n_cases_cum, n_population_2018) %>%
-  dplyr::rename(n_cases_60days_since_1case = n_cases_cum) %>%
-  dplyr::mutate(
-    n_cases_60days_since_1case_per1m = n_cases_60days_since_1case/n_population_2018*1000000
-  ) %>%
-  dplyr::select(-n_population_2018)
+  dplyr::select(country_code, n_cases_cum, n_cases_cum_per_1m) %>%
+  dplyr::rename(n_cases_60days_since_1case       = n_cases_cum) %>%
+  dplyr::rename(n_cases_60days_since_1case_per1m = n_cases_cum_per_1m) %>%
+  ungroup()
+
+
+# Deaths 30 days after 1st case
+d5 <- ds0 %>%
+  group_by(country_code) %>%
+  dplyr::filter(days_since_1case == 30) %>%
+  dplyr::select(country_code, n_deaths_cum, n_deaths_cum_per_1m) %>%
+  dplyr::rename(n_deaths_30days_since_1case       = n_deaths_cum) %>%
+  dplyr::rename(n_deaths_30days_since_1case_per1m = n_deaths_cum_per_1m) %>%
+  ungroup()
+d5 %>% glimpse()
+# Deaths 60 days after 1st case
+d6 <- ds0 %>%
+  group_by(country_code) %>%
+  dplyr::filter(days_since_1case == 60) %>%
+  dplyr::select(country_code, n_deaths_cum, n_deaths_cum_per_1m) %>%
+  dplyr::rename(n_deaths_60days_since_1case       = n_deaths_cum) %>%
+  dplyr::rename(n_deaths_60days_since_1case_per1m = n_deaths_cum_per_1m)%>%
+  ungroup()
+
+# Cases 30 days after 1st death
+d7 <- ds0 %>%
+  group_by(country_code) %>%
+  dplyr::filter(days_since_1death == 30) %>%
+  dplyr::select(country_code, n_cases_cum, n_cases_cum_per_1m) %>%
+  dplyr::rename(n_cases_30days_since_1death = n_cases_cum) %>%
+  dplyr::rename(n_cases_30days_since_1death_per1m = n_cases_cum_per_1m)%>%
+  ungroup()
+
+# Cases 60 days after 1st case
+d8 <- ds0 %>%
+  group_by(country_code) %>%
+  dplyr::filter(days_since_1death == 60) %>%
+  dplyr::select(country_code, n_cases_cum, n_cases_cum_per_1m) %>%
+  dplyr::rename(n_cases_60days_since_1death = n_cases_cum) %>%
+  dplyr::rename(n_cases_60days_since_1death_per1m = n_cases_cum_per_1m) %>%
+  ungroup()
+
+
+
 
 # ds0 %>% filter(country_ == "LVA")
-ds_response <- list(d1,d2,d3,d4) %>% Reduce(function(a,b) dplyr::full_join(a,b), .)
-ds_response <- ds_response %>%
+ds_scince_metric <- list(d1,d2,d3,d4,d5,d6,d7,d8) %>% Reduce(function(a,b) dplyr::full_join(a,b), .)
+ds_scince_metric %>% glimpse()
+ds_scince_metric <- ds_scince_metric %>%
   dplyr::left_join(
-    ds_covid %>% distinct(country_code, geo_id, country)
+    ds_country_codes, by = c("country_code" = "country_code3")
   ) %>%
   dplyr::filter(!is.na(country_code))
 
-ds_response %>% neat_DT
+ds_scince_metric %>% glimpse()
+ds_scince_metric %>% neat_DT()
+
+
+
+
 
 # ---- publish ---------------------------------------
 path_report <- "./analysis/response-stringency-1/response-stringency-1.Rmd"
