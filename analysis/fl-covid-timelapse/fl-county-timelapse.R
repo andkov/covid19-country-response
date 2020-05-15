@@ -2,7 +2,7 @@
 
 # reproducing the animation from
 # https://www.r-bloggers.com/tracking-covid19-cases-throughout-nj-with-r/
-
+# also see https://www.r-spatial.org/r/2018/10/25/ggplot2-sf-2.html
 
 library(dplyr) # used for data wrangling
 library(ggplot2)
