@@ -105,6 +105,8 @@ ds_hr <- ls_health_resources$data_agg
 ds_cgrt <- readr::read_rds("./data-unshared/derived/OxCGRT.rds")
 # ds_cgrt %>% glimpse()
 # n_distinct(ds_cgrt$country_code)
+ds_covid$country_code %>% unique() %>% length()
+ds_cgrt$country_code %>% unique() %>% length()
 
 # ---- inspect-data ----------------------
 
@@ -121,8 +123,7 @@ ds0 <- ds_covid %>%
   )
 
 ds0 %>% glimpse()
-unique(ds_covid$country_code)
-unique(ds0$country_code)
+ds0$country_code %>% unique() %>% length()
 # d_out <- ds0 %>% filter(country_code == "ITA")
 # d_out <- ds0 %>% filter(country_code == "LVA")
 
@@ -213,18 +214,45 @@ d8 <- ds0 %>%
 # ds0 %>% filter(country_ == "LVA")
 ds_scince_metric <- list(d1,d2,d3,d4,d5,d6,d7,d8) %>% Reduce(function(a,b) dplyr::full_join(a,b), .)
 ds_scince_metric %>% glimpse()
+longer_names <- setdiff(names(ds_scince_metric),"country_code")
+ds_scince_metric_long <- ds_scince_metric %>%
+  tidyr::pivot_longer(cols = longer_names, names_to = "metric", values_to = "value")
+ds_scince_metric_long %>% glimpse()
+
 ds_scince_metric <- ds_scince_metric %>%
   dplyr::left_join(
     ds_country_codes, by = c("country_code" = "country_code3")
   ) %>%
   dplyr::filter(!is.na(country_code))
 
+ds_scince_metric_long <- ds_scince_metric_long %>%
+  dplyr::left_join(
+    ds_country_codes, by = c("country_code" = "country_code3")
+  ) %>%
+  dplyr::filter(!is.na(country_code))
+
+ds_scince_metric_long %>% glimpse()
 ds_scince_metric %>% glimpse()
-ds_scince_metric %>% neat_DT()
+
+# ds_scince_metric %>% neat_DT()
+ls_scince_metri <- list(
+  "wide" = ds_scince_metric, "long" = ds_scince_metric_long
+) %>%
+  readr::write_rds("./analysis/shiny-since-metric/data.rds")
 
 
+# ----- since-metrics ----------------------
+possible_metrics <- ds_scince_metric_long$metric %>% unique()
+ds_metric_pairs <- expand.grid(possible_metrics, possible_metrics) %>%
+  mutate(same = Var1 == Var2) %>%
+  filter(!same)
 
 
+# ----- family ---------------------------
+ls <- readr::read_rds(paste0(config$path_oecd_clean,"family.rds"))
+ds <- ls$data_agg
+ds %>% glimpse()
+ds$location %>% unique() %>% length()
 
 # ---- publish ---------------------------------------
 path_report <- "./analysis/response-stringency-1/response-stringency-1.Rmd"
