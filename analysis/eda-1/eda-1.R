@@ -235,64 +235,7 @@ g2 <- d2 %>%
 g2 <- plotly::ggplotly(g2)
 g2
 
-# ---- q3 -----------
 
-# d1 <- ds0 %>%
-d_out <- ds0 %>%
-  filter(country_code == "ITA") %>%
-  select(country_code, date,n_cases_cum, n_deaths_cum, days_since_1case, days_since_1death)
-
-# Deaths 30 days after 1st death
-d1 <- ds0 %>%
-  group_by(country_code) %>%
-  dplyr::filter(days_since_1death == 30) %>%
-  dplyr::select(country_code, n_deaths_cum, n_population_2018) %>%
-  dplyr::rename(n_deaths_30days_since_1death = n_deaths_cum) %>%
-  dplyr::mutate(n_deaths_30days_since_1death_per100k = n_deaths_30days_since_1death/n_population_2018*100000 ) %>%
-  dplyr::select(-n_population_2018)
-
-# Deaths 60 days after 1st death
-d2 <- ds0 %>%
-  group_by(country_code) %>%
-  dplyr::filter(days_since_1death == 60) %>%
-  dplyr::select(country_code, n_deaths_cum,n_population_2018) %>%
-  dplyr::rename(n_deaths_60days_since_1death = n_deaths_cum) %>%
-  dplyr::mutate(
-    n_deaths_60days_since_1death_per100k = n_deaths_60days_since_1death/n_population_2018*100000
-  ) %>%
-  dplyr::select(-n_population_2018)
-
-# Cases 30 days after 1st case
-d3 <- ds0 %>%
-  group_by(country_code) %>%
-  dplyr::filter(days_since_1case == 30) %>%
-  dplyr::select(country_code, n_cases_cum, n_population_2018) %>%
-  dplyr::rename(n_cases_30days_since_1case = n_cases_cum) %>%
-  dplyr::mutate(
-    n_cases_30days_since_1case_per100k = n_cases_30days_since_1case/n_population_2018*100000
-  ) %>%
-  dplyr::select(-n_population_2018)
-
-# Cases 60 days after 1st case
-d4 <- ds0 %>%
-  group_by(country_code) %>%
-  dplyr::filter(days_since_1case == 60) %>%
-  dplyr::select(country_code, n_cases_cum, n_population_2018) %>%
-  dplyr::rename(n_cases_60days_since_1case = n_cases_cum) %>%
-  dplyr::mutate(
-    n_cases_60days_since_1case_per100k = n_cases_60days_since_1case/n_population_2018*100000
-  ) %>%
-  dplyr::select(-n_population_2018)
-
-# ds0 %>% filter(country_ == "LVA")
-ds_response <- list(d1,d2,d3,d4) %>% Reduce(function(a,b) dplyr::full_join(a,b), .)
-ds_response <- ds_response %>%
-  dplyr::left_join(
-    ds_covid %>% distinct(country_code, geo_id, country)
-  ) %>%
-  dplyr::filter(!is.na(country_code))
-
-ds_response %>% neat_DT
 
 # ---- publish ---------------------------------------
 path_report <- "./analysis/response-stringency-1/response-stringency-1.Rmd"
