@@ -343,11 +343,11 @@ lsmeta$POWERCODE
 #
 ds1 <- ds0 %>%
   dplyr::mutate(
-    indicator    = factor(INDICATOR, levels = lsmeta$INDICATOR$id, labels = lsmeta$INDICATOR$label)
-    ,MEASURE = factor(MEASURE, levels = lsmeta$MEASURE$id, labels = lsmeta$MEASURE$label)
+    indicator   = factor(INDICATOR, levels = lsmeta$INDICATOR$id, labels = lsmeta$INDICATOR$label)
+    ,MEASURE    = factor(MEASURE, levels = lsmeta$MEASURE$id, labels = lsmeta$MEASURE$label)
     ,INEQUALITY = factor(INEQUALITY, levels = lsmeta$INEQUALITY$id, labels = lsmeta$INEQUALITY$label)
-    ,UNIT = factor(UNIT, levels = lsmeta$UNIT$id, labels = lsmeta$UNIT$label)
-    ,POWERCODE = factor(POWERCODE, levels = lsmeta$POWERCODE$id, labels = lsmeta$POWERCODE$label)
+    ,UNIT       = factor(UNIT, levels = lsmeta$UNIT$id, labels = lsmeta$UNIT$label)
+    ,POWERCODE  = factor(POWERCODE, levels = lsmeta$POWERCODE$id, labels = lsmeta$POWERCODE$label)
   )
 ds1 %>% glimpse()
 # what defines a row?
