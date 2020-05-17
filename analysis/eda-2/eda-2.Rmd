@@ -1,5 +1,5 @@
 ---
-title: "EDA-2"
+title: "EDA-2: Contextual Predisposing"
 author: "Andriy Koval"
 date: "May 9, 2020"
 output:
@@ -7,10 +7,15 @@ output:
     theme: simplex
     toc: true
     toc_depth: 3
-    keep_md: true
+    keep_md: false
     toc_float: true
     code_folding: hide
 ---
+
+# Abstract
+This report explores the Contextual Predisposing Characteristics (see Anderson model) of OECD countries and relates them to COVID-19 mortality during the first 30 days of the epidemic in each country. 
+
+The report will focus on three subsections: (1) Demographic characteristics, (2) Social characteristic, and (3) Belief, as operationalized by the variables in the OECD database. 
 
 <!-- These two chunks should be added in the beginning of every .Rmd that you want to source an .R script -->
 <!--  The 1st mandatory chunck  -->
@@ -46,12 +51,9 @@ opts_chunk$set(
 echoChunks <- TRUE
 options(width=120) #So the output is 50% wider than the default.
 # connect to the file with the underlying R script  
-read_chunk("./analysis/eda-1/eda-1.R")
+read_chunk("./analysis/eda-2/eda-2.R")
 # read_chunk("../../../analysis/blogposts/florida-suicide-count/fl-suicide-count.R")
 ```
-# Abstract
-
-To be added
 
 # Environment
 
@@ -80,30 +82,36 @@ The data comes from [OxCGRT][] and  [OECD][] databases
 ds0 %>% glimpse()
 ```
 
-# Q1 - Shape of the trend
+# COVID Indicators
 
-> How does COVID-19 progress in each country?  
+What are some basic indicators of progression of COVID in each country?  Without resorting to estimating the growth parameter of the contagion or mortality trajectory, we compute impact indicators based on the total number of cases or deaths at a given time point:  
 
-```{r q1-basic-timeline, echo=TRUE, fig.height=7, fig.width=10, out.width = "1200px", message=FALSE, results='asis',warning = F, cache=TRUE}
+- Number of __deaths__ 30 days since 1st confirmed ___death___ (per 1 million)
+- Number of __deaths__ 30 days since 1st confirmed ___case___ (per 1 million)
+- Number of __cases__ 30 dyas since 1st confirmed ___death___ (per 1 million)
+- Number of __cases__ 30 dyas since 1st confirmed ___case___ (per 1 million)
+
+```{r covid-metric-1, echo=TRUE, fig.height=7, fig.width=10, out.width = "1200px", message=FALSE, results='hide',warning = F, cache=TRUE}
 ```
 
-# Q1 - Within Country
-```{r q1a, echo=TRUE, fig.height=2, fig.width=10, out.width = "1200px", message=FALSE, results='asis',warning = F, cache=TRUE}
+## 1 
+```{r why_75-1,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
 ```
 
-# Q2 - Response Stringency
-
-> What was the trend of the response to COVID-10 by each country?  
-
-```{r q2-response-trend, echo=TRUE, fig.height=7, fig.width=10, out.width = "1200px", message=FALSE, results='show',warning = F, cache=TRUE}
+## 2
+```{r why_75-2,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
 ```
 
-```{r q2-all, echo=TRUE,  out.width = "900px", message=FALSE, results='show',warning = F, cache=TRUE}
+## 3
+```{r why_75-3,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
 ```
 
-# Q3 - Response metrics
+## 4
+```{r why_75-4,echo=TRUE,fig.height=7, fig.width=10, out.width = "1200px",  message=FALSE, results='show',warning = F, cache=TRUE}
+```
 
-```{r q3, echo=TRUE, fig.height=2, fig.width=10, out.width = "1200px", message=FALSE, results='show',warning = F, cache=TRUE}
+## 5
+```{r why_75-5,echo=TRUE,fig.height=7, fig.width=10, out.width = "1200px",  message=FALSE, results='show',warning = F, cache=TRUE}
 ```
 
 session information
