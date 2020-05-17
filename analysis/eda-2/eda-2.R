@@ -42,6 +42,9 @@ compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
       # this solution might be vulnerable to cases where some intermediate dates are missed
       n_deaths_cum         = cumsum(tidyr::replace_na(n_deaths,0))
       ,n_cases_cum         = cumsum(tidyr::replace_na(n_cases,0))
+      ,n_deaths_cum_per_1m = n_deaths_cum/n_population_2018*1000000
+      ,n_cases_cum_per_1m  = n_cases_cum/ n_population_2018*1000000
+
       ,cutoff_death        = n_deaths_cum >= 1
       ,cutoff_case         = n_cases_cum >= 1
       ,days_since_1death   = cumsum(tidyr::replace_na(cutoff_death,0))
@@ -50,16 +53,15 @@ compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
       ,date_of_1case       = lubridate::as_date(ifelse(days_since_1case==1,date, NA))
       ,date_of_1death      = min(date_of_1death, na.rm =T)
       ,date_of_1case       = min(date_of_1case, na.rm =T)
-      ,days_since_1death   = date - date_of_1death
-      ,days_since_1case    = date - date_of_1case
-      ,n_deaths_cum_per_1m = n_deaths_cum/n_population_2018*1000000
-      ,n_cases_cum_per_1m  = n_cases_cum/ n_population_2018*1000000
+      ,days_since_1death   = (date - date_of_1death) %>% as.integer()
+      ,days_since_1case    = (date - date_of_1case) %>% as.integer()
+
     ) %>%
     dplyr::ungroup() %>%
     # dplyr::filter(epi_timeline > 0) %>%
     dplyr::mutate(
-      days_since_exodus = date - lubridate::date("2020-01-13") # first case outside of china
-      ,days_since_pandemic = date - lubridate::date("2020-03-11") # WHO declares pandemic
+      days_since_exodus    = as.integer(date - lubridate::date("2020-01-13")) # first case outside of china
+      ,days_since_pandemic = as.integer(date - lubridate::date("2020-03-11")) # WHO declares pandemic
     ) %>%
     select(-cutoff_death, - cutoff_case, -date_of_1death, -date_of_1case)
   return(d_out)
@@ -129,7 +131,7 @@ ds0$country_code %>% unique() %>% length()
 
 # -----  -------------------
 
-# ---- performance-indicators -----------------------
+# ---- covid-indicators -----------------------
 # d1 <- ds0 %>%
 d_out <- ds0 %>%
   filter(country_code == "ITA") %>%
@@ -209,8 +211,6 @@ d8 <- ds0 %>%
   ungroup()
 
 
-
-
 # ds0 %>% filter(country_ == "LVA")
 ds_scince_metric <- list(d1,d2,d3,d4,d5,d6,d7,d8) %>% Reduce(function(a,b) dplyr::full_join(a,b), .)
 ds_scince_metric %>% glimpse()
@@ -235,7 +235,7 @@ ds_scince_metric_long %>% glimpse()
 ds_scince_metric %>% glimpse()
 
 # ds_scince_metric %>% neat_DT()
-ls_scince_metri <- list(
+ls_scince_metric <- list(
   "wide" = ds_scince_metric, "long" = ds_scince_metric_long
 ) %>%
   readr::write_rds("./analysis/shiny-since-metric/data.rds")
@@ -249,10 +249,51 @@ ds_metric_pairs <- expand.grid(possible_metrics, possible_metrics) %>%
 
 
 # ----- family ---------------------------
-ls <- readr::read_rds(paste0(config$path_oecd_clean,"family.rds"))
-ds <- ls$data_agg
-ds %>% glimpse()
-ds$location %>% unique() %>% length()
+# ls <- readr::read_rds(paste0(config$path_oecd_clean,"family.rds"))
+# ds <- ls$data_agg
+# ds %>% glimpse()
+# ds$location %>% unique() %>% length()
+
+# ----- sc ---------------------------
+ls <- readr::read_rds(paste0(config$path_oecd_clean,"serving_citizens.rds"))
+ds_citserv <- ls$data_agg %>%
+  # filter(country_code == "ITA")
+  select(location, indicator, value) %>%
+  mutate(
+    indicator = as.character(indicator)
+  ) %>%
+  dplyr::rename(
+    metric = indicator, country_code = location
+  )
+
+ds_citserv %>% glimpse()
+
+ds1_long <- ds_scince_metric_long %>%
+  select(country_code, metric, value) %>%
+  # filter(country_code == "ITA") %>%
+  bind_rows(ds_citserv ) %>%
+  dplyr::left_join(
+    ds_country_codes, by = c("country_code" = "country_code3")
+  ) %>%
+  mutate(
+    metric = stringr::str_replace_all(metric," ","_")
+    ,metric = stringr::str_replace_all(metric,"\\(","_")
+    ,metric = stringr::str_replace_all(metric,"\\)","_")
+    ,metric = stringr::str_replace_all(metric,"\\%","_")
+    ,metric = stringr::str_replace_all(metric,",","_")
+    ,metric = stringr::str_replace_all(metric,"-","_")
+
+  )
+ds1_long$metric %>% unique()
+
+ds1_wide <- ds1_long %>%
+  tidyr::pivot_wider(names_from = "metric", values_from = "value" )
+
+list(
+  "wide" = ds1_wide, "long" = ds1_long
+) %>%
+  readr::write_rds("./analysis/shiny-since-metric/data.rds")
+
 
 # ---- publish ---------------------------------------
 path_report <- "./analysis/response-stringency-1/response-stringency-1.Rmd"
