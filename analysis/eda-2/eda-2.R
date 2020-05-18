@@ -133,17 +133,20 @@ ds0 <- ds_covid %>%
 # d_out <- ds0 %>% filter(country_code == "LVA")
 
 # ----current-toll ----------------
+current_date <- Sys.Date()
 
-d1 <- ds0 %>%
+
+g1 <- ds0 %>%
   filter(country_code %in% ds_country$id) %>%
-  filter(date == lubridate::as_date("2020-05-17"))
-# d1 %>% glimpse()
-
-g1 <- d1 %>%
+  filter(date == lubridate::as_date(current_date)) %>%
   mutate(country_label = forcats::fct_reorder(country_label, n_deaths_cum_per_1m)) %>%
   ggplot(aes(x = n_deaths_cum_per_1m, y = country_label))+
   geom_segment(aes(yend = country_label, xend = min(n_deaths_cum_per_1m)))+
-  geom_point(aes(size = n_cases_cum_per_1m), shape = 21, alpha = .2 )
+  geom_point(aes(size = n_cases_cum_per_1m, fill = n_cases_cum_per_1m), shape = 21, alpha = .9 )+
+  scale_fill_viridis_c(option = "magma",direction = 1)+
+  labs(title = paste0("Total cumulative deaths as of ", current_date ),
+       x = "Total confirmed deaths per 1 million", y = "Country",
+       size = "Total cases (per 1m)", fill = "Total cases (per 1m)")
 g1
 
 
@@ -163,10 +166,11 @@ d1 <- ds0 %>%
   mutate(since_exodus_to_first_death = days_since_exodus - days_since_1death) %>%
   mutate(since_exodus_to_first_case = days_since_exodus - days_since_1case)
 d1 %>% glimpse()
-d1 %>%
+g1 <- d1 %>%
   ggplot(aes( x = since_exodus_to_first_case, y = n_deaths_cum_per_1m)) +
   # ggplot(aes( x = since_exodus_to_first_death, y = n_deaths_cum_per_1m)) +
-  geom_text(aes(label = country_code))
+  geom_text(aes(label = country_code, group = country_label))
+plotly::ggplotly(g1+scale_x_continuous(limits = c(0,75)))
 
 
 # ---- covid-metric-1 -----------------------
