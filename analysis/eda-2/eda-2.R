@@ -125,6 +125,9 @@ ds0 <- ds_covid %>%
   dplyr::left_join(
     ds_country_codes,
     by = c("country_code" = "country_code3")
+  ) %>%
+  dplyr::mutate(
+    oecd = country_code %in% ds_country$id
   )
 
 # ds0 %>% glimpse()
@@ -133,7 +136,7 @@ ds0 <- ds_covid %>%
 # d_out <- ds0 %>% filter(country_code == "LVA")
 
 # focus on OECD countries and variables
-ds1 <- ds0 %>% filter(country_code %in% ds_country$id) %>%
+ds1 <- ds0 %>% filter(oecd) %>%
   # filter(country_code == "AUS") %>%
 
   select(
@@ -146,6 +149,9 @@ ds1 <- ds0 %>% filter(country_code %in% ds_country$id) %>%
   #   ,days_btw_1case_1death      = days_to_1death_since_exodus - days_since_1case
   #   ,country_label                = forcats::fct_reorder(country_label, days_btw_1case_1death)
   # )
+
+# ds1 <- ds1 %>%
+#   filter(days_since_1case == 0)
 
 # How long did it take to show first case/death?
 ds1 %>%
@@ -161,8 +167,9 @@ ds1 %>%
   geom_point(shape = 21, size =2, alpha = .6, fill = "#1b9e77")+
   geom_point(aes(x = days_to_1death_since_exodus), shape = 21, size =2, alpha = .6, fill = "#d95f02")+
   # geom_text(aes(label = country_code), hjust = -1, size = 3, color = "grey60")+
-  labs(title = "Timeline")
+  labs(title = "COVID Timeline", x = "Days to first case since exodus (Jan 13)", y = NULL)
 
+# reorder
 ds1 %>%
   filter(days_since_1case == 0) %>%
   mutate(
@@ -178,7 +185,7 @@ ds1 %>%
   # geom_text(aes(label = country_code), hjust = -1, size = 3, color = "grey60")+
   labs(title = "Timeline")
 
-
+# reorder
 ds1 %>%
   filter(days_since_1case == 0) %>%
   mutate(
@@ -193,6 +200,20 @@ ds1 %>%
   geom_point(aes(x = days_to_1death_since_exodus), shape = 21, size =2, alpha = .6, fill = "#d95f02")+
   # geom_text(aes(label = country_code), hjust = -1, size = 3, color = "grey60")+
   labs(title = "Timeline")
+
+ds0 %>%
+  filter(oecd) %>%
+  filter(days_since_1case == 30) %>%
+  # filter(days_since_1death == 0) %>%
+  mutate(
+    days_to_1death = -1* days_since_1death
+    ,days_to_1death_since_exodus = (-1*days_since_1death) +days_since_exodus
+  ) %>%
+  ggplot(aes(x = days_since_exodus, y = days_to_1death))+
+  # geom_point(shape =21, aes(size = StringencyIndex))+
+  # geom_point(shape =21, aes(size = n_deaths_cum))+
+  geom_text(aes(label = country_code))+
+  labs(title = "Early timeline")
 
 # ---- -----------
 # How does Covid toll on relative scale compare to absolute?
