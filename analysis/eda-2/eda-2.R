@@ -132,34 +132,155 @@ ds0 <- ds_covid %>%
 # d_out <- ds0 %>% filter(country_code == "ITA")
 # d_out <- ds0 %>% filter(country_code == "LVA")
 
+# focus on OECD countries and variables
+ds1 <- ds0 %>% filter(country_code %in% ds_country$id) %>%
+  # filter(country_code == "AUS") %>%
+
+  select(
+    date, country_code,country_label, country_code2,
+    n_deaths_cum_per_1m, n_cases_cum_per_1m, StringencyIndex,
+    days_since_1case, days_since_1death, days_since_exodus, days_since_pandemic
+  ) #%>%
+  # mutate(
+  #   days_to_1death_since_exodus = (-1*days_since_1death) +days_since_exodus
+  #   ,days_btw_1case_1death      = days_to_1death_since_exodus - days_since_1case
+  #   ,country_label                = forcats::fct_reorder(country_label, days_btw_1case_1death)
+  # )
+
+# How long did it take to show first case/death?
+ds1 %>%
+  filter(days_since_1case == 0) %>%
+  mutate(
+    country_label                = forcats::fct_reorder(country_label, days_since_exodus)
+    ,days_to_1death_since_exodus = (-1*days_since_1death) +days_since_exodus
+  ) %>%
+  # ggplot(aes(x = days_since_exodus, y = country_label))+
+  ggplot(aes(x = days_since_exodus, y = country_label))+
+  geom_segment(aes(yend = country_label, xend = 0), linetype="dotted", alpha = .8)+
+  geom_segment(aes(yend = country_label, xend = days_to_1death_since_exodus, color = "red"))+
+  geom_point(shape = 21, size =2, alpha = .6, fill = "#1b9e77")+
+  geom_point(aes(x = days_to_1death_since_exodus), shape = 21, size =2, alpha = .6, fill = "#d95f02")+
+  # geom_text(aes(label = country_code), hjust = -1, size = 3, color = "grey60")+
+  labs(title = "Timeline")
+
+ds1 %>%
+  filter(days_since_1case == 0) %>%
+  mutate(
+    days_to_1death_since_exodus = (-1*days_since_1death) +days_since_exodus
+   ,country_label                = forcats::fct_reorder(country_label, days_to_1death_since_exodus)
+  ) %>%
+  # ggplot(aes(x = days_since_exodus, y = country_label))+
+  ggplot(aes(x = days_since_exodus, y = country_label))+
+  geom_segment(aes(yend = country_label, xend = 0), linetype="dotted", alpha = .8)+
+  geom_segment(aes(yend = country_label, xend = days_to_1death_since_exodus, color = "red"))+
+  geom_point(shape = 21, size =2, alpha = .6, fill = "#1b9e77")+
+  geom_point(aes(x = days_to_1death_since_exodus), shape = 21, size =2, alpha = .6, fill = "#d95f02")+
+  # geom_text(aes(label = country_code), hjust = -1, size = 3, color = "grey60")+
+  labs(title = "Timeline")
+
+
+ds1 %>%
+  filter(days_since_1case == 0) %>%
+  mutate(
+    days_to_1death_since_exodus = (-1*days_since_1death) +days_since_exodus
+    ,country_label                = forcats::fct_reorder(country_label, days_since_1death)
+  ) %>%
+  # ggplot(aes(x = days_since_exodus, y = country_label))+
+  ggplot(aes(x = days_since_exodus, y = country_label))+
+  geom_segment(aes(yend = country_label, xend = 0), linetype="dotted", alpha = .8)+
+  geom_segment(aes(yend = country_label, xend = days_to_1death_since_exodus, color = "red"))+
+  geom_point(shape = 21, size =2, alpha = .6, fill = "#1b9e77")+
+  geom_point(aes(x = days_to_1death_since_exodus), shape = 21, size =2, alpha = .6, fill = "#d95f02")+
+  # geom_text(aes(label = country_code), hjust = -1, size = 3, color = "grey60")+
+  labs(title = "Timeline")
+
+# ---- -----------
+# How does Covid toll on relative scale compare to absolute?
+
+d1 <- ds0 %>%
+  filter(country_code %in% ds_country$id) %>%
+  filter(
+    days_since_1death == 29 | days_since_exodus == 100
+  ) %>%
+  group_by(country_code) %>% mutate(ind = n() ) %>% ungroup() %>%
+  select(country_code, ind) %>% filter(ind ==1)
+  select(country_code,n_deaths_cum_per_1m, days_)
+
+# d <- ds0 %>% filter(country_code=="CZE")
+#  %>%
+d1 %>% ggplot(aes(x=days_since_1case, y = n_deaths_cum_per_1m))+
+# d1 %>% ggplot(aes(x=date, y = n_deaths_cum_per_1m))+
+  geom_text(aes(label = country_code))
+
+# Toll at ABSOLUTE timeline (100 days after exodus)
+d2 <- ds0 %>%
+  filter(country_code %in% ds_country$id) %>%
+  filter(days_since_exodus == 100) %>%
+  # group_by(country_code) %>% mutate(ind = n() ) %>% ungroup() %>%
+  # select(country_code, ind) %>% filter(ind ==1)
+  select(country_code, n_deaths_cum_per_1m, days_since_1case, days_since_exodus)
+d2 %>% ggplot(aes(x=days_since_1case, y = n_deaths_cum_per_1m))+
+  geom_text(aes(label = country_code))
+
 # ----current-toll ----------------
 current_date <- Sys.Date()
 
-
+# Total deaths today
 g1 <- ds0 %>%
   filter(country_code %in% ds_country$id) %>%
   filter(date == lubridate::as_date(current_date)) %>%
   mutate(country_label = forcats::fct_reorder(country_label, n_deaths_cum_per_1m)) %>%
   ggplot(aes(x = n_deaths_cum_per_1m, y = country_label))+
-  geom_segment(aes(yend = country_label, xend = min(n_deaths_cum_per_1m)))+
+  geom_segment(aes(yend = country_label, xend = 0))+
   geom_point(aes(size = n_cases_cum_per_1m, fill = n_cases_cum_per_1m), shape = 21, alpha = .9 )+
+  geom_text(aes(label = country_code2), hjust = -1, size = 3)+
   scale_fill_viridis_c(option = "magma",direction = 1)+
+  theme(legend.position = "left")+
   labs(title = paste0("Total cumulative deaths as of ", current_date ),
        x = "Total confirmed deaths per 1 million", y = "Country",
        size = "Total cases (per 1m)", fill = "Total cases (per 1m)")
 g1
 
-
-d1 <- ds0 %>%
+# Total deaths 30 days after 1st death
+g1 <- ds0 %>%
   filter(country_code %in% ds_country$id) %>%
-  filter(days_since_1death == 60) %>%
+  filter(days_since_1death == 30) %>%
   mutate(country_label = forcats::fct_reorder(country_label, n_deaths_cum_per_1m)) %>%
   ggplot(aes(x = n_deaths_cum_per_1m, y = country_label))+
-  geom_segment(aes(yend = country_label, xend = min(n_deaths_cum_per_1m)))+
-  geom_point(aes(size = n_cases_cum_per_1m), shape = 21, alpha = .2 )
+  geom_segment(aes(yend = country_label, xend = 0))+
+  geom_point(aes(size = n_cases_cum_per_1m, fill = n_cases_cum_per_1m), shape = 21, alpha = .9 )+
+  geom_text(aes(label = country_code2), hjust = -1, size = 3)+
+  scale_fill_viridis_c(option = "magma",direction = 1)+
+  theme(legend.position = "left")+
+  labs(title = paste0("Total cumulative deaths 30 days after 1st confirmed death in the country"),
+       x = "Total confirmed deaths per 1 million", y = "Country",
+       size = "Total cases (per 1m)", fill = "Total cases (per 1m)")
 g1
 
 
+# Total deaths 100 days after exodus
+g1 <- ds0 %>%
+  filter(country_code %in% ds_country$id) %>%
+  filter(days_since_exodus == 100) %>%
+  mutate(country_label = forcats::fct_reorder(country_label, n_deaths_cum_per_1m)) %>%
+  ggplot(aes(x = n_deaths_cum_per_1m, y = country_label))+
+  geom_segment(aes(yend = country_label, xend = 0))+
+  geom_point(aes(size = n_cases_cum_per_1m, fill = n_cases_cum_per_1m), shape = 21, alpha = .9 )+
+  geom_text(aes(label = country_code2), hjust = -1, size = 3)+
+  scale_fill_viridis_c(option = "magma",direction = 1)+
+  theme(legend.position = "left")+
+  labs(title = paste0("Total cumulative deaths 100 days after first confirmed death outside of China (Jan 13, 2020)" ),
+       x = "Total confirmed deaths per 1 million", y = "Country",
+       size = "Total cases (per 1m)", fill = "Total cases (per 1m)")
+g1
+
+
+
+# ---- -----------------
+
+
+
+# ---- -----------------
 d1 <- ds0 %>%
   filter(country_code %in% ds_country$id) %>%
   filter(date == lubridate::as_date("2020-05-17")) %>%
@@ -380,6 +501,7 @@ g3 %>% plotly::layout(autosize = F, width = 900, height = 600, margin = margings
 # ----- why_75-4 ----------------------
 
 # 4. Regradless of scale, we see that Day 75 (2020-03-28) is approximately the scree point in the mortality trajectory
+# Not, without some notable exceptions (France)
 # ds0 %>% glimpse()
 d4 <- ds0 %>%
   filter(country_code %in% ds_country$id)
