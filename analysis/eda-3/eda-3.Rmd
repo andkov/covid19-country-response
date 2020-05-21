@@ -1,7 +1,7 @@
 ---
-title: "EDA-2: Contextual Predisposing"
+title: "EDA-3"
 author: "Andriy Koval"
-date: "May 9, 2020"
+date: "May 20, 2020"
 output:
   html_document:
     theme: simplex
@@ -11,11 +11,6 @@ output:
     toc_float: true
     code_folding: hide
 ---
-
-# Abstract
-This report explores the Contextual Predisposing Characteristics (see Anderson model) of OECD countries and relates them to COVID-19 mortality during the first 30 days of the epidemic in each country. 
-
-The report will focus on three subsections: (1) Demographic characteristics, (2) Social characteristic, and (3) Belief, as operationalized by the variables in the OECD database. 
 
 <!-- These two chunks should be added in the beginning of every .Rmd that you want to source an .R script -->
 <!--  The 1st mandatory chunck  -->
@@ -55,7 +50,6 @@ read_chunk("./analysis/eda-3/eda-3.R")
 # read_chunk("../../../analysis/blogposts/florida-suicide-count/fl-suicide-count.R")
 ```
 
-# Environment
 
 ```{r load-packages, echo=echoChunks, message=FALSE}
 ```
@@ -69,81 +63,84 @@ read_chunk("./analysis/eda-3/eda-3.R")
 ```{r declare-functions, echo=echoChunks, results='show', message=FALSE}
 ```
 
-# Data  
-
-The data comes from [OxCGRT][] and  [OECD][] databases
 
 ```{r load-data, echo=echoChunks, results='show', message=FALSE}
 ```
-
-## Data Tweaks
 
 ```{r tweak-data-1, echo=echoChunks, results='show', message=FALSE,cache=TRUE, warning =F}
 ds0 %>% glimpse()
 ```
 
-# COVID Indicators
+# Days to First Case/Death
 
-What are some basic indicators of progression of COVID in each country?  Without resorting to estimating the growth parameter of the contagion or mortality trajectory, we compute impact indicators based on the total number of cases or deaths at a given time point:  
-
-- Number of __deaths__ 30 days since 1st confirmed ___death___ (per 1 million)
-- Number of __deaths__ 30 days since 1st confirmed ___case___ (per 1 million)
-- Number of __cases__ 30 dyas since 1st confirmed ___death___ (per 1 million)
-- Number of __cases__ 30 dyas since 1st confirmed ___case___ (per 1 million)
-
-```{r covid-metric-1, echo=TRUE, fig.height=7, fig.width=10, out.width = "1200px", message=FALSE, results='hide',warning = F, cache=TRUE}
+## by first case
+```{r daysto-1, echo=F, fig.height=18, fig.width=8, out.width = "1200px", message=FALSE, results='show',warning = F, cache=TRUE}
 ```
 
-## 1  
-   
+## by first death
+```{r daysto-2, echo=F, fig.height=18, fig.width=8, out.width = "1200px", message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
+## by time between
+```{r daysto-3, echo=F, fig.height=18, fig.width=8, out.width = "1200px", message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
+## snapshots: CASE
+```{r daysto-4, echo=F, fig.height=9, fig.width=16, out.width = "1200px", message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
+## snapshots: DEATH
+```{r daysto-5, echo=F, fig.height=9, fig.width=16, out.width = "1200px", message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
+<!-- # COVID Indicators -->
+
+<!-- What are some basic indicators of progression of COVID in each country?  Without resorting to estimating the growth parameter of the contagion or mortality trajectory, we compute impact indicators based on the total number of cases or deaths at a given time point:   -->
+
+<!-- - Number of __deaths__ 30 days since 1st confirmed ___death___ (per 1 million) -->
+<!-- - Number of __deaths__ 30 days since 1st confirmed ___case___ (per 1 million) -->
+<!-- - Number of __cases__ 30 dyas since 1st confirmed ___death___ (per 1 million) -->
+<!-- - Number of __cases__ 30 dyas since 1st confirmed ___case___ (per 1 million) -->
+
+<!-- ```{r covid-metric-1, echo=TRUE, fig.height=7, fig.width=10, out.width = "1200px", message=FALSE, results='hide',warning = F, cache=TRUE} -->
+<!-- ``` -->
+# Response trajectory
+
+## 1 Timeline of Response  
+
 ```{r why_75-1,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
 ```
-.    
-.    
-.    
-.    
-.  
-.  
+.
+.
+.
+.
+.
+.
 
-## 2  
- 
+
+## 2 Timeline of mortality   
+
 ```{r why_75-2,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
 ```
-.    
-.    
-.    
-.    
-.  
-.  
+.
+.
+.
+.
+.
+.
 
-## 3  
+
+## 3 Mortality centered   
 ```{r why_75-3,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
 ```
-.  
-.  
-.  
-.  
-.  
+.
+.
+.
+.
+.
 
-## 4  
-   
-```{r why_75-4,echo=TRUE,fig.height=7, fig.width=10, out.width = "1200px",  message=FALSE, results='show',warning = F, cache=TRUE}
-```
-\n
-\n
-  
-  
-  
-  
-  
+## 4 
 
-## 5  
-
-```{r why_75-5,echo=TRUE,fig.height=7, fig.width=10, out.width = "1200px",  message=FALSE, results='show',warning = F, cache=TRUE}
-```
-  
-  
-  
   
   
 
