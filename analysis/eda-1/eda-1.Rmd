@@ -33,12 +33,12 @@ opts_chunk$set(
   message = TRUE,
   comment = NA, 
   tidy = FALSE,
-  fig.height = 4, 
-  fig.width = 5.5, 
-  out.width = "1200px",
-  fig.path = 'figure_rmd/',     
-  dev = "png",
-  dpi = 400
+  # fig.height = 4, 
+  # fig.width = 5.5, 
+  # out.width = "700px",
+  fig.path = 'figure_rmd/'     
+  # dev = "png"
+  # dpi = 400
   # fig.path = 'figure_pdf/',     
   # dev = "pdf"#,
   # dev.args=list(pdf = list(colormodel = 'cmyk'))
@@ -51,7 +51,7 @@ read_chunk("./analysis/eda-1/eda-1.R")
 ```
 # Abstract
 
-To be added
+The reports looks at progression of COVID-19 within OECD countries and the overall magnitude of governments' response to the pandemic. 
 
 # Environment
 
@@ -67,18 +67,56 @@ To be added
 ```{r declare-functions, echo=echoChunks, results='show', message=FALSE}
 ```
 
-# Data  
+# Data Sources 
 
-The data comes from [OxCGRT][] and  [OECD][] databases
+- Cases and mortlaity for COVID-19 are sourced from the [European Centre for Disease Prevention and Control](https://www.ecdc.europa.eu/en/covid-19-pandemic) 
+- Government Response metric to COVID-19 (Stringency Index) is sources from [Oxford COVID-19 Government Response Tracker (OxCGRT)](https://www.bsg.ox.ac.uk/research/research-projects/coronavirus-government-response-tracker)
+
 
 ```{r load-data, echo=echoChunks, results='show', message=FALSE}
 ```
 
-## Data Tweaks
-
 ```{r tweak-data-1, echo=echoChunks, results='show', message=FALSE,cache=TRUE, warning =F}
 ds0 %>% glimpse()
 ```
+
+# Q0 - Response and Toll
+
+> What does Response to and Toll from COVID look for all OECD countries?
+
+## Response 
+
+```{r q3-response-all,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
+```
+.  
+.  
+.  
+.  
+.  
+.    
+
+## Toll   
+
+
+```{r q3-toll-all, echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
+.  
+.  
+.  
+.  
+.  
+
+
+## Toll centered   
+
+```{r q3-toll-all-centered, echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
+```
+.  
+.  
+.  
+.  
+.   
 
 # Q1 - Shape of the trend
 
@@ -88,6 +126,17 @@ ds0 %>% glimpse()
 ```
 
 # Q1 - Within Country
+
+> How do key indices compare within each country?
+
+___Common legend___:  
+
+- (first dot) = 1st confirmed case
+- (second dot) = 1st confirmed death  
+- (dotted line) = pandemic announced by WHO (March 11)  
+- (dashed lines) = 75th and 100th day since Exodus (January 13), first confirmed case outside China  
+- X-asis measures `Days since Exodus`
+
 ```{r q1a, echo=TRUE, fig.height=2, fig.width=10, out.width = "1200px", message=FALSE, results='asis',warning = F, cache=TRUE}
 ```
 
@@ -98,13 +147,11 @@ ds0 %>% glimpse()
 ```{r q2-response-trend, echo=TRUE, fig.height=7, fig.width=10, out.width = "1200px", message=FALSE, results='show',warning = F, cache=TRUE}
 ```
 
-```{r q2-all, echo=TRUE,  out.width = "900px", message=FALSE, results='show',warning = F, cache=TRUE}
-```
 
-# Q3 - Response metrics
 
-```{r q3, echo=TRUE, fig.height=2, fig.width=10, out.width = "1200px", message=FALSE, results='show',warning = F, cache=TRUE}
-```
+
+
+
 
 session information
 ===========================================================================
