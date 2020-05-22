@@ -269,9 +269,9 @@ d1 <- ds0 %>%
   filter(
     days_since_1death == 29 | days_since_exodus == 100
   ) %>%
-  group_by(country_code) %>% mutate(ind = n() ) %>% ungroup() %>%
-  select(country_code, ind) %>% filter(ind ==1)
-  # select(country_code,n_deaths_cum_per_1m, days_)
+  # group_by(country_code) %>% mutate(ind = n() ) %>% ungroup() %>%
+  # select(country_code, ind) %>% filter(ind ==1)
+  select(country_code,n_deaths_cum_per_1m)
 
 # d <- ds0 %>% filter(country_code=="CZE")
 #  %>%
