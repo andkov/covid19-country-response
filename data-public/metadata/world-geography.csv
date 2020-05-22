@@ -1,0 +1,255 @@
+continent_name,continent_code,country_name,country_code2,country_code,country_number,country_label,oecd
+Asia,AS,"Afghanistan, Islamic Republic of",AF,AFG,4,Afghanistan,FALSE
+Europe,EU,"Albania, Republic of",AL,ALB,8,Albania,FALSE
+Antarctica,AN,Antarctica (the territory South of 60 deg S),AQ,ATA,10,Antarctica,FALSE
+Africa,AF,"Algeria, People's Democratic Republic of",DZ,DZA,12,Algeria,FALSE
+Oceania,OC,American Samoa,AS,ASM,16,American Samoa,FALSE
+Europe,EU,"Andorra, Principality of",AD,AND,20,Andorra,FALSE
+Africa,AF,"Angola, Republic of",AO,AGO,24,Angola,FALSE
+North America,NAM,Antigua and Barbuda,AG,ATG,28,Antigua and Barbuda,FALSE
+Europe,EU,"Azerbaijan, Republic of",AZ,AZE,31,Azerbaijan,FALSE
+South America,SA,"Argentina, Argentine Republic",AR,ARG,32,Argentina,FALSE
+Oceania,OC,"Australia, Commonwealth of",AU,AUS,36,Australia,TRUE
+Europe,EU,"Austria, Republic of",AT,AUT,40,Austria,TRUE
+North America,NAM,"Bahamas, Commonwealth of the",BS,BHS,44,Bahamas,FALSE
+Asia,AS,"Bahrain, Kingdom of",BH,BHR,48,Bahrain,FALSE
+Asia,AS,"Bangladesh, People's Republic of",BD,BGD,50,Bangladesh,FALSE
+Europe,EU,"Armenia, Republic of",AM,ARM,51,Armenia,FALSE
+North America,NAM,Barbados,BB,BRB,52,Barbados,FALSE
+Europe,EU,"Belgium, Kingdom of",BE,BEL,56,Belgium,TRUE
+North America,NAM,Bermuda,BM,BMU,60,Bermuda,FALSE
+Asia,AS,"Bhutan, Kingdom of",BT,BTN,64,Bhutan,FALSE
+South America,SA,"Bolivia, Republic of",BO,BOL,68,Bolivia,FALSE
+Europe,EU,Bosnia and Herzegovina,BA,BIH,70,Bosnia and Herzegovina,FALSE
+Africa,AF,"Botswana, Republic of",BW,BWA,72,Botswana,FALSE
+Antarctica,AN,Bouvet Island (Bouvetoya),BV,BVT,74,Bouvet Island,FALSE
+South America,SA,"Brazil, Federative Republic of",BR,BRA,76,Brazil,FALSE
+North America,NAM,Belize,BZ,BLZ,84,Belize,FALSE
+Asia,AS,British Indian Ocean Territory (Chagos Archipelago),IO,IOT,86,British Indian Ocean Territory,FALSE
+Oceania,OC,Solomon Islands,SB,SLB,90,Solomon Islands,FALSE
+North America,NAM,British Virgin Islands,VG,VGB,92,British Virgin Islands,FALSE
+Asia,AS,Brunei Darussalam,BN,BRN,96,Brunei Darussalam,FALSE
+Europe,EU,"Bulgaria, Republic of",BG,BGR,100,Bulgaria,FALSE
+Asia,AS,"Myanmar, Union of",MM,MMR,104,Myanmar,FALSE
+Africa,AF,"Burundi, Republic of",BI,BDI,108,Burundi,FALSE
+Europe,EU,"Belarus, Republic of",BY,BLR,112,Belarus,FALSE
+Asia,AS,"Cambodia, Kingdom of",KH,KHM,116,Cambodia,FALSE
+Africa,AF,"Cameroon, Republic of",CM,CMR,120,Cameroon,FALSE
+North America,NAM,Canada,CA,CAN,124,Canada,TRUE
+Africa,AF,"Cape Verde, Republic of",CV,CPV,132,Cape Verde,FALSE
+North America,NAM,Cayman Islands,KY,CYM,136,Cayman Islands,FALSE
+Africa,AF,Central African Republic,CF,CAF,140,Central African Republic,FALSE
+Asia,AS,"Sri Lanka, Democratic Socialist Republic of",LK,LKA,144,Sri Lanka,FALSE
+Africa,AF,"Chad, Republic of",TD,TCD,148,Chad,FALSE
+South America,SA,"Chile, Republic of",CL,CHL,152,Chile,FALSE
+Asia,AS,"China, People's Republic of",CN,CHN,156,China,FALSE
+Asia,AS,Taiwan,TW,TWN,158,Taiwan,FALSE
+Asia,AS,Christmas Island,CX,CXR,162,Christmas Island,FALSE
+Asia,AS,Cocos (Keeling) Islands,CC,CCK,166,Cocos,FALSE
+South America,SA,"Colombia, Republic of",CO,COL,170,Colombia,FALSE
+Africa,AF,"Comoros, Union of the",KM,COM,174,Comoros,FALSE
+Africa,AF,Mayotte,YT,MYT,175,Mayotte,FALSE
+Africa,AF,"Congo, Republic of the",CG,COG,178,Congo,FALSE
+Africa,AF,"Congo, Democratic Republic of the",CD,COD,180,Congo,FALSE
+Oceania,OC,Cook Islands,CK,COK,184,Cook Islands,FALSE
+North America,NAM,"Costa Rica, Republic of",CR,CRI,188,Costa Rica,FALSE
+Europe,EU,"Croatia, Republic of",HR,HRV,191,Croatia,FALSE
+North America,NAM,"Cuba, Republic of",CU,CUB,192,Cuba,FALSE
+Europe,EU,"Cyprus, Republic of",CY,CYP,196,Cyprus,FALSE
+Europe,EU,Czech Republic,CZ,CZE,203,Czech Republic,TRUE
+Africa,AF,"Benin, Republic of",BJ,BEN,204,Benin,FALSE
+Europe,EU,"Denmark, Kingdom of",DK,DNK,208,Denmark,TRUE
+North America,NAM,"Dominica, Commonwealth of",DM,DMA,212,Dominica,FALSE
+North America,NAM,Dominican Republic,DO,DOM,214,Dominican Republic,FALSE
+South America,SA,"Ecuador, Republic of",EC,ECU,218,Ecuador,FALSE
+North America,NAM,"El Salvador, Republic of",SV,SLV,222,El Salvador,FALSE
+Africa,AF,"Equatorial Guinea, Republic of",GQ,GNQ,226,Equatorial Guinea,FALSE
+Africa,AF,"Ethiopia, Federal Democratic Republic of",ET,ETH,231,Ethiopia,FALSE
+Africa,AF,"Eritrea, State of",ER,ERI,232,Eritrea,FALSE
+Europe,EU,"Estonia, Republic of",EE,EST,233,Estonia,TRUE
+Europe,EU,Faroe Islands,FO,FRO,234,Faroe Islands,FALSE
+South America,SA,Falkland Islands (Malvinas),FK,FLK,238,Falkland Islands,FALSE
+Antarctica,AN,South Georgia and the South Sandwich Islands,GS,SGS,239,South Georgia and the South Sandwich Islands,FALSE
+Oceania,OC,"Fiji, Republic of the Fiji Islands",FJ,FJI,242,Fiji,FALSE
+Europe,EU,"Finland, Republic of",FI,FIN,246,Finland,TRUE
+Europe,EU,Aland Islands,AX,ALA,248,Aland Islands,FALSE
+Europe,EU,"France, French Republic",FR,FRA,250,France,TRUE
+South America,SA,French Guiana,GF,GUF,254,French Guiana,FALSE
+Oceania,OC,French Polynesia,PF,PYF,258,French Polynesia,FALSE
+Antarctica,AN,French Southern Territories,TF,ATF,260,French Southern Territories,FALSE
+Africa,AF,"Djibouti, Republic of",DJ,DJI,262,Djibouti,FALSE
+Africa,AF,"Gabon, Gabonese Republic",GA,GAB,266,Gabon,FALSE
+Europe,EU,Georgia,GE,GEO,268,Georgia,FALSE
+Africa,AF,"Gambia, Republic of the",GM,GMB,270,Gambia,FALSE
+Asia,AS,"Palestinian Territory, Occupied",PS,PSE,275,Palestinian Territory,FALSE
+Europe,EU,"Germany, Federal Republic of",DE,DEU,276,Germany,TRUE
+Africa,AF,"Ghana, Republic of",GH,GHA,288,Ghana,FALSE
+Europe,EU,Gibraltar,GI,GIB,292,Gibraltar,FALSE
+Oceania,OC,"Kiribati, Republic of",KI,KIR,296,Kiribati,FALSE
+Europe,EU,"Greece, Hellenic Republic",GR,GRC,300,Greece,TRUE
+North America,NAM,Greenland,GL,GRL,304,Greenland,FALSE
+North America,NAM,Grenada,GD,GRD,308,Grenada,FALSE
+North America,NAM,Guadeloupe,GP,GLP,312,Guadeloupe,FALSE
+Oceania,OC,Guam,GU,GUM,316,Guam,FALSE
+North America,NAM,"Guatemala, Republic of",GT,GTM,320,Guatemala,FALSE
+Africa,AF,"Guinea, Republic of",GN,GIN,324,Guinea,FALSE
+South America,SA,"Guyana, Co-operative Republic of",GY,GUY,328,Guyana,FALSE
+North America,NAM,"Haiti, Republic of",HT,HTI,332,Haiti,FALSE
+Antarctica,AN,Heard Island and McDonald Islands,HM,HMD,334,Heard Island and McDonald Islands,FALSE
+Europe,EU,Holy See (Vatican City State),VA,VAT,336,Holy See,FALSE
+North America,NAM,"Honduras, Republic of",HN,HND,340,Honduras,FALSE
+Asia,AS,"Hong Kong, Special Administrative Region of China",HK,HKG,344,Hong Kong,FALSE
+Europe,EU,"Hungary, Republic of",HU,HUN,348,Hungary,TRUE
+Europe,EU,"Iceland, Republic of",IS,ISL,352,Iceland,TRUE
+Asia,AS,"India, Republic of",IN,IND,356,India,FALSE
+Asia,AS,"Indonesia, Republic of",ID,IDN,360,Indonesia,FALSE
+Asia,AS,"Iran, Islamic Republic of",IR,IRN,364,Iran,FALSE
+Asia,AS,"Iraq, Republic of",IQ,IRQ,368,Iraq,FALSE
+Europe,EU,Ireland,IE,IRL,372,Ireland,TRUE
+Asia,AS,"Israel, State of",IL,ISR,376,Israel,TRUE
+Europe,EU,"Italy, Italian Republic",IT,ITA,380,Italy,TRUE
+Africa,AF,"Cote d'Ivoire, Republic of",CI,CIV,384,Cote d'Ivoire,FALSE
+North America,NAM,Jamaica,JM,JAM,388,Jamaica,FALSE
+Asia,AS,Japan,JP,JPN,392,Japan,TRUE
+Asia,AS,"Kazakhstan, Republic of",KZ,KAZ,398,Kazakhstan,FALSE
+Asia,AS,"Jordan, Hashemite Kingdom of",JO,JOR,400,Jordan,FALSE
+Africa,AF,"Kenya, Republic of",KE,KEN,404,Kenya,FALSE
+Asia,AS,"Korea, Democratic People's Republic of",KP,PRK,408,Korea N,FALSE
+Asia,AS,"Korea, Republic of",KR,KOR,410,Korea S,TRUE
+Asia,AS,"Kuwait, State of",KW,KWT,414,Kuwait,FALSE
+Asia,AS,Kyrgyz Republic,KG,KGZ,417,Kyrgyz Republic,FALSE
+Asia,AS,Lao People's Democratic Republic,LA,LAO,418,Laos,FALSE
+Asia,AS,"Lebanon, Lebanese Republic",LB,LBN,422,Lebanon,FALSE
+Africa,AF,"Lesotho, Kingdom of",LS,LSO,426,Lesotho,FALSE
+Europe,EU,"Latvia, Republic of",LV,LVA,428,Latvia,TRUE
+Africa,AF,"Liberia, Republic of",LR,LBR,430,Liberia,FALSE
+Africa,AF,Libyan Arab Jamahiriya,LY,LBY,434,Libyan Arab Jamahiriya,FALSE
+Europe,EU,"Liechtenstein, Principality of",LI,LIE,438,Liechtenstein,FALSE
+Europe,EU,"Lithuania, Republic of",LT,LTU,440,Lithuania,TRUE
+Europe,EU,"Luxembourg, Grand Duchy of",LU,LUX,442,Luxembourg,FALSE
+Asia,AS,"Macao, Special Administrative Region of China",MO,MAC,446,Macao,FALSE
+Africa,AF,"Madagascar, Republic of",MG,MDG,450,Madagascar,FALSE
+Africa,AF,"Malawi, Republic of",MW,MWI,454,Malawi,FALSE
+Asia,AS,Malaysia,MY,MYS,458,Malaysia,FALSE
+Asia,AS,"Maldives, Republic of",MV,MDV,462,Maldives,FALSE
+Africa,AF,"Mali, Republic of",ML,MLI,466,Mali,FALSE
+Europe,EU,"Malta, Republic of",MT,MLT,470,Malta,FALSE
+North America,NAM,Martinique,MQ,MTQ,474,Martinique,FALSE
+Africa,AF,"Mauritania, Islamic Republic of",MR,MRT,478,Mauritania,FALSE
+Africa,AF,"Mauritius, Republic of",MU,MUS,480,Mauritius,FALSE
+North America,NAM,"Mexico, United Mexican States",MX,MEX,484,Mexico,TRUE
+Europe,EU,"Monaco, Principality of",MC,MCO,492,Monaco,FALSE
+Asia,AS,Mongolia,MN,MNG,496,Mongolia,FALSE
+Europe,EU,"Moldova, Republic of",MD,MDA,498,Moldova,FALSE
+Europe,EU,"Montenegro, Republic of",ME,MNE,499,Montenegro,FALSE
+North America,NAM,Montserrat,MS,MSR,500,Montserrat,FALSE
+Africa,AF,"Morocco, Kingdom of",MA,MAR,504,Morocco,FALSE
+Africa,AF,"Mozambique, Republic of",MZ,MOZ,508,Mozambique,FALSE
+Asia,AS,"Oman, Sultanate of",OM,OMN,512,Oman,FALSE
+Africa,AF,"Namibia, Republic of",NA,NAM,516,Namibia,FALSE
+Oceania,OC,"Nauru, Republic of",NR,NRU,520,Nauru,FALSE
+Asia,AS,"Nepal, State of",NP,NPL,524,Nepal,FALSE
+Europe,EU,"Netherlands, Kingdom of the",NL,NLD,528,Netherlands,TRUE
+North America,NAM,Netherlands Antilles,AN,ANT,530,Netherlands Antilles,FALSE
+North America,NAM,Curasao,CW,CUW,531,Curasao,FALSE
+North America,NAM,Aruba,AW,ABW,533,Aruba,FALSE
+North America,NAM,Sint Maarten (Netherlands),SX,SXM,534,Sint Maarten,FALSE
+North America,NAM,"Bonaire, Sint Eustatius and Saba",BQ,BES,535,Bonaire,FALSE
+Oceania,OC,New Caledonia,NC,NCL,540,New Caledonia,FALSE
+Oceania,OC,"Vanuatu, Republic of",VU,VUT,548,Vanuatu,FALSE
+Oceania,OC,New Zealand,NZ,NZL,554,New Zealand,TRUE
+North America,NAM,"Nicaragua, Republic of",NI,NIC,558,Nicaragua,FALSE
+Africa,AF,"Niger, Republic of",NE,NER,562,Niger,FALSE
+Africa,AF,"Nigeria, Federal Republic of",NG,NGA,566,Nigeria,FALSE
+Oceania,OC,Niue,NU,NIU,570,Niue,FALSE
+Oceania,OC,Norfolk Island,NF,NFK,574,Norfolk Island,FALSE
+Europe,EU,"Norway, Kingdom of",NO,NOR,578,Norway,TRUE
+Oceania,OC,"Northern Mariana Islands, Commonwealth of the",MP,MNP,580,Northern Mariana Islands,FALSE
+North America,NAM,United States Minor Outlying Islands,UM,UMI,581,US Minor Outlying Islands,FALSE
+Oceania,OC,"Micronesia, Federated States of",FM,FSM,583,Micronesia,FALSE
+Oceania,OC,"Marshall Islands, Republic of the",MH,MHL,584,Marshall Islands,FALSE
+Oceania,OC,"Palau, Republic of",PW,PLW,585,Palau,FALSE
+Asia,AS,"Pakistan, Islamic Republic of",PK,PAK,586,Pakistan,FALSE
+North America,NAM,"Panama, Republic of",PA,PAN,591,Panama,FALSE
+Oceania,OC,"Papua New Guinea, Independent State of",PG,PNG,598,Papua New Guinea,FALSE
+South America,SA,"Paraguay, Republic of",PY,PRY,600,Paraguay,FALSE
+South America,SA,"Peru, Republic of",PE,PER,604,Peru,FALSE
+Asia,AS,"Philippines, Republic of the",PH,PHL,608,Philippines,FALSE
+Oceania,OC,Pitcairn Islands,PN,PCN,612,Pitcairn Islands,FALSE
+Europe,EU,"Poland, Republic of",PL,POL,616,Poland,TRUE
+Europe,EU,"Portugal, Portuguese Republic",PT,PRT,620,Portugal,TRUE
+Africa,AF,"Guinea-Bissau, Republic of",GW,GNB,624,Guinea-Bissau,FALSE
+Asia,AS,"Timor-Leste, Democratic Republic of",TL,TLS,626,Timor-Leste,FALSE
+North America,NAM,"Puerto Rico, Commonwealth of",PR,PRI,630,Puerto Rico,FALSE
+Asia,AS,"Qatar, State of",QA,QAT,634,Qatar,FALSE
+Africa,AF,Reunion,RE,REU,638,Reunion,FALSE
+Europe,EU,Romania,RO,ROU,642,Romania,FALSE
+Europe,EU,Russian Federation,RU,RUS,643,Russia,TRUE
+Africa,AF,"Rwanda, Republic of",RW,RWA,646,Rwanda,FALSE
+North America,NAM,Saint Barthelemy,BL,BLM,652,Saint Barthelemy,FALSE
+Africa,AF,Saint Helena,SH,SHN,654,Saint Helena,FALSE
+North America,NAM,"Saint Kitts and Nevis, Federation of",KN,KNA,659,Saint Kitts and Nevis,FALSE
+North America,NAM,Anguilla,AI,AIA,660,Anguilla,FALSE
+North America,NAM,Saint Lucia,LC,LCA,662,Saint Lucia,FALSE
+North America,NAM,Saint Martin,MF,MAF,663,Saint Martin,FALSE
+North America,NAM,Saint Pierre and Miquelon,PM,SPM,666,Saint Pierre and Miquelon,FALSE
+North America,NAM,Saint Vincent and the Grenadines,VC,VCT,670,Saint Vincent and the Grenadines,FALSE
+Europe,EU,"San Marino, Republic of",SM,SMR,674,San Marino,FALSE
+Africa,AF,"Sao Tome and Principe, Democratic Republic of",ST,STP,678,Sao Tome and Principe,FALSE
+Asia,AS,"Saudi Arabia, Kingdom of",SA,SAU,682,Saudi Arabia,FALSE
+Africa,AF,"Senegal, Republic of",SN,SEN,686,Senegal,FALSE
+Europe,EU,"Serbia, Republic of",RS,SRB,688,Serbia,FALSE
+Africa,AF,"Seychelles, Republic of",SC,SYC,690,Seychelles,FALSE
+Africa,AF,"Sierra Leone, Republic of",SL,SLE,694,Sierra Leone,FALSE
+Asia,AS,"Singapore, Republic of",SG,SGP,702,Singapore,FALSE
+Europe,EU,Slovakia (Slovak Republic),SK,SVK,703,Slovakia,TRUE
+Asia,AS,"Vietnam, Socialist Republic of",VN,VNM,704,Vietnam,FALSE
+Europe,EU,"Slovenia, Republic of",SI,SVN,705,Slovenia,TRUE
+Africa,AF,"Somalia, Somali Republic",SO,SOM,706,Somalia,FALSE
+Africa,AF,"South Africa, Republic of",ZA,ZAF,710,South Africa,TRUE
+Africa,AF,"Zimbabwe, Republic of",ZW,ZWE,716,Zimbabwe,FALSE
+Europe,EU,"Spain, Kingdom of",ES,ESP,724,Spain,TRUE
+Africa,AF,South Sudan,SS,SSD,728,South Sudan,FALSE
+Africa,AF,Western Sahara,EH,ESH,732,Western Sahara,FALSE
+Africa,AF,"Sudan, Republic of",SD,SDN,736,Sudan,FALSE
+South America,SA,"Suriname, Republic of",SR,SUR,740,Suriname,FALSE
+Europe,EU,Svalbard & Jan Mayen Islands,SJ,SJM,744,Svalbard & Jan Mayen Islands,FALSE
+Africa,AF,"Swaziland, Kingdom of",SZ,SWZ,748,Swaziland,FALSE
+Europe,EU,"Sweden, Kingdom of",SE,SWE,752,Sweden,TRUE
+Europe,EU,"Switzerland, Swiss Confederation",CH,CHE,756,Switzerland,TRUE
+Asia,AS,Syrian Arab Republic,SY,SYR,760,Syrian Arab Republic,FALSE
+Asia,AS,"Tajikistan, Republic of",TJ,TJK,762,Tajikistan,FALSE
+Asia,AS,"Thailand, Kingdom of",TH,THA,764,Thailand,FALSE
+Africa,AF,"Togo, Togolese Republic",TG,TGO,768,Togo,FALSE
+Oceania,OC,Tokelau,TK,TKL,772,Tokelau,FALSE
+Oceania,OC,"Tonga, Kingdom of",TO,TON,776,Tonga,FALSE
+North America,NAM,"Trinidad and Tobago, Republic of",TT,TTO,780,Trinidad and Tobago,FALSE
+Asia,AS,United Arab Emirates,AE,ARE,784,United Arab Emirates,FALSE
+Africa,AF,"Tunisia, Tunisian Republic",TN,TUN,788,Tunisia,FALSE
+Europe,EU,"Turkey, Republic of",TR,TUR,792,Turkey,TRUE
+Asia,AS,Turkmenistan,TM,TKM,795,Turkmenistan,FALSE
+North America,NAM,Turks and Caicos Islands,TC,TCA,796,Turks and Caicos Islands,FALSE
+Oceania,OC,Tuvalu,TV,TUV,798,Tuvalu,FALSE
+Africa,AF,"Uganda, Republic of",UG,UGA,800,Uganda,FALSE
+Europe,EU,Ukraine,UA,UKR,804,Ukraine,FALSE
+Europe,EU,"Macedonia, The Former Yugoslav Republic of",MK,MKD,807,Macedonia,FALSE
+Africa,AF,"Egypt, Arab Republic of",EG,EGY,818,Egypt,FALSE
+Europe,EU,United Kingdom of Great Britain & Northern Ireland,GB,GBR,826,United Kingdom,TRUE
+Europe,EU,"Guernsey, Bailiwick of",GG,GGY,831,Guernsey,FALSE
+Europe,EU,"Jersey, Bailiwick of",JE,JEY,832,Jersey,FALSE
+Europe,EU,Isle of Man,IM,IMN,833,Isle of Man,FALSE
+Africa,AF,"Tanzania, United Republic of",TZ,TZA,834,Tanzania,FALSE
+North America,NAM,United States of America,US,USA,840,United States,TRUE
+North America,NAM,United States Virgin Islands,VI,VIR,850,US Virgin Islands,FALSE
+Africa,AF,Burkina Faso,BF,BFA,854,Burkina Faso,FALSE
+South America,SA,"Uruguay, Eastern Republic of",UY,URY,858,Uruguay,FALSE
+Asia,AS,"Uzbekistan, Republic of",UZ,UZB,860,Uzbekistan,FALSE
+South America,SA,"Venezuela, Bolivarian Republic of",VE,VEN,862,Venezuela,FALSE
+Oceania,OC,Wallis and Futuna,WF,WLF,876,Wallis and Futuna,FALSE
+Oceania,OC,"Samoa, Independent State of",WS,WSM,882,Samoa,FALSE
+Asia,AS,Yemen,YE,YEM,887,Yemen,FALSE
+Africa,AF,"Zambia, Republic of",ZM,ZMB,894,Zambia,FALSE
+Oceania,OC,Disputed Territory,XX,,NA,Disputed Territory,FALSE
+Asia,AS,Iraq-Saudi Arabia Neutral Zone,XE,,NA,Iraq-Saudi Arabia Neutral Zone,FALSE
+Asia,AS,United Nations Neutral Zone,XD,,NA,United Nations Neutral Zone,FALSE
+Asia,AS,Spratly Islands,XS,,NA,Spratly Islands,FALSE
