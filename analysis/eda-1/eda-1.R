@@ -25,7 +25,13 @@ source("./scripts/common-functions.R")        # reporting functions and quick vi
 # source("./scripts/graphing/graph-support.R") # font and color conventions
 
 # ---- declare-globals --------------------
-ggplot2::theme_set(ggplot2::theme_bw())
+ggplot2::theme_set(
+  ggplot2::theme_bw(
+  )+
+    theme(
+      strip.background = element_rect(fill="grey90", color = NA)
+    )
+)
 
 # ---- declare-functions ---------------------------
 compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
@@ -58,8 +64,8 @@ compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
     dplyr::ungroup() %>%
     # dplyr::filter(epi_timeline > 0) %>%
     dplyr::mutate(
-      days_since_exodus = date - lubridate::date("2020-01-13") # first case outside of china
-      ,days_since_pandemic = date - lubridate::date("2020-03-11") # WHO declares pandemic
+      days_since_exodus    = as.integer(date - lubridate::date("2020-01-13")) # first case outside of china
+      ,days_since_pandemic = as.integer(date - lubridate::date("2020-03-11")) # WHO declares pandemic
     ) %>%
     select(-cutoff_death, - cutoff_case, -date_of_1death, -date_of_1case)
   return(d_out)
@@ -71,7 +77,13 @@ compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
 #       country_code, date,n_cases, n_deaths, ConfirmedDeaths, ConfirmedCases
 #     ) %>%
 #   compute_epi_timeline()
-
+margings_for_plotly <- list(
+  l = 50,
+  r = 50,
+  b = 100,
+  t = 100,
+  pad = 4
+)
 
 # ---- load-data -------------------------------------------------------------
 # list of focal countries in OECD database
@@ -125,7 +137,11 @@ d_out <- ds0 %>% filter(country_code == "ITA")
 # ----- q1-basic-timeline -------------
 # ds0 %>% glimpse()
 d1 <- ds0 %>%
-  filter(country_code %in% ds_country$id)
+  filter(country_code %in% ds_country$id) %>%
+  mutate(
+    n_cases_cum = n_cases_cum / 1000
+    ,n_cases_cum_per_1m = n_cases_cum_per_1m / 1000
+  )
 g1 <- d1 %>%
   ggplot(aes(
     x = days_since_exodus
@@ -134,21 +150,31 @@ g1 <- d1 %>%
     # ,y = n_deaths_cum
     # ,y = n_deaths_cum_per_1m
   ))+
-  geom_line()+
+  geom_line(size = .5)+
   # geom_line(aes(y=StringencyIndex), color = "red")+
-  facet_wrap(~country_label, scale = "free")+
-  geom_point(data = d1 %>% filter(days_since_1case == 1), size = 2, fill = "#1b9e77", color = "black", alpha = .5, shape = 21)+
-  geom_point(data = d1 %>% filter(days_since_1death == 1), size = 2, fill = "#d95f02", color = "black", alpha = .5, shape = 21)+
+  facet_wrap(~country_label, scale = "free", ncol = 6)+
+  geom_point(
+    data = d1 %>% filter(days_since_1case == 1)
+    ,size = 2, fill = "#1b9e77", color = "black", alpha = .5, shape = 21
+  )+
+  geom_point(
+    data = d1 %>% filter(days_since_1death == 1)
+    ,size = 2, fill = "#d95f02", color = "black", alpha = .5, shape = 21
+  )+
+  geom_vline(xintercept = 58, linetype = "dotted",)+
+  geom_vline(xintercept = 75, linetype = "dashed", alpha = .5)+
+  geom_vline(xintercept = 100, linetype = "dashed", color = "red", alpha = .5)+
+  scale_x_continuous(breaks = seq(0,100, 50))+
   labs(
     title = "Timeline of COVID-19 "
-    , y = "Cumulative Cases", x = "Days since first case outside of China (Jan 13, 2020)"
-    , caption = "(first dot) = 1st confirmed case, (second dot) = 1st confirmed death, (dashed line) = pandemic announced by WHO"
-  )+
-  geom_vline(xintercept = 58, linetype = "dashed")
+    , y = "Cumulative Cases (in thousands)", x = "Days since first case outside of China (Jan 13, 2020)"
+    , caption = "(first dot) = 1st confirmed case, (second dot) = 1st confirmed death,
+    (dotted line) = pandemic announced by WHO, (dashed lines) = 75 and 100th day since Exodus"
+  )
 cat("\n## Cases\n")
 g1
 cat("\n## Cases per 1m\n")
-g1 + aes(y = n_cases_cum_per_1m)+labs(y = "Cumulative Cases per 1 mil")
+g1 + aes(y = n_cases_cum_per_1m)+labs(y = "Cumulative Cases per 1 mil (in thousands)")
 cat("\n## Deaths\n")
 g1 + aes(y = n_deaths_cum)+labs(y = "Cumulative Deaths")
 cat("\n## Deaths per 1m\n")
@@ -156,6 +182,8 @@ g1 + aes(y = n_deaths_cum_per_1m)+labs(y = "Cumulative Deaths per 1 mil")
 
 
 # ----- q1a -----------
+# Q  How do key indices compare within each country?
+
 focal_vars <- c( "n_cases_cum", "n_cases_cum_per_1m", "n_deaths_cum", "n_deaths_cum_per_1m",
                  "StringencyIndex")
 
@@ -171,7 +199,10 @@ ds1 <- ds0 %>%
 
 print_one_wrap <- function(d, country = "ITA"){
   # d <- ds1; country = "ITA"
-  d1 <- d %>% filter(country_code == country)
+  d1 <- d %>% filter(country_code == country) %>%
+    dplyr::mutate(
+      country_label = stringr::str_replace_all(country_label,"\\(the Republic of\\)","")
+    )
 
   g1 <- d1 %>%
     ggplot(aes(x = days_since_exodus, y = value))+
@@ -182,8 +213,18 @@ print_one_wrap <- function(d, country = "ITA"){
     geom_point(
       data = d1 %>% filter(days_since_1death == 1),
       size = 2, fill = "#d95f02", color = "black", alpha = .5, shape = 21)+
-    geom_vline(xintercept = 58, linetype = "dashed")+
-    facet_wrap(country_label ~ metric, scale = "free_y",ncol = 5)
+    geom_vline(xintercept = 58, linetype = "dotted",)+
+    geom_vline(xintercept = 75, linetype = "dashed", alpha = .5)+
+    geom_vline(xintercept = 100, linetype = "dashed", color = "red", alpha = .5)+
+    facet_wrap(country_label ~ metric, scale = "free_y",ncol = 5,
+               labeller = labeller(metric = c(
+                 "n_cases_cum" = " Cases",
+                 "n_cases_cum_per_1m" = " Cases per million",
+                 "n_deaths_cum" = "Deaths",
+                 "n_deaths_cum_per_1m" = "Deaths per million",
+                 "StringencyIndex" = "Stringency Index"
+               )))+
+    labs(y = NULL, x = NULL)
   g1
 }
 
@@ -191,10 +232,15 @@ print_one_wrap <- function(d, country = "ITA"){
 
 countries <- unique(ds1$country_code)
 for(country_i in countries){
-  cat("\n## ", country_i,"\n")
+  # cat("\n#### ", country_i,"\n")
   ds1 %>% print_one_wrap(country = country_i) %>% print()
   cat("\n")
 }
+
+
+
+
+
 
 # ----- q2-response-trend -----------------
 # What the trend response to COVID-10 by each country?
@@ -207,33 +253,106 @@ g1 <- d1 %>%
   geom_point(data = d1 %>% filter(days_since_1case == 1), size = 2, fill = "#1b9e77", color = "black", alpha = .5, shape = 21)+
   geom_point(data = d1 %>% filter(days_since_1death == 1), size = 2, fill = "#d95f02", color = "black", alpha = .5, shape = 21)+
   facet_wrap(~country_label)+
+  geom_vline(xintercept = 58, linetype = "dotted",)+
+  geom_vline(xintercept = 75, linetype = "dashed", alpha = .5)+
+  geom_vline(xintercept = 100, linetype = "dashed", color = "red", alpha = .5)+
   labs(
     title = "Timeline of OECD countries' respones to COVID-19 as measured by the Stringency Index"
     ,y = "Stringency Index", x = "Days since first case outside of China (Jan 13, 2020)"
-    , caption = "First dot = 1st confired case, Second dot = 1st confirmed death, line = Pandemic announced by WHO"
-  )+
-  geom_vline(xintercept = 58, linetype = "dashed")
+    , caption = "(first dot) = 1st confirmed case, (second dot) = 1st confirmed death,
+    (dotted line) = pandemic announced by WHO, (dashed lines) = 75 and 100th day since Exodus"
+  )
 g1
 
 
-# ----- q2-all -----------------
+# ----- q3-response-all -----------------
 
-d2 <- ds0 %>%
-  filter(country_code %in% ds_country$id)
+# Why 75 days after exodus should be the starting point?
+# 1. Most countries have peaked in their response
+d1 <- ds0 %>% filter(country_code %in% ds_country$id)
+g1 <- ds0 %>%
+  # filter(country_code == "ITA") %>%
+  ggplot(aes(x = days_since_exodus, y = StringencyIndex, group = country_label))+
+  geom_line( alpha = .1)+
+  geom_point(data = d1 %>% filter(days_since_1case == 1), size = 2, fill = "#1b9e77", color = "black", alpha = .5, shape = 21)+
+  geom_point(data = d1 %>% filter(days_since_1death == 1), size = 2, fill = "#d95f02", color = "black", alpha = .5, shape = 21)+
+  scale_x_continuous(breaks = seq(0,100, 25))+
+  labs(
+    title = "Timeline of countries' respones to COVID-19 as measured by the Stringency Index"
+    ,y = "Stringency Index", x = "Days since first case outside of China (Jan 13, 2020)"
+  )+
+  geom_vline(xintercept = 58, linetype = "dotted")+
+  geom_vline(xintercept = 75, linetype = "dashed")+
+  geom_vline(xintercept = 100, linetype = "dashed", color = "red")
+margings_for_plotly <- list(
+  l = 50,
+  r = 50,
+  b = 100,
+  t = 100,
+  pad = 4
+)
+g1 <- plotly::ggplotly(g1)
+g1 %>% plotly::layout(autosize = F, width = 900, height = 600, margin = margings_for_plotly)
+
+
+# ----- q3-toll-all ----------------------
+# 2. This is when the mortality curves starts going up
+d2 <- ds0 %>% filter(country_code %in% ds_country$id)
 g2 <- d2 %>%
   filter(country_code %in% ds_country$id) %>%
   # filter(country_code == "ITA") %>%
-  ggplot(aes(x = days_since_exodus, y = StringencyIndex, group = country_label))+
+  ggplot(aes(x = days_since_exodus, y = n_deaths_cum_per_1m, group = country_label))+
   geom_line( alpha = .2)+
   geom_point(data = d2 %>% filter(days_since_1case == 1), size = 2, fill = "#1b9e77", color = "black", alpha = .5, shape = 21)+
   geom_point(data = d2 %>% filter(days_since_1death == 1), size = 2, fill = "#d95f02", color = "black", alpha = .5, shape = 21)+
+  scale_x_continuous(breaks = seq(0,100, 25))+
   labs(
-    title = "Timeline of OECD countries' respones to COVID-19 as measured by the Stringency Index"
-    ,y = "Stringency Index", x = "Days since first case outside of China (Jan 13, 2020)"
+    title = "Timeline of COVID-19 deaths per 1 million"
+    ,y = "Total Deaths per 1 million", x = "Days since first case outside of China (Jan 13, 2020)"
   )+
-  geom_vline(xintercept = 58, linetype = "dashed")
+  geom_vline(xintercept = 58, linetype = "dotted")+
+  geom_vline(xintercept = 75, linetype = "dashed")+
+  geom_vline(xintercept = 100, linetype = "dashed", color = "red")
+margings_for_plotly <- list(
+  l = 50,
+  r = 50,
+  b = 100,
+  t = 100,
+  pad = 4
+)
 g2 <- plotly::ggplotly(g2)
-g2
+g2 %>% plotly::layout(autosize = F, width = 900, height = 600, margin = margings_for_plotly)
+# g2 %>% plotly::layout(autosize = T)
+
+# ----- q3-toll-all-centered ----------------------
+# 3. Repositioning to the first death:
+d3 <- ds0 %>% filter(country_code %in% ds_country$id)
+g3 <- d3 %>%
+  # filter(country_code == "ITA") %>%
+  ggplot(aes(x = days_since_1death, y = n_deaths_cum_per_1m, group = country_label))+
+  geom_line( alpha = .2)+
+  geom_point(data = d3 %>% filter(days_since_1case == 1), size = 2, fill = "#1b9e77", color = "black", alpha = .5, shape = 21)+
+  geom_point(data = d3 %>% filter(days_since_1death == 1), size = 2, fill = "#d95f02", color = "black", alpha = .5, shape = 21)+
+  scale_x_continuous(breaks = seq(-100,100, 25))+
+  labs(
+    title = "Timeline of COVID-19 deaths per 1 million (centered)"
+    ,y = "Total Deaths (per 1 million)", x = "Days since first confirmed death in the country"
+  )
+margings_for_plotly <- list(
+  l = 50,
+  r = 50,
+  b = 100,
+  t = 100,
+  pad = 4
+)
+g3 <- plotly::ggplotly(g3)
+g3 %>% plotly::layout(autosize = F, width = 900, height = 600, margin = margings_for_plotly)
+# g3 %>% plotly::layout(autosize = T)
+
+
+
+
+
 
 
 
