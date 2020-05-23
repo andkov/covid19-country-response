@@ -250,11 +250,12 @@ d11 <- ds0 %>%
   # filter(oecd) %>%
   filter(days_since_1case == 0) %>%
   mutate(
-     days_from_1case_to_1death = -1*days_since_1death
-    ,date_1case                = date
+     date_1case                = date
+    ,days_from_exodus_to_1case = days_since_exodus
+    ,days_from_1case_to_1death = -1*days_since_1death
     ,stringency_1case          = StringencyIndex,
   ) %>%
-  distinct(country_code,date_1case, days_from_1case_to_1death, stringency_1case )
+  distinct(country_code, date_1case,  days_from_exodus_to_1case, days_from_1case_to_1death, stringency_1case  )
 d11 %>% glimpse()
 
 # what was the response stringency on the date of first death?
@@ -262,10 +263,11 @@ d12 <- ds0 %>%
   # filter(oecd) %>%
   filter(days_since_1death == 0) %>%
   dplyr::rename(
-    stringency_1death = StringencyIndex,
-    date_1death       = date
+     date_1death       = date
+    ,days_from_exodus_to_1death = days_since_exodus
+    ,stringency_1death = StringencyIndex
   ) %>%
-  distinct(country_code, date_1death, stringency_1death)
+  distinct(country_code, date_1death, days_from_exodus_to_1death, stringency_1death)
 d12 %>% glimpse()
 
 # ds0 %>% filter(country_ == "LVA")
@@ -273,8 +275,10 @@ ds_scince_metric <- list(
   d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12
 ) %>% Reduce( function(a,b) dplyr::left_join(a,b), . )
 ds_scince_metric %>% glimpse()
-longer_names <- setdiff(names(ds_scince_metric),"country_code")
+
+longer_names <- setdiff(names(ds_scince_metric),c("country_code","date_1case","date_1death"))
 ds_scince_metric_long <- ds_scince_metric %>%
+  select(-date_1case, -date_1death) %>%
   tidyr::pivot_longer(cols = longer_names, names_to = "metric", values_to = "value")
 # ds_scince_metric_long %>% glimpse()
 
@@ -367,25 +371,9 @@ ds0 %>%
   guides(color = F)+
   labs(title = "COVID Timeline: Days to 1st case \n Ordered by gap between 1st case and 1st death", x = "Days to first case since exodus (Jan 13)", y = NULL)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # ----- daysto-4 ------------
-
-
 g1 <- ds0 %>%
-  # filter(oecd) %>%
+  filter(oecd) %>%
   filter(days_since_1case %in% c(0,5, 10, 15, 20, 25, 30, 35, 40) ) %>%
   # ggplot(aes(x = days_since_exodus, y = StringencyIndex))+
   ggplot(aes(x = date, y = StringencyIndex))+
@@ -400,40 +388,13 @@ g1 <- ds0 %>%
 
 g1
 
-# ---- -----------
-# How does Covid toll on relative scale compare to absolute?
-
-d1 <- ds0 %>%
-  filter(country_code %in% ds_country$id) %>%
-  filter(
-    days_since_1death == 29 | days_since_exodus == 100
-  ) %>%
-  group_by(country_code) %>% mutate(ind = n() ) %>% ungroup() %>%
-  select(country_code, ind) %>% filter(ind ==1)
-  select(country_code,n_deaths_cum_per_1m, days_)
-
-# d <- ds0 %>% filter(country_code=="CZE")
-#  %>%
-d1 %>% ggplot(aes(x=days_since_1case, y = n_deaths_cum_per_1m))+
-# d1 %>% ggplot(aes(x=date, y = n_deaths_cum_per_1m))+
-  geom_text(aes(label = country_code))
-
-# Toll at ABSOLUTE timeline (100 days after exodus)
-d2 <- ds0 %>%
-  filter(country_code %in% ds_country$id) %>%
-  filter(days_since_exodus == 100) %>%
-  # group_by(country_code) %>% mutate(ind = n() ) %>% ungroup() %>%
-  # select(country_code, ind) %>% filter(ind ==1)
-  select(country_code, n_deaths_cum_per_1m, days_since_1case, days_since_exodus)
-d2 %>% ggplot(aes(x=days_since_1case, y = n_deaths_cum_per_1m))+
-  geom_text(aes(label = country_code))
 
 # ----current-toll ----------------
 current_date <- Sys.Date()
 
 # Total deaths today
 g1 <- ds0 %>%
-  filter(country_code %in% ds_country$id) %>%
+  filter(oecd) %>%
   filter(date == lubridate::as_date(current_date)) %>%
   mutate(country_label = forcats::fct_reorder(country_label, n_deaths_cum_per_1m)) %>%
   ggplot(aes(x = n_deaths_cum_per_1m, y = country_label))+
@@ -449,7 +410,7 @@ g1
 
 # Total deaths 30 days after 1st death
 g1 <- ds0 %>%
-  filter(country_code %in% ds_country$id) %>%
+  filter(oecd) %>%
   filter(days_since_1death == 30) %>%
   mutate(country_label = forcats::fct_reorder(country_label, n_deaths_cum_per_1m)) %>%
   ggplot(aes(x = n_deaths_cum_per_1m, y = country_label))+
@@ -466,7 +427,7 @@ g1
 
 # Total deaths 100 days after exodus
 g1 <- ds0 %>%
-  filter(country_code %in% ds_country$id) %>%
+  filter(oecd) %>%
   filter(days_since_exodus == 100) %>%
   mutate(country_label = forcats::fct_reorder(country_label, n_deaths_cum_per_1m)) %>%
   ggplot(aes(x = n_deaths_cum_per_1m, y = country_label))+
@@ -488,8 +449,9 @@ g1
 
 # ---- -----------------
 d1 <- ds0 %>%
-  filter(country_code %in% ds_country$id) %>%
-  filter(date == lubridate::as_date("2020-05-17")) %>%
+  filter(oecd) %>%
+  # filter(date == lubridate::as_date("2020-05-17")) %>%
+  filter(days_since_1death == 30) %>%
   mutate(since_exodus_to_first_death = days_since_exodus - days_since_1death) %>%
   mutate(since_exodus_to_first_case = days_since_exodus - days_since_1case)
 d1 %>% glimpse()
