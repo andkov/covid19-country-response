@@ -56,7 +56,7 @@ shinyServer(function(session, input, output) {
             ggplot(aes_string(
                 x = var_name_x
                 , y = var_name_y
-                , label = "contry_code2"
+                , label = "country_code"
                 , group = "country_label"))+
             geom_text()+
           ggpmisc::stat_poly_eq(
