@@ -93,6 +93,10 @@ ds0 %>% glimpse()
 ```{r daysto-5, echo=F, fig.height=9, fig.width=16, out.width = "1200px", message=FALSE, results='show',warning = F, cache=TRUE}
 ```
 
+## snapshots: Stringency
+```{r daysto-5, echo=F, fig.height=9, fig.width=16, out.width = "1200px", message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
 <!-- # COVID Indicators -->
 
 <!-- What are some basic indicators of progression of COVID in each country?  Without resorting to estimating the growth parameter of the contagion or mortality trajectory, we compute impact indicators based on the total number of cases or deaths at a given time point:   -->
