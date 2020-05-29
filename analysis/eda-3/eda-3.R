@@ -221,15 +221,6 @@ d1 <- ds0 %>%
   ) %>%
   distinct(country_label,date, days_bwt_1case_1death, StringencyIndex, country_code)
 
-# d1 %>%
-#   # ggplot(aes(x = days_bwt_1case_1death, y = StringencyIndex))+
-#   # ggplot(aes(y = days_bwt_1case_1death, x = StringencyIndex))+
-#   filter(country_code != "NPL") %>%
-#   ggplot(aes(y = days_bwt_1case_1death, x = StringencyIndex))+
-#   geom_text(aes(label = country_code))+
-#   geom_smooth(method = "lm",se = F)+
-#   labs(title = "", x = "Stringency Index at the time of first confirmed case",
-#        y = "Days btw 1st case and 1st death")
 
 g1 <- ds0 %>%
   # filter(oecd) %>%
@@ -258,6 +249,19 @@ g1 <- ds0 %>%
   geom_vline(xintercept = lubridate::as_date("2020-03-11"), linetype = "dashed", color = "red")+
 labs(title = "Country response at N days since the first confirmed DEATH",
      caption = "red dashed line = pandemic announced by WHO")
+g1
+
+# ----- daysto-6 ------------
+g1 <- ds0 %>%
+  # filter(oecd) %>%
+  filter(days_since_1death %in% c(0,5, 10, 15, 20, 25, 30, 35, 40) ) %>%
+  # ggplot(aes(x = days_since_exodus, y = StringencyIndex))+
+  ggplot(aes(x = date, y = StringencyIndex))+
+  geom_text(aes(label = country_code), alpha = .3)+
+  facet_wrap(~days_since_1death)+
+  geom_vline(xintercept = lubridate::as_date("2020-03-11"), linetype = "dashed", color = "red")+
+  labs(title = "Country response at N days since the first confirmed DEATH",
+       caption = "red dashed line = pandemic announced by WHO")
 g1
 
 
@@ -359,136 +363,6 @@ g1 <- d1 %>%
   # ggplot(aes( x = since_exodus_to_first_death, y = n_deaths_cum_per_1m)) +
   geom_text(aes(label = country_code, group = country_label))
 plotly::ggplotly(g1+scale_x_continuous(limits = c(0,75)))
-
-
-# ---- covid-metric-1 -----------------------
-# d1 <- ds0 %>%
-d_out <- ds0 %>%
-  filter(country_code == "ITA") %>%
-  select(country_code, date,n_cases_cum, n_deaths_cum, days_since_1case, days_since_1death)
-
-# Deaths 30 days after 1st death
-d1 <- ds0 %>%
-  group_by(country_code) %>%
-  dplyr::filter(days_since_1death == 30) %>%
-  dplyr::select(country_code, n_deaths_cum, n_deaths_cum_per_1m) %>%
-  dplyr::rename(n_deaths_30days_since_1death       = n_deaths_cum) %>%
-  dplyr::rename(n_deaths_30days_since_1death_per1m = n_deaths_cum_per_1m) %>%
-  ungroup()
-d1 %>% glimpse()
-# Deaths 60 days after 1st death
-d2 <- ds0 %>%
-  group_by(country_code) %>%
-  dplyr::filter(days_since_1death == 60) %>%
-  dplyr::select(country_code, n_deaths_cum,n_deaths_cum_per_1m) %>%
-  dplyr::rename(n_deaths_60days_since_1death       = n_deaths_cum) %>%
-  dplyr::rename(n_deaths_60days_since_1death_per1m = n_deaths_cum_per_1m)%>%
-  ungroup()
-
-# Cases 30 days after 1st case
-d3 <- ds0 %>%
-  group_by(country_code) %>%
-  dplyr::filter(days_since_1case == 30) %>%
-  dplyr::select(country_code, n_cases_cum, n_cases_cum_per_1m) %>%
-  dplyr::rename(n_cases_30days_since_1case       = n_cases_cum) %>%
-  dplyr::rename(n_cases_30days_since_1case_per1m = n_cases_cum_per_1m)%>%
-  ungroup()
-
-# Cases 60 days after 1st case
-d4 <- ds0 %>%
-  group_by(country_code) %>%
-  dplyr::filter(days_since_1case == 60) %>%
-  dplyr::select(country_code, n_cases_cum, n_cases_cum_per_1m) %>%
-  dplyr::rename(n_cases_60days_since_1case       = n_cases_cum) %>%
-  dplyr::rename(n_cases_60days_since_1case_per1m = n_cases_cum_per_1m) %>%
-  ungroup()
-
-
-# Deaths 30 days after 1st case
-d5 <- ds0 %>%
-  group_by(country_code) %>%
-  dplyr::filter(days_since_1case == 30) %>%
-  dplyr::select(country_code, n_deaths_cum, n_deaths_cum_per_1m) %>%
-  dplyr::rename(n_deaths_30days_since_1case       = n_deaths_cum) %>%
-  dplyr::rename(n_deaths_30days_since_1case_per1m = n_deaths_cum_per_1m) %>%
-  ungroup()
-d5 %>% glimpse()
-# Deaths 60 days after 1st case
-d6 <- ds0 %>%
-  group_by(country_code) %>%
-  dplyr::filter(days_since_1case == 60) %>%
-  dplyr::select(country_code, n_deaths_cum, n_deaths_cum_per_1m) %>%
-  dplyr::rename(n_deaths_60days_since_1case       = n_deaths_cum) %>%
-  dplyr::rename(n_deaths_60days_since_1case_per1m = n_deaths_cum_per_1m)%>%
-  ungroup()
-
-# Cases 30 days after 1st death
-d7 <- ds0 %>%
-  group_by(country_code) %>%
-  dplyr::filter(days_since_1death == 30) %>%
-  dplyr::select(country_code, n_cases_cum, n_cases_cum_per_1m) %>%
-  dplyr::rename(n_cases_30days_since_1death = n_cases_cum) %>%
-  dplyr::rename(n_cases_30days_since_1death_per1m = n_cases_cum_per_1m)%>%
-  ungroup()
-
-# Cases 60 days after 1st case
-d8 <- ds0 %>%
-  group_by(country_code) %>%
-  dplyr::filter(days_since_1death == 60) %>%
-  dplyr::select(country_code, n_cases_cum, n_cases_cum_per_1m) %>%
-  dplyr::rename(n_cases_60days_since_1death = n_cases_cum) %>%
-  dplyr::rename(n_cases_60days_since_1death_per1m = n_cases_cum_per_1m) %>%
-  ungroup()
-
-
-# Deaths 100 days since exodus
-d9 <- ds0 %>%
-  group_by(country_code) %>%
-  dplyr::filter(days_since_exodus == 100) %>%
-  dplyr::select(country_code, n_deaths_cum, n_deaths_cum_per_1m) %>%
-  dplyr::rename(n_deaths_100days_since_exodus       = n_deaths_cum) %>%
-  dplyr::rename(n_deaths_100days_since_exodus_per_1m = n_deaths_cum_per_1m)%>%
-  ungroup()
-
-
-# Cases 100 days since exodus
-d10 <- ds0 %>%
-  group_by(country_code) %>%
-  dplyr::filter(days_since_exodus == 100) %>%
-  dplyr::select(country_code, n_cases_cum, n_cases_cum_per_1m) %>%
-  dplyr::rename(n_cases_100days_since_exodus = n_cases_cum) %>%
-  dplyr::rename(n_cases_100days_since_exodus_per_1m = n_cases_cum_per_1m) %>%
-  ungroup()
-
-
-# ds0 %>% filter(country_ == "LVA")
-ds_scince_metric <- list(d1,d2,d3,d4,d5,d6,d7,d8,d9, d10) %>% Reduce(function(a,b) dplyr::full_join(a,b), .)
-ds_scince_metric %>% glimpse()
-longer_names <- setdiff(names(ds_scince_metric),"country_code")
-ds_scince_metric_long <- ds_scince_metric %>%
-  tidyr::pivot_longer(cols = longer_names, names_to = "metric", values_to = "value")
-# ds_scince_metric_long %>% glimpse()
-
-ds_scince_metric <- ds_scince_metric %>%
-  dplyr::left_join(
-    ds_country_codes, by = c("country_code" = "country_code3")
-  ) %>%
-  dplyr::filter(!is.na(country_code))
-
-ds_scince_metric_long <- ds_scince_metric_long %>%
-  dplyr::left_join(
-    ds_country_codes, by = c("country_code" = "country_code3")
-  ) %>%
-  dplyr::filter(!is.na(country_code))
-
-# ds_scince_metric_long %>% glimpse()
-# ds_scince_metric %>% glimpse()
-
-# ds_scince_metric %>% neat_DT()
-ls_scince_metric <- list(
-  "wide" = ds_scince_metric, "long" = ds_scince_metric_long
-)
-ls_scince_metric %>%  readr::write_rds("./analysis/shiny-since-metric/data.rds")
 
 
 # ----- why_75-1 ----------------------
