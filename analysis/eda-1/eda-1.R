@@ -357,7 +357,7 @@ g3 %>% plotly::layout(autosize = F, width = 900, height = 600, margin = margings
 
 
 # ---- publish ---------------------------------------
-path_report <- "./analysis/response-stringency-1/response-stringency-1.Rmd"
+path_report <- "./analysis/eda-1/eda-1.Rmd"
 rmarkdown::render(
   input = path_report,
   output_format=c("html_document")
