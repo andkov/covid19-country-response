@@ -122,7 +122,7 @@ ds0 %>% glimpse()
 
 > How does COVID-19 progress in each country?  
 
-```{r q1-basic-timeline, echo=TRUE, fig.height=7, fig.width=10, out.width = "1200px", message=FALSE, results='asis',warning = F, cache=TRUE}
+```{r q1-basic-timeline, echo=TRUE, fig.height=8, fig.width=10, out.width = "1200px", message=FALSE, results='asis',warning = F, cache=TRUE}
 ```
 
 # Q1 - Within Country
@@ -140,11 +140,11 @@ ___Common legend___:
 ```{r q1a, echo=TRUE, fig.height=2, fig.width=10, out.width = "1200px", message=FALSE, results='asis',warning = F, cache=TRUE}
 ```
 
-# Q2 - Response Stringency
+# Q2 - Response 
 
 > What was the trend of the response to COVID-10 by each country?  
 
-```{r q2-response-trend, echo=TRUE, fig.height=7, fig.width=10, out.width = "1200px", message=FALSE, results='show',warning = F, cache=TRUE}
+```{r q2-response-trend, echo=TRUE, fig.height=7, fig.width=10, out.width = "1200px", message=FALSE, results='asis',warning = F, cache=TRUE}
 ```
 
 
