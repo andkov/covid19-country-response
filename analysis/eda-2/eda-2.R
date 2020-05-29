@@ -670,7 +670,7 @@ list(
 
 
 # ---- publish ---------------------------------------
-path_report <- "./analysis/response-stringency-1/response-stringency-1.Rmd"
+path_report <- "./analysis/eda-2/eda-2.Rmd"
 rmarkdown::render(
   input = path_report,
   output_format=c("html_document")
