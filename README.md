@@ -3,9 +3,13 @@ Combines data  from OECD database and other source to examine countries' respons
 
 Analytic Reports
 ----------------------
-- [EDA-1][eda-1]  - general trends of the COVID-19 spread and Stringency Index
+- [EDA-1][eda-1] - general trends of the COVID-19 spread and Stringency Index 
+- [EDA-2][eda-2] - exploring early sequence and toll of COVID-19 among OECD countries
+- [EDA-2][eda-3] - sequence of epidemiological events in all countries
 
 [eda-1]:https://raw.githack.com/andkov/covid19-country-response/master/analysis/eda-1/eda-1.html
+[eda-2]:https://raw.githack.com/andkov/covid19-country-response/master/analysis/eda-2/eda-2.html
+[eda-3]:https://raw.githack.com/andkov/covid19-country-response/master/analysis/eda-3/eda-3.html
 
 
 Potential data sources
