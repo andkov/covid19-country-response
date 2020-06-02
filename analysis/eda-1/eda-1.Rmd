@@ -1,5 +1,5 @@
 ---
-title: "EDA-1"
+title: "EDA-1: Impact and Response"
 author: "Andriy Koval"
 date: "May 7, 2020"
 output:
