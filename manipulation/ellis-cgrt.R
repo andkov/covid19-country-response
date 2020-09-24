@@ -29,7 +29,9 @@ ds_covid <- readr::read_csv(config$path_input_covid)
 ds_covid %>% glimpse()
 
 
-ds_cgrt <- readr::read_csv(path_file)
+ds_cgrt <- read_csv(path_file,
+                    col_types = cols(RegionName = col_character(),
+                                     RegionCode = col_character()))
 ds_cgrt %>% glimpse()
 
 # Excel source is in wide format, one tab per indicator
@@ -43,29 +45,36 @@ ds_cgrt %>% glimpse()
 
 # sources can be joined by the three letter country code
 # ---- tweak-data -----------------------
-cgrt_names <- names(ds_cgrt)
-cgrt_names <- stringr::str_replace_all(cgrt_names, " ", "_")
-cgrt_names <- stringr::str_replace_all(cgrt_names, "/", "_or_")
-names(ds_cgrt) <- cgrt_names
+ds_cgrt <- ds_cgrt %>% janitor::clean_names()
+# cgrt_names <- names(ds_cgrt)
+# cgrt_names <- stringr::str_replace_all(cgrt_names, " ", "_")
+# cgrt_names <- stringr::str_replace_all(cgrt_names, "/", "_or_")
+# names(ds_cgrt) <- cgrt_names
 ds_cgrt %>% glimpse()
 ds_cgrt <- ds_cgrt %>%
   dplyr::mutate(
-    Date = lubridate::ymd(Date)
+    date = lubridate::ymd(date)
   )
 
-d <- ds_cgrt %>% filter(CountryCode == "AFG") %>% select(Date, CountryCode, ConfirmedCases, ConfirmedDeaths)
+# d <- ds_cgrt %>% filter(CountryCode == "AFG") %>% select(Date, CountryCode, ConfirmedCases, ConfirmedDeaths)
 # some useful columns from the ECDC  covid source
-ds_cgrt <- ds_cgrt %>%
-  dplyr::rename(
-    # country_name = CountryName,
-    country_code = CountryCode,
-    date = Date
-  ) %>%
-  dplyr::select(-CountryName)
+# ds_cgrt <- ds_cgrt %>%
+#   dplyr::rename(
+#     # country_name = CountryName,
+#     country_code = CountryCode,
+#     date = Date
+#   ) %>%
+#   dplyr::select(-CountryName)
 
 ds_cgrt %>% glimpse()
 
-ds_cgrt %>% readr::write_rds("./data-unshared/derived/OxCGRT.rds")
+# ds_cgrt %>% readr::write_rds("./data-unshared/derived/OxCGRT.rds")
+#
+
+# ---- save-to-disk --------------------
+# ds_daily %>% readr::write_csv(config$path_input_jh_daily)
+ds_cgrt %>% readr::write_rds(config$path_input_cgrt)
+
 
 
 
