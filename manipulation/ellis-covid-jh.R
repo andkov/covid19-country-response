@@ -39,9 +39,23 @@ ds_daily <- ls_daily %>% bind_rows(.id = "date") %>% janitor::clean_names()
 
 ds_daily %>% glimpse()
 
+
+us_pop <- readr::read_csv("../COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv") %>% janitor::clean_names() %>% select(1:12)
+
+us_pop %>%  filter(country_region == "US") %>% glimpse()
+
+ds_uspop <- us_pop %>%
+  group_by(province_state) %>%
+  summarize(
+    population = sum(population, na.rm = T)
+  )
+# add state population
+ds_daily <- ds_daily %>%
+  left_join(ds_uspop,by = "province_state")
+
 # ---- save-to-disk --------------------
-# ds_daily %>% readr::write_csv(config$path_input_jh_daily)
-ds_daily %>% readr::write_rds("./data-unshared/derived/js_daily.rds")
+ds_daily %>% readr::write_csv(config$path_input_jh_daily)
+# ds_daily %>% readr::write_csv("./data-unshared/derived/js_daily.rds")
 
 
 
