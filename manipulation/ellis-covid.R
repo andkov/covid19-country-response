@@ -52,7 +52,7 @@ ds_country <-
   )
 # sources can be joined by the three letter country code
 # ---- tweak-data -----------------------
-names(ds_covid) <- c("date", "day", "month", "year", "n_cases", "n_deaths", "country", "geo_id", "country_code","n_population_2018", "continent")
+names(ds_covid) <- c("date", "day", "month", "year", "n_cases", "n_deaths", "country", "geo_id", "country_code","n_population_2018", "continent", "n_cases_cum_14d_per100k")
 
 ds_covid <- ds_covid %>%
   dplyr::mutate(
