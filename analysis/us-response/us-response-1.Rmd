@@ -1,0 +1,157 @@
+---
+title: "US Response to COVID-19"
+author: "Andriy Koval"
+date: "Sep 24, 2020"
+output:
+  html_document:
+    theme: simplex
+    toc: true
+    toc_depth: 3
+    keep_md: false
+    toc_float: true
+    code_folding: hide
+---
+
+<!-- These two chunks should be added in the beginning of every .Rmd that you want to source an .R script -->
+<!--  The 1st mandatory chunck  -->
+<!--  Set the working directory to the repository's base directory -->
+```{r, echo=F, message=F} 
+#Don't combine this call with any other chunk 
+# cat("Working directory: ", getwd()) # check where you are
+  library(knitr)
+# Rmd is in "./reports/reportA/reportA.Rmd", but now the root is "./"
+  knitr::opts_knit$set(root.dir='../../') # "go up" from the folder where this .Rmd is save until you arrive at the root/working directory
+```
+
+<!--  The 2nd mandatory chunck  -->
+<!-- Set the report-wide options, and point to the external code file. -->
+```{r set_options, echo=F}
+# set options shared by all chunks
+opts_chunk$set(
+  results='show', 
+  attr.source = ".numberLines",
+  message = TRUE,
+  comment = NA, 
+  tidy = FALSE,
+  # fig.height = 4, 
+  # fig.width = 5.5, 
+  # out.width = "700px",
+  fig.path = 'figure_rmd/'     
+  # dev = "png"
+  # dpi = 400
+  # fig.path = 'figure_pdf/',     
+  # dev = "pdf"#,
+  # dev.args=list(pdf = list(colormodel = 'cmyk'))
+)
+echoChunks <- TRUE
+options(width=120) #So the output is 50% wider than the default.
+# connect to the file with the underlying R script  
+read_chunk("./analysis/us-response/us-response-1.R")
+# read_chunk("../../../analysis/blogposts/florida-suicide-count/fl-suicide-count.R")
+```
+
+
+```{r load-packages, echo=echoChunks, message=FALSE}
+```
+
+```{r load-sources, echo=echoChunks, message=FALSE}
+```
+
+```{r declare-globals, echo=echoChunks, results='show', message=FALSE}
+```
+ 
+```{r declare-functions, echo=echoChunks, results='show', message=FALSE}
+```
+
+
+```{r load-data, echo=echoChunks, results='show', message=FALSE}
+```
+
+```{r tweak-data, echo=echoChunks, results='show', message=FALSE}
+```
+
+# Timeline of COVID-19 measures
+
+Source: [OVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19)
+
+See [codebook](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data#usa-daily-state-reports-csse_covid_19_daily_reports_us) for definition of measures. 
+
+* <b>Confirmed</b> - Aggregated case count for the state.
+* <b>Incident_Rate</b> - cases per 100,000 persons.
+
+* <b>Deaths</b> - Aggregated death toll for the state.
+* <b>Mortality_Rate</b> - Number recorded deaths * 100/ Number confirmed cases.
+
+* <b>People_Tested</b> - Total number of people who have been tested.
+* <b>Testing_Rate</b> - Total test results per 100,000 persons. The "total test results" are equal to "Total test results (Positive + Negative)" from [COVID Tracking Project](https://covidtracking.com/).
+
+* <b>People_Hospitalized</b> - Total number of people hospitalized. (Nullified on Aug 31, see [Issue #3083](https://github.com/CSSEGISandData/COVID-19/issues/3083))
+* <b>Hospitalization_Rate</b> - US Hospitalization Rate (%): = Total number hospitalized / Number cases. The "Total number hospitalized" is the "Hospitalized – Cumulative" count from [COVID Tracking Project](https://covidtracking.com/). The "hospitalization rate" and "Total number hospitalized" is only presented for those states which provide cumulative hospital data. (Nullified on Aug 31, see 
+
+* <b>Recovered</b> - Aggregated Recovered case count for the state.
+* <b>Active</b> - Aggregated confirmed cases that have not been resolved (Active cases = total cases - total recovered - total deaths).
+
+## Confirmed 
+
+```{r confirmed, echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
+
+## Deaths 
+
+```{r deaths,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
+
+## Tests
+
+ 
+```{r tested,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
+
+## Hospitalizations
+
+ 
+```{r hospitalized,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
+  
+# Government Response 
+
+See [OxCGRT Codebook](https://github.com/OxCGRT/covid-policy-tracker/blob/master/documentation/codebook.md) for definitions of indices. 
+
+## Stringency (Overall)
+
+```{r stringency,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
+## Government Response 
+
+```{r government,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
+## Containment Health
+
+```{r containment,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
+## Economic Support
+
+```{r economy,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
+session information
+===========================================================================
+
+For the sake of documentation and reproducibility, the current report was rendered in the following environment.  Click the line below to expand.
+
+<details>
+  <summary>Environment <span class="glyphicon glyphicon-plus-sign"></span></summary>
+```{r session-info, echo=FALSE}
+if( requireNamespace("devtools", quietly = TRUE) ) {
+  devtools::session_info()
+} else {
+  sessionInfo()
+} 
+```
