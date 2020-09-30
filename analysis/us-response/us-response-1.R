@@ -24,6 +24,7 @@ source("./scripts/common-functions.R")        # reporting functions and quick vi
 # source("./scripts/graphing/graph-presets.R") # font and color conventions
 # source("./scripts/graphing/graph-support.R") # font and color conventions
 
+source("./analysis/us-response/cgrt-levels.R")
 # ---- declare-globals --------------------
 ggplot2::theme_set(
   ggplot2::theme_bw(
@@ -86,13 +87,21 @@ compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
 #   b = 100,
 #   t = 100,
 #   pad = 4
-# )
+# )\
 
-print_plotly_lines <- function(d, measure = "confirmed", default_region = "Florida", ...){
+
+print_plotly_lines <- function(d, measure = "confirmed", grouping = "province_state", default_region = "Florida", ...){
   # d <- ds_daily
+  # grouping_enq <-grouping_name rlang::sym(paste0("~ ",grouping))
+  grouping_name <- parse(text = grouping)
+  grouping_enq  <- rlang::sym(grouping)
+
   g1 <- d %>%
-    plotly::highlight_key(~ province_state) %>%
-    ggplot(aes_string(x = "date", y = measure, group = "province_state"))+
+    # plotly::highlight_key(~ province_state) %>%
+    # plotly::highlight_key(grouping_enq ) %>%
+    plotly::highlight_key(~eval(grouping_name) ) %>%
+    ggplot(aes_string(x = "date", y = measure, group = grouping))+
+    # ggplot(aes(x = date, y = measure, group = !!grouping_enq))+
     geom_line( alpha = .3) +
     scale_y_continuous(labels = scales::comma)+
     labs(
@@ -106,6 +115,7 @@ print_plotly_lines <- function(d, measure = "confirmed", default_region = "Flori
       on             = "plotly_click"          # or "plotly_hover"
       ,dynamic       = TRUE                    # adds color option
       ,selectize     = TRUE                    # select what to highlight
+      ,persistent = FALSE
       ,defaultValues = default_region          # highlights in the beginning
     ) %>%
     plotly::layout(margin = list(l = 0, r = 0, b = 80, t = 30, pad = 0))
@@ -119,6 +129,7 @@ print_plotly_lines <- function(d, measure = "confirmed", default_region = "Flori
 
 # ds_daily %>% print_plotly_lines("confirmed", y  = "Confirmed Cases", title = "XXX")
 # ds_daily %>% print_plotly_lines("active")
+# ds_cgrt %>% print_plotly_lines("stringency_index",grouping = "region_code",  default_region = c("USA","GBR","IRL","CAN"))
 
 # ---- load-data -------------------------------------------------------------
 # reference table for geographic units
@@ -140,86 +151,119 @@ ds_daily <- readr::read_csv(config$path_input_jh_daily)
 # ds_covid$country_code %>% unique() %>% length()
 # ds_cgrt$country_code %>% unique() %>% length()
 
+# metadata to
+cgrt_key <- readxl::read_xlsx("./data-public/metadata/cgrt/cgrt-key.xlsx", sheet = "key")
+
+meta_cgrt <- function(item_id,field){
+  # item_id = "h1"
+  # field  = "field_enqlabel"
+  field_enq <- rlang::sym(field)
+  cgrt_key %>% filter(id == item_id) %>%
+    pull(field_enq)
+}
+# meta_cgrt("h2","name")
+
 # ---- tweak-data --------------------
+cgrt_key %>% select(id, name,measurement)
+
 
 ds_cgrt <- ds_cgrt %>%
   mutate(
-    region_code = ifelse(is.na(region_code) & country_code == "USA" , "USA", region_code)
-    ,region_name = ifelse(is.na(region_name)& country_code == "USA", "USA", region_name)
-  ) %>%
-  rename(
-    province_state = region_name
-  ) %>%
-  filter(
-    country_code == "USA"
+    region_code = ifelse(is.na(region_code), country_code, region_code)
+    ,region_name = ifelse(is.na(region_name), country_name, region_name)
+  ) #%>%
+  # filter(
+  #   # country_code == "USA"
+  #   country_code %in% c("USA","GBR", "IRL","CAN")
+  # )
+
+# ds_cgrt %>% filter(country_code == "USA") %>% View()
+
+# recode levels of CGRT
+for(i in names(cgrt_levels)){
+  # qname <- "c1"
+  qname <- i
+  item_name <- meta_cgrt(qname, "name")
+  item_levels <- cgrt_levels[[qname]]
+
+  ds_cgrt <- ds_cgrt %>%
+    mutate_at(
+      .vars = item_name, .funs = factor, levels = names(item_levels), labels = item_levels
+    )
+}
+# inspect
+# ds_cgrt %>% group_by(c1_school_closing) %>% count()
+
+
+
+# d %>% glimpse()
+# ds_cgrt %>% glimpse()
+ds_cgrt <- ds_cgrt %>%
+  mutate(
+    month    = lubridate::month(date)
+    ,month   = factor(month, levels =1:12, labels = month.abb)
+    ,month   = fct_rev(month)
+    ,week    = lubridate::week(date)
+    ,day     = lubridate::day(date)
+    ,weekday = lubridate::wday(date)
+    ,province_state = region_name
   )
 
 
-# #
-# ds_daily <- ds_daily %>%
-#   mutate(
-#     confirmed_100k = (confirmed / population) * 100000
-#     deaths_100k = (confirmed / population) * 100000
-#     recovered_100k = (confirmed / population) * 100000
-#     active_100k = (confirmed / population) * 100000
-#     people_tested_100k = (confirmed / population) * 100000
-#     people_hospitalized_100k = (confirmed / population) * 100000
-#   )
+# ds_cgrt %>% glimpse()
+print_tile <- function(d, region, measure, relative_h = c(2,1)){
+  # d <-  ds_cgrt
+  # region = "USA"
+  # measure = "h2"
+  measure_str <-  meta_cgrt(measure,"name")
+  measure_label <-  meta_cgrt(measure,"label")
+  measure_enq <- rlang::sym(measure_str)
+  main_title = paste0("(",toupper(region),") - ", measure_label)
+  d1 <- d %>%
+    filter(region_name == region) #%>%
+    # select(date,region_name, !!measure_enq)
+  # d1
+  g <- d1 %>%
+    ggplot(aes(x=day, y = month, fill = !!measure_enq))+
+    geom_tile(color = "white")+
+    scale_fill_viridis_d(option = "magma", begin = .0, end = .9,  direction = -1)+
+    theme(
+      panel.grid = element_blank()
+      # ,legend.position = "right"
+    )+
+    labs(y = NULL, x = "Day of the month",
+         title = main_title, fill = meta_cgrt(measure, "label"))
 
-# ---- inspect-data ----------------------
+  g_legend <- ggpubr::get_legend(g) %>% ggpubr::as_ggplot()
+  g <- cowplot::plot_grid(
+    g +theme(legend.position = "none")
+    , g_legend,ncol=1, rel_heights = relative_h
+  )
+ g
+}
+ ds_cgrt%>% print_tile("Ireland","c2")
+ ds_cgrt%>% print_tile("United States","c2")
+ ds_cgrt%>% print_tile("Canada","c2")
+ ds_cgrt%>% print_tile("United Kingdom","c2")
 
-# ds_daily %>% distinct(country_region)
+# g1_legend <- ggpubr::get_legend(g1) %>% ggpubr::as_ggplot()
 
-# ---- declare-functions2 -----------------
-# d <- ds_daily %>%
-#   filter(province_state == "Florida")
+# ggpubr::as_ggplot(g1_legend)
 
-# g <- d %>%
-#   ggplot(aes(x = date, y = confirmed ))+
-#   geom_line()
-# g
-#
-# g + aes(y = deaths)
-# g + aes(y = recovered) # nothing
-# g + aes(y = active)
-# g + aes(y = incident_rate) # transformed active
-# g + aes(y = people_tested)
-# g + aes(y = people_hospitalized)
-# g + aes(y = mortality_rate)
-# g + aes(y = testing_rate)
-# g + aes(y = hospitalization_rate)
-#
-# g <- ds_daily %>%
-#   # filter(province_state %in% c("Florida","New York")) %>%
-#   ggplot(aes(x = date, y = confirmed ))+
-#   geom_line(aes(group =province_state ))+
-#   geom_smooth()
-# g
-#
+cowplot::plot_grid(g1 +theme(legend.position = "none"), g1_legend,ncol=1, rel_heights = c(2,1))
+# ----- containment -------------
+ds_cgrt %>% print_tile("USA","c1")
 
-# confirmed - incident_rate
-# deaths - mortality_rate
-# people_tested - testing_rate
-# people_hospitalized - hospitalization_rate
-#
-# ds_daily %>% glimpse()
-# print_state_facets <- function(d, measure){
-#   d <- ds_daily
-#   # measure <- "confirmed"
-#   measure <- "incident_rate"
-#
-#   g1 <- d %>%
-#     ggplot(aes_string(x = "date", y = measure, group = "province_state"))+
-#     geom_line( alpha = .9) +
-#     scale_y_continuous(labels = scales::comma)+
-#     facet_wrap(~province_state,ncol = 7)+
-#     labs( x = "Date")
-#   g1
-#
-# }
+# ---- health-policy -----------
+ds_cgrt %>% print_tile("USA","h1")
+
+ds_cgrt %>% print_tile("USA","h2")
+
+ds_cgrt %>% print_tile("USA","h3")
 
 
-
+# ---- econ-support --------
+ds %>% print_tile("USA","e1")
 
 # ---- confirmed -------------------------
 ds_daily %>% print_plotly_lines("confirmed", y = "Confirmed Cases", title = "Timeline of confirmed cases by state")
@@ -257,6 +301,8 @@ ds_cgrt %>% print_plotly_lines("containment_health_index ", y = "Containment Hea
 
 # ---- economy ----------------------
 ds_cgrt %>% print_plotly_lines("economic_support_index ", y = "Economic Support Index", title = "Timeline of Economic Support index by state", default_region = "USA")
+
+
 
 
 
