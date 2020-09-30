@@ -164,7 +164,7 @@ meta_cgrt <- function(item_id,field){
 # meta_cgrt("h2","name")
 
 # ---- tweak-data --------------------
-cgrt_key %>% select(id, name,measurement)
+# cgrt_key %>% select(id, name,measurement)
 
 
 ds_cgrt <- ds_cgrt %>%
@@ -241,29 +241,47 @@ print_tile <- function(d, region, measure, relative_h = c(2,1)){
   )
  g
 }
- ds_cgrt%>% print_tile("Ireland","c2")
- ds_cgrt%>% print_tile("United States","c2")
- ds_cgrt%>% print_tile("Canada","c2")
- ds_cgrt%>% print_tile("United Kingdom","c2")
+ # ds_cgrt%>% print_tile("Ireland","c2")
+ # ds_cgrt%>% print_tile("United States","c2")
+ # ds_cgrt%>% print_tile("Canada","c2")
+ # ds_cgrt%>% print_tile("United Kingdom","c2")
 
-# g1_legend <- ggpubr::get_legend(g1) %>% ggpubr::as_ggplot()
+# ----- containment-measures -------------
 
-# ggpubr::as_ggplot(g1_legend)
+for(i in c(paste0("c",1:8))){
+  # i <- "c1"
+  measure_label <-  meta_cgrt(i,"label")
+  measure_desc <-  meta_cgrt(i,"description")
+  cat("\n##",measure_label,"\n")
+  ds_cgrt %>% print_tile("United States",i) %>% print()
+  cat("\n")
+}
 
-cowplot::plot_grid(g1 +theme(legend.position = "none"), g1_legend,ncol=1, rel_heights = c(2,1))
-# ----- containment -------------
-ds_cgrt %>% print_tile("USA","c1")
 
 # ---- health-policy -----------
-ds_cgrt %>% print_tile("USA","h1")
+for(i in c(paste0("h",1:3))){
+  # i <- "c1"
+  measure_label <-  meta_cgrt(i,"label")
+  measure_desc <-  meta_cgrt(i,"description")
+  cat("\n##",measure_label,"\n")
+  measure_desc %>% print()
+  ds_cgrt %>% print_tile("United States",i) %>% print()
+  cat("\n")
+}
 
-ds_cgrt %>% print_tile("USA","h2")
 
-ds_cgrt %>% print_tile("USA","h3")
 
 
 # ---- econ-support --------
-ds %>% print_tile("USA","e1")
+for(i in c(paste0("h",1:2))){
+  # i <- "c1"
+  measure_label <-  meta_cgrt(i,"label")
+  measure_desc <-  meta_cgrt(i,"description")
+  cat("\n##",measure_label,"\n")
+  ds_cgrt %>% print_tile("United States",i) %>% print()
+  cat("\n")
+}
+
 
 # ---- confirmed -------------------------
 ds_daily %>% print_plotly_lines("confirmed", y = "Confirmed Cases", title = "Timeline of confirmed cases by state")
