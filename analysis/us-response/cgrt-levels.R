@@ -84,7 +84,7 @@ levels_h1 <- c(
 # H2_Testing policy
 levels_h2 <- c(
   "0" =  "0 - no testing policy"
-  ,"1" = "1 - only those who both (a) have symptoms AND (b) meet specific criteria (eg key workers, admitted to hospital, came into contact with a known case, returned from overseas)"
+  ,"1" = "1 - only those who both (a) have symptoms AND (b) meet specific criteria \n(eg key workers, admitted to hospital, came into contact with a known case, returned from overseas)"
   ,"2" = "2 - testing of anyone showing Covid-19 symptoms"
   ,"3" = "3 - pen public testing (eg 'drive through' testing available to asymptomatic people)"
 )
