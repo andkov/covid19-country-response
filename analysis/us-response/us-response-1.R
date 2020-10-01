@@ -115,7 +115,7 @@ print_plotly_lines <- function(d, measure = "confirmed", grouping = "province_st
       on             = "plotly_click"          # or "plotly_hover"
       ,dynamic       = TRUE                    # adds color option
       ,selectize     = TRUE                    # select what to highlight
-      ,persistent = FALSE
+      ,persistent = TRUE
       ,defaultValues = default_region          # highlights in the beginning
     ) %>%
     plotly::layout(margin = list(l = 0, r = 0, b = 80, t = 30, pad = 0))
@@ -129,26 +129,45 @@ print_plotly_lines <- function(d, measure = "confirmed", grouping = "province_st
 # ds_cgrt %>% glimpse()
 print_tile <- function(d, region, measure, relative_h = c(2,1)){
   # d <-  ds_cgrt
-  # region = "USA"
-  # measure = "h2"
+  # region = "United States"
+  # measure = "c2"
+  # relative_h = c(2,1)
   measure_str <-  meta_cgrt(measure,"name")
   measure_label <-  meta_cgrt(measure,"label")
   measure_enq <- rlang::sym(measure_str)
+
+
   main_title = paste0("(",toupper(region),") - ", measure_label)
+  items_with_flag <- cgrt_key %>% filter(flag != "NULL") %>% pull(id)
+  item_flag_name <- cgrt_key %>% filter(id == measure) %>% pull(flag) %>% tolower()
+  item_flag_name_eqn <- rlang::sym(item_flag_name)
   d1 <- d %>%
     filter(region_name == region) #%>%
+    # dplyr::rename(flag = c1_flag)
   # select(date,region_name, !!measure_enq)
   # d1
   g <- d1 %>%
     ggplot(aes(x=day, y = month, fill = !!measure_enq))+
     geom_tile(color = "white")+
-    scale_fill_viridis_d(option = "magma", begin = .0, end = .9,  direction = -1)+
+    scale_fill_viridis_d(option = "magma", begin = .0, end = .9,  direction = -1,drop = FALSE,
+                         na.translate = F)+
+    # geom_point(aes(shape = factor(c2_flag)))+
+    # scale_shape_manual(values = c("0" = "32", "1" = "8"))+
     theme(
       panel.grid = element_blank()
       # ,legend.position = "right"
     )+
+
     labs(y = NULL, x = "Day of the month",
          title = main_title, fill = meta_cgrt(measure, "label"))
+
+  # g
+
+
+  # if(measure %in% items_with_flag){
+  #
+  #   g <- g+geom_point(aes())
+  # }
 
   g_legend <- ggpubr::get_legend(g) %>% ggpubr::as_ggplot()
   g <- cowplot::plot_grid(
@@ -223,11 +242,11 @@ ds_cgrt <- ds_cgrt %>%
     ,day     = lubridate::day(date)
     ,weekday = lubridate::wday(date)
     ,province_state = region_name
-  ) #%>%
-  # filter(
-  #   # country_code == "USA"
-  #   country_code %in% c("USA","GBR", "IRL","CAN")
-  # )
+  ) %>%
+  filter(
+    # country_code == "USA"
+    country_code %in% c("USA","GBR", "IRL","CAN")
+  )
 
 # ds_cgrt %>% filter(country_code == "USA") %>% View()
 
@@ -245,52 +264,154 @@ for(i in names(cgrt_levels)){
 }
 # inspect
 # ds_cgrt %>% group_by(c1_school_closing) %>% count()
-
-
-
-ds_covid %>% glimpse()
-ds_covid %>% print_plotly_lines(measure = "n_cases_cum", grouping = "province_state",y = "Confirmed Cases", title = "Timeline of confirmed cases by country",default_region =  "Canada")
-
+#
 # ----- containment-measures -------------
-
 for(i in c(paste0("c",1:8))){
   # i <- "c1"
   measure_label <-  meta_cgrt(i,"label")
   measure_desc <-  meta_cgrt(i,"description")
-  cat("\n##",measure_label,"\n")
+  cat("\n###",measure_label,"\n")
+  measure_desc %>% print()
+  cat("\n")
   ds_cgrt %>% print_tile("United States",i) %>% print()
   cat("\n")
 }
-
 
 # ---- health-policy -----------
 for(i in c(paste0("h",1:3))){
   # i <- "c1"
   measure_label <-  meta_cgrt(i,"label")
   measure_desc <-  meta_cgrt(i,"description")
-  cat("\n##",measure_label,"\n")
+  cat("\n###",measure_label,"\n")
   measure_desc %>% print()
+  cat("\n")
   ds_cgrt %>% print_tile("United States",i) %>% print()
   cat("\n")
 }
 
-
-
-
 # ---- econ-support --------
-for(i in c(paste0("h",1:2))){
+for(i in c(paste0("e",1:2))){
   # i <- "c1"
   measure_label <-  meta_cgrt(i,"label")
   measure_desc <-  meta_cgrt(i,"description")
-  cat("\n##",measure_label,"\n")
+  cat("\n###",measure_label,"\n")
+  measure_desc %>% print()
+  cat("\n")
   ds_cgrt %>% print_tile("United States",i) %>% print()
   cat("\n")
 }
 
 
+# ----- containment-measures-can -------------
+for(i in c(paste0("c",1:8))){
+  # i <- "c1"
+  measure_label <-  meta_cgrt(i,"label")
+  measure_desc <-  meta_cgrt(i,"description")
+  cat("\n###",measure_label,"\n")
+  measure_desc %>% print()
+  cat("\n")
+  ds_cgrt %>% print_tile("Canada",i) %>% print()
+  cat("\n")
+}
+
+# ---- health-policy-can -----------
+for(i in c(paste0("h",1:3))){
+  # i <- "c1"
+  measure_label <-  meta_cgrt(i,"label")
+  measure_desc <-  meta_cgrt(i,"description")
+  cat("\n###",measure_label,"\n")
+  measure_desc %>% print()
+  cat("\n")
+  ds_cgrt %>% print_tile("Canada",i) %>% print()
+  cat("\n")
+}
+
+# ---- econ-support-can --------
+for(i in c(paste0("e",1:2))){
+  # i <- "c1"
+  measure_label <-  meta_cgrt(i,"label")
+  measure_desc <-  meta_cgrt(i,"description")
+  cat("\n###",measure_label,"\n")
+  measure_desc %>% print()
+  cat("\n")
+  ds_cgrt %>% print_tile("Canada",i) %>% print()
+  cat("\n")
+}
+
+# ----- containment-measures-grb -------------
+for(i in c(paste0("c",1:8))){
+  # i <- "c1"
+  measure_label <-  meta_cgrt(i,"label")
+  measure_desc <-  meta_cgrt(i,"description")
+  cat("\n###",measure_label,"\n")
+  measure_desc %>% print()
+  cat("\n")
+  ds_cgrt %>% print_tile("United Kingdom",i) %>% print()
+  cat("\n")
+}
+
+# ---- health-policy-grb -----------
+for(i in c(paste0("h",1:3))){
+  # i <- "c1"
+  measure_label <-  meta_cgrt(i,"label")
+  measure_desc <-  meta_cgrt(i,"description")
+  cat("\n###",measure_label,"\n")
+  measure_desc %>% print()
+  cat("\n")
+  ds_cgrt %>% print_tile("United Kingdom",i) %>% print()
+  cat("\n")
+}
+
+# ---- econ-support-grb --------
+for(i in c(paste0("e",1:2))){
+  # i <- "c1"
+  measure_label <-  meta_cgrt(i,"label")
+  measure_desc <-  meta_cgrt(i,"description")
+  cat("\n###",measure_label,"\n")
+  measure_desc %>% print()
+  cat("\n")
+  ds_cgrt %>% print_tile("United Kingdom",i) %>% print()
+  cat("\n")
+}
+
+# ----- containment-measures-irl -------------
+for(i in c(paste0("c",1:8))){
+  # i <- "c1"
+  measure_label <-  meta_cgrt(i,"label")
+  measure_desc <-  meta_cgrt(i,"description")
+  cat("\n###",measure_label,"\n")
+  measure_desc %>% print()
+  cat("\n")
+  ds_cgrt %>% print_tile("Ireland",i) %>% print()
+  cat("\n")
+}
+
+# ---- health-policy-irl -----------
+for(i in c(paste0("h",1:3))){
+  # i <- "c1"
+  measure_label <-  meta_cgrt(i,"label")
+  measure_desc <-  meta_cgrt(i,"description")
+  cat("\n###",measure_label,"\n")
+  measure_desc %>% print()
+  cat("\n")
+  ds_cgrt %>% print_tile("Ireland",i) %>% print()
+  cat("\n")
+}
+
+# ---- econ-support-irl --------
+for(i in c(paste0("e",1:2))){
+  # i <- "c1"
+  measure_label <-  meta_cgrt(i,"label")
+  measure_desc <-  meta_cgrt(i,"description")
+  cat("\n###",measure_label,"\n")
+  measure_desc %>% print()
+  cat("\n")
+  ds_cgrt %>% print_tile("Ireland",i) %>% print()
+  cat("\n")
+}
+
 # ---- confirmed -------------------------
 ds_daily %>% print_plotly_lines("confirmed", y = "Confirmed Cases", title = "Timeline of confirmed cases by state")
-
 
 ds_daily %>% print_plotly_lines("incident_rate", y = "Incident Rate", title = "Timeline of incident rate by state")
 
@@ -313,17 +434,17 @@ ds_daily %>% print_plotly_lines("people_hospitalized", y = "People Hospitalized"
 ds_daily %>% print_plotly_lines("hospitalization_rate", y = "Hospitalization Rate", title = "Timeline of hospitalization rate by state")
 
 
-# ---- stringency ----------------------
-ds_cgrt %>% print_plotly_lines("stringency_index", y = "Stringency Index", title = "Timeline of stringency index by state", default_region = "USA")
+# ---- stringency-index ----------------------
+ds_cgrt %>% print_plotly_lines("stringency_index", y = "Stringency Index", title = "Timeline of stringency index by state", default_region = "United States")
 
-# ---- government ----------------------
-ds_cgrt %>% print_plotly_lines("government_response_index", y = "Government Response Index", title = "Timeline of Gov Response index by state", default_region = "Florida")
+# ---- government-index ----------------------
+ds_cgrt %>% print_plotly_lines("government_response_index", y = "Government Response Index", title = "Timeline of Gov Response index by state", default_region = "United States")
 
-# ---- containment ----------------------
-ds_cgrt %>% print_plotly_lines("containment_health_index ", y = "Containment Health Index", title = "Timeline of Containment Health index by state", default_region = "USA")
+# ---- containment-index ----------------------
+ds_cgrt %>% print_plotly_lines("containment_health_index ", y = "Containment Health Index", title = "Timeline of Containment Health index by state", default_region = "United States")
 
-# ---- economy ----------------------
-ds_cgrt %>% print_plotly_lines("economic_support_index ", y = "Economic Support Index", title = "Timeline of Economic Support index by state", default_region = "USA")
+# ---- economy-index ----------------------
+ds_cgrt %>% print_plotly_lines("economic_support_index ", y = "Economic Support Index", title = "Timeline of Economic Support index by state", default_region = "United States")
 
 
 
@@ -339,6 +460,12 @@ rmarkdown::render(
 )
 
 
+path_report <- "./analysis/us-response/us-response-2.Rmd"
+rmarkdown::render(
+  input = path_report,
+  output_format=c("html_document")
+  ,clean=TRUE
+)
 
 
 
