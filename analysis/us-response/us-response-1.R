@@ -126,6 +126,43 @@ print_plotly_lines <- function(d, measure = "confirmed", grouping = "province_st
 
 
 
+# ds_cgrt %>% glimpse()
+print_tile <- function(d, region, measure, relative_h = c(2,1)){
+  # d <-  ds_cgrt
+  # region = "USA"
+  # measure = "h2"
+  measure_str <-  meta_cgrt(measure,"name")
+  measure_label <-  meta_cgrt(measure,"label")
+  measure_enq <- rlang::sym(measure_str)
+  main_title = paste0("(",toupper(region),") - ", measure_label)
+  d1 <- d %>%
+    filter(region_name == region) #%>%
+  # select(date,region_name, !!measure_enq)
+  # d1
+  g <- d1 %>%
+    ggplot(aes(x=day, y = month, fill = !!measure_enq))+
+    geom_tile(color = "white")+
+    scale_fill_viridis_d(option = "magma", begin = .0, end = .9,  direction = -1)+
+    theme(
+      panel.grid = element_blank()
+      # ,legend.position = "right"
+    )+
+    labs(y = NULL, x = "Day of the month",
+         title = main_title, fill = meta_cgrt(measure, "label"))
+
+  g_legend <- ggpubr::get_legend(g) %>% ggpubr::as_ggplot()
+  g <- cowplot::plot_grid(
+    g +theme(legend.position = "none")
+    , g_legend,ncol=1, rel_heights = relative_h
+  )
+  g
+}
+# ds_cgrt%>% print_tile("Ireland","c2")
+# ds_cgrt%>% print_tile("United States","c2")
+# ds_cgrt%>% print_tile("Canada","c2")
+# ds_cgrt%>% print_tile("United Kingdom","c2")
+
+
 
 # ds_daily %>% print_plotly_lines("confirmed", y  = "Confirmed Cases", title = "XXX")
 # ds_daily %>% print_plotly_lines("active")
@@ -164,13 +201,28 @@ meta_cgrt <- function(item_id,field){
 # meta_cgrt("h2","name")
 
 # ---- tweak-data --------------------
-# cgrt_key %>% select(id, name,measurement)
 
+ds_covid <- ds_covid %>%
+  compute_epi_timeline() %>%
+  dplyr::left_join(
+    ds_geo ,
+    by = c("country_code" = "iso3" )
+  )
+
+
+# cgrt_key %>% select(id, name,measurement)
 
 ds_cgrt <- ds_cgrt %>%
   mutate(
     region_code = ifelse(is.na(region_code), country_code, region_code)
     ,region_name = ifelse(is.na(region_name), country_name, region_name)
+    ,month    = lubridate::month(date)
+    ,month   = factor(month, levels =1:12, labels = month.abb)
+    ,month   = fct_rev(month)
+    ,week    = lubridate::week(date)
+    ,day     = lubridate::day(date)
+    ,weekday = lubridate::wday(date)
+    ,province_state = region_name
   ) #%>%
   # filter(
   #   # country_code == "USA"
@@ -196,55 +248,8 @@ for(i in names(cgrt_levels)){
 
 
 
-# d %>% glimpse()
-# ds_cgrt %>% glimpse()
-ds_cgrt <- ds_cgrt %>%
-  mutate(
-    month    = lubridate::month(date)
-    ,month   = factor(month, levels =1:12, labels = month.abb)
-    ,month   = fct_rev(month)
-    ,week    = lubridate::week(date)
-    ,day     = lubridate::day(date)
-    ,weekday = lubridate::wday(date)
-    ,province_state = region_name
-  )
-
-
-# ds_cgrt %>% glimpse()
-print_tile <- function(d, region, measure, relative_h = c(2,1)){
-  # d <-  ds_cgrt
-  # region = "USA"
-  # measure = "h2"
-  measure_str <-  meta_cgrt(measure,"name")
-  measure_label <-  meta_cgrt(measure,"label")
-  measure_enq <- rlang::sym(measure_str)
-  main_title = paste0("(",toupper(region),") - ", measure_label)
-  d1 <- d %>%
-    filter(region_name == region) #%>%
-    # select(date,region_name, !!measure_enq)
-  # d1
-  g <- d1 %>%
-    ggplot(aes(x=day, y = month, fill = !!measure_enq))+
-    geom_tile(color = "white")+
-    scale_fill_viridis_d(option = "magma", begin = .0, end = .9,  direction = -1)+
-    theme(
-      panel.grid = element_blank()
-      # ,legend.position = "right"
-    )+
-    labs(y = NULL, x = "Day of the month",
-         title = main_title, fill = meta_cgrt(measure, "label"))
-
-  g_legend <- ggpubr::get_legend(g) %>% ggpubr::as_ggplot()
-  g <- cowplot::plot_grid(
-    g +theme(legend.position = "none")
-    , g_legend,ncol=1, rel_heights = relative_h
-  )
- g
-}
- # ds_cgrt%>% print_tile("Ireland","c2")
- # ds_cgrt%>% print_tile("United States","c2")
- # ds_cgrt%>% print_tile("Canada","c2")
- # ds_cgrt%>% print_tile("United Kingdom","c2")
+ds_covid %>% glimpse()
+ds_covid %>% print_plotly_lines(measure = "n_cases_cum", grouping = "province_state",y = "Confirmed Cases", title = "Timeline of confirmed cases by country",default_region =  "Canada")
 
 # ----- containment-measures -------------
 
