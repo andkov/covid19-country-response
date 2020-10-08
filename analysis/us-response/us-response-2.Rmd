@@ -1,0 +1,188 @@
+---
+title: "Response to COVID-19: USA,CAN,GRB,IRL"
+author: "Andriy Koval"
+date: "October 1, 2020"
+output:
+  html_document:
+    theme: simplex
+    toc: true
+    toc_depth: 3
+    keep_md: false
+    toc_float: true
+    code_folding: hide
+---
+
+<!-- These two chunks should be added in the beginning of every .Rmd that you want to source an .R script -->
+<!--  The 1st mandatory chunck  -->
+<!--  Set the working directory to the repository's base directory -->
+```{r, echo=F, message=F} 
+#Don't combine this call with any other chunk 
+# cat("Working directory: ", getwd()) # check where you are
+  library(knitr)
+# Rmd is in "./reports/reportA/reportA.Rmd", but now the root is "./"
+  knitr::opts_knit$set(root.dir='../../') # "go up" from the folder where this .Rmd is save until you arrive at the root/working directory
+```
+
+<!--  The 2nd mandatory chunck  -->
+<!-- Set the report-wide options, and point to the external code file. -->
+```{r set_options, echo=F}
+# set options shared by all chunks
+opts_chunk$set(
+  results='show', 
+  attr.source = ".numberLines",
+  message = TRUE,
+  comment = NA, 
+  tidy = FALSE,
+  # fig.height = 4, 
+  # fig.width = 5.5, 
+  # out.width = "700px",
+  fig.path = 'figure_rmd/'     
+  # dev = "png"
+  # dpi = 400
+  # fig.path = 'figure_pdf/',     
+  # dev = "pdf"#,
+  # dev.args=list(pdf = list(colormodel = 'cmyk'))
+)
+echoChunks <- TRUE
+options(width=120) #So the output is 50% wider than the default.
+# connect to the file with the underlying R script  
+read_chunk("./analysis/us-response/us-response-1.R")
+# read_chunk("../../../analysis/blogposts/florida-suicide-count/fl-suicide-count.R")
+```
+
+
+```{r load-packages, echo=echoChunks, message=FALSE}
+```
+
+```{r load-sources, echo=echoChunks, message=FALSE}
+```
+
+```{r declare-globals, echo=echoChunks, results='show', message=FALSE}
+```
+ 
+```{r declare-functions, echo=echoChunks, results='show', message=FALSE}
+```
+ 
+
+
+```{r load-data, echo=echoChunks, results='show', message=FALSE}
+```
+
+```{r tweak-data, echo=echoChunks, results='show', message=FALSE, warning=F}
+```
+
+```{r declare-functions-2, echo=echoChunks, results='show', message=FALSE}
+```
+# OxCGRT Indices
+
+See [OxCGRT Codebook](https://github.com/OxCGRT/covid-policy-tracker/blob/master/documentation/codebook.md) for definitions of indices. 
+
+```{r}
+cgrt_key %>% select(id,label, description, measurement) %>% neat()
+```
+
+## Stringency (Overall)
+
+```{r stringency-index,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
+## Government Response 
+
+```{r government-index,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
+## Containment Health
+
+```{r containment-index,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
+## Economic Support
+
+```{r economy-index,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
+```
+
+
+# United States
+
+## Containment and Closure policies
+
+```{r containment-measures, echo=TRUE, message=FALSE, warning=FALSE, cache=TRUE, results='asis'}
+```
+
+## Health System Policies
+
+```{r health-policy, echo=TRUE, message=FALSE, warning=FALSE, cache=TRUE, results='asis'}
+```
+
+## Economic Support
+
+```{r econ-support, echo=TRUE,  message=FALSE, results='asis',warning = F, cache=TRUE}
+```
+
+# Canada
+
+## Containment and Closure policies
+
+```{r containment-measures-can, echo=TRUE, message=FALSE, warning=FALSE, cache=TRUE, results='asis'}
+```
+
+## Health System Policies
+
+```{r health-policy-can, echo=TRUE, message=FALSE, warning=FALSE, cache=TRUE, results='asis'}
+```
+
+## Economic Support
+
+```{r econ-support-can, echo=TRUE,  message=FALSE, results='asis',warning = F, cache=TRUE}
+```
+
+
+# United Kingdom
+
+## Containment and Closure policies
+
+```{r containment-measures-grb, echo=TRUE, message=FALSE, warning=FALSE, cache=TRUE, results='asis'}
+```
+
+## Health System Policies
+
+```{r health-policy-grb, echo=TRUE, message=FALSE, warning=FALSE, cache=TRUE, results='asis'}
+```
+
+## Economic Support
+
+```{r econ-support-grb, echo=TRUE,  message=FALSE, results='asis',warning = F, cache=TRUE}
+```
+
+# Ireland
+
+## Containment and Closure policies
+
+```{r containment-measures-irl, echo=TRUE, message=FALSE, warning=FALSE, cache=TRUE, results='asis'}
+```
+
+## Health System Policies
+
+```{r health-policy-irl, echo=TRUE, message=FALSE, warning=FALSE, cache=TRUE, results='asis'}
+```
+
+## Economic Support
+
+```{r econ-support-irl, echo=TRUE,  message=FALSE, results='asis',warning = F, cache=TRUE}
+```
+
+
+session information
+===========================================================================
+
+For the sake of documentation and reproducibility, the current report was rendered in the following environment.  Click the line below to expand.
+
+<details>
+  <summary>Environment <span class="glyphicon glyphicon-plus-sign"></span></summary>
+```{r session-info, echo=FALSE}
+if( requireNamespace("devtools", quietly = TRUE) ) {
+  devtools::session_info()
+} else {
+  sessionInfo()
+} 
+```
