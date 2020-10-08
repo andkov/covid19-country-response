@@ -1,6 +1,6 @@
 # Source
 # https://github.com/OxCGRT/covid-policy-tracker
-
+# must refresh repo before updating the file
 
 rm(list=ls(all=TRUE)) #Clear the memory of variables from previous run.
 # This is not called by knitr, because it's above the first chunk.
@@ -17,6 +17,7 @@ library(utils)
 library(httr)
 library(magrittr)
 library(dplyr)
+library(readr)
 
 # ---- declare-globals ---------------------------------------------------------
 config <- config::get()
@@ -29,7 +30,7 @@ ds_covid <- readr::read_csv(config$path_input_covid)
 ds_covid %>% glimpse()
 
 
-ds_cgrt <- read_csv(path_file,
+ds_cgrt <- readr::read_csv(path_file,
                     col_types = cols(RegionName = col_character(),
                                      RegionCode = col_character()))
 ds_cgrt %>% glimpse()
