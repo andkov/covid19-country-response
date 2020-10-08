@@ -1,7 +1,7 @@
 ---
-title: "US Response to COVID-19"
+title: "COVID-19 in USA - John Hopkins Data"
 author: "Andriy Koval"
-date: "Sep 24, 2020"
+date: "October 1, 2020"
 output:
   html_document:
     theme: simplex
@@ -67,12 +67,12 @@ read_chunk("./analysis/us-response/us-response-1.R")
 ```{r load-data, echo=echoChunks, results='show', message=FALSE}
 ```
 
-```{r tweak-data, echo=echoChunks, results='show', message=FALSE}
+```{r tweak-data, echo=echoChunks, results='show', message=FALSE, warning=F}
 ```
 
 # Timeline of COVID-19 measures
 
-Source: [OVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19)
+Source: [COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19)
 
 See [codebook](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data#usa-daily-state-reports-csse_covid_19_daily_reports_us) for definition of measures. 
 
@@ -116,30 +116,7 @@ See [codebook](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid
 ```{r hospitalized,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
 ```
 
-  
-# Government Response 
 
-See [OxCGRT Codebook](https://github.com/OxCGRT/covid-policy-tracker/blob/master/documentation/codebook.md) for definitions of indices. 
-
-## Stringency (Overall)
-
-```{r stringency,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
-```
-
-## Government Response 
-
-```{r government,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
-```
-
-## Containment Health
-
-```{r containment,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
-```
-
-## Economic Support
-
-```{r economy,echo=TRUE,  message=FALSE, results='show',warning = F, cache=TRUE}
-```
 
 session information
 ===========================================================================
