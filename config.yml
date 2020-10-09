@@ -4,6 +4,7 @@ default:
     path_input_oecd   : !expr strftime(Sys.Date(), "data-unshared/derived/oedc-%Y-%m-%d.csv")
     path_input_covid  : !expr strftime(Sys.Date(), "data-unshared/derived/covid-%Y-%m-%d.csv")
     path_input_jh_daily: !expr strftime(Sys.Date(), "data-unshared/derived/jh_daily-%Y-%m-%d.csv")
+    path_input_jh_usts: !expr strftime(Sys.Date(), "data-unshared/derived/jh_usts-%Y-%m-%d.csv")
     path_input_cgrt:     !expr strftime(Sys.Date(), "data-unshared/derived/cgrt-%Y-%m-%d.rds")
     path_oecd_health_chapter: "data-unshared/raw/oecd/health/"
     path_oecd_raw: "data-unshared/raw/oecd/"
