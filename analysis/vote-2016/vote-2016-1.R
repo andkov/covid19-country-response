@@ -111,13 +111,8 @@ ds_covid_nyt_county <- readr::read_csv("../covid-19-data/us-counties.csv")
 
 # ---- tweak-data --------------------
 
-ds_vote <- ds_election %>%
-  select()
-
-ds_vote %>% glimpse()
-
 ds_us_pop <- ds_us_pop %>%
-  select(sumlev, region, division, state, county,fips, state_name = stname, county_name = ctyname, popestimate2019)
+  select(sumlev, region, division, state, county,fips, state_name = stname, county_name = ctyname, popestimate2016, popestimate2019)
 
 ds_us_pop_state <- ds_us_pop %>%
   filter(sumlev == "040") %>%
@@ -191,11 +186,53 @@ d %>% ggplot()+
   geom_histogram(aes(x=per_dem), fill = "blue", alpha =.5)+
   labs(title = "How many counties ")
 
+
+ds_vote <-
+  ds_election %>%
+  filter(state_abbr != "AK") %>%
+
+  left_join(ds_us_pop_county %>% select(fips, popestimate2016), by = c("county_fips"="fips") )
+
+ds_vote %>% glimpse()
+
+ds_vote %>%
+  ggplot(aes(x = popestimate2016, y = votes_gop))+
+  geom_point(shape = 21, alpha = .2)
+
 # ------ ----------------------
 ds_election %>% glimpse()
 ds_covid_nyt_county %>% glimpse()
 
 
+# ----- state ---------------
+
+ds_covid_state <-
+  ds_covid_nyt_county %>%
+  # filter(county != "Unknown") %>%
+  rename(
+    n_cases_cum   = cases
+    ,n_deaths_cum = deaths
+  ) %>%
+  left_join( ds_us_pop_county %>% select(fips, region, division, n_population_2019 = popestimate2019 )) %>%
+  dplyr::group_by(fips) %>%
+  dplyr::mutate(
+    # this solution might be vulnerable to cases where some intermediate dates are missed
+    n_deaths_cum_per_1m = n_deaths_cum/n_population_2019*1000000
+    ,n_cases_cum_per_1m  = n_cases_cum/ n_population_2019*1000000
+
+    ,cutoff_death        = n_deaths_cum >= 1
+    ,cutoff_case         = n_cases_cum >= 1
+    ,days_since_1death   = cumsum(tidyr::replace_na(cutoff_death,0))
+    ,days_since_1case    = cumsum(tidyr::replace_na(cutoff_case,0))
+    ,date_of_1death      = lubridate::as_date(ifelse(days_since_1death==1,date, NA))
+    ,date_of_1case       = lubridate::as_date(ifelse(days_since_1case==1,date, NA))
+    ,date_of_1death      = min(date_of_1death, na.rm =T)
+    ,date_of_1case       = min(date_of_1case, na.rm =T)
+    ,days_since_1death   = (date - date_of_1death) %>% as.integer()
+    ,days_since_1case    = (date - date_of_1case) %>% as.integer()
+
+  ) %>%
+  ungroup()
 
 
 # ---- publish ---------------------------------------
