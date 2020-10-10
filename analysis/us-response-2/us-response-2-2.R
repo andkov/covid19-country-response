@@ -7,6 +7,7 @@ library(magrittr) #Pipes
 library(dplyr) # for shorter function names. but still prefer dplyr:: stems
 library(forcats)
 library(stringr)
+library(lubridate)
 library(knitr) # dynamic documents
 library(rmarkdown) # dynamic
 library(kableExtra) # enhanced tables, see http://haozhu233.github.io/kableExtra/awesome_table_in_html.html
@@ -215,29 +216,32 @@ varnames_territories <- c(
   ,"Virgin Islands"
 )
 
-ds_usts2 <- ds_usts %>%
+ds_usts <- ds_usts %>%
   left_join(
     ds_us_pop %>% distinct(region, division,state_name)
     , by  = c("province_state" = "state_name")
   ) %>%
+  mutate(
+    incident_rate = n_cases/population*100000
+    ,mortality_rate = n_deaths/population*100000
+  ) %>%
   dplyr::mutate(
-    region2 = dplyr::case_when(
+    region = dplyr::case_when(
       (province_state %in% varnames_crouise) ~ "Cruiseship",
       (province_state %in% varnames_territories) ~ "Territories",
-      TRUE ~ region
+      TRUE ~ as.character(region)
       ) %>% as_factor(),
-    division2 = dplyr::case_when(
+    division = dplyr::case_when(
       province_state %in% varnames_crouise ~ "Cruiseship",
       province_state %in% varnames_territories ~ "Territories",
-      TRUE ~ division
+      TRUE ~ as.character(division)
     ) %>% as_factor()
   )
-ds_usts2 %>% glimpse()
 
-ds_usts2 %>% distinct(region, region2)
+ds_usts %>% glimpse()
 
 #
-ds_usts %>% filter(is.na(region)) %>% distinct(province_state)
+# ds_usts %>% arrange(region, division) %>%  distinct(province_state, division, region)  %>% View()
 # -----inspect ---------------
 
 ds_daily %>% glimpse()
@@ -246,44 +250,104 @@ ds_us_pop %>% glimpse()
 ds_us_pop_state %>% glimpse()
 # ------ ----------------------
 
+# d %>% ggplot(aes(x=date, y = n_cases, group = fips))+geom_line()
 
-
-compute_epi <- function(d, grouping_vars){
-  # d <- ds_daily
+compute_epi <- function(d, grouping_vars, var_cases = "n_cases", var_deaths = "n_deaths", long =FALSE){
+  # d <- ds_usts %>% filter(province_state == "Florida")
   # grouping_vars <- c("fips","date")
+  # grouping_vars <- c("date")
+  # var_cases = "n_cases"
+  # var_deaths = "n_deaths"
+  # long = F
+  # browser()
   grouping_vars_enquo <- rlang::syms(grouping_vars)
+  var_cases_enquo <- rlang::sym(var_cases)
+  var_deaths_enquo <- rlang::sym(var_deaths)
+  metric_order <- c(
+    # "n_cases"           = "Cases (this day)"
+     "n_cases_roll_7"   = "Cases (7-day average)"
+    ,"n_cases_roll_7_rate" = "Cases(7DA/100K)"
+    ,"n_cases_cum"      = "Cases (cumulative)"
+    ,"incident_rate"    = "Cases (cum/100K)"
+    # ,"n_deaths"         = "Deaths (this day)"
+    ,"n_deaths_roll_7"  = "Deaths (7-day average)"
+    ,"n_deaths_roll_7_rate"  = "Deaths (7DA/100K)"
+    ,"n_deaths_cum"     = "Deaths (cumulative)"
+    ,"mortality_rate"   = "Deaths (cum/100K)"
+    )
 
-  d1 <- d %>%
+  d_out <- d %>%
     dplyr::arrange(!!!grouping_vars_enquo) %>%
     dplyr::group_by(!!!grouping_vars_enquo) %>%
     dplyr::summarize(
-      confirmed_cum = sum(confirmed_cum, na.rm = T)
-      ,deaths_cum = sum(deaths_cum, na.rm = T)
-      ,tested_cum = sum(tested_cum, na.rm = T)
-      ,hospitalized_cum = sum(hospitalized_cum, na.rm = T)
-      ,population = sum(population, na.rm = T)
-      ,incident_rate = confirmed_cum/population*100000
-      ,mortality_rate = deaths_cum*100/population
-      ,testing_rate = tested_cum/population*100000
-      ,hospitalization_rate = hospitalized_cum/confirmed_cum
+      n_cases_cum     = sum(!!var_cases_enquo, na.rm = T)
+      ,n_deaths_cum   = sum(!!var_deaths_enquo, na.rm = T)
+      ,population     = sum(population, na.rm = T)
+      ,incident_rate  = n_cases_cum/population*100000
+      ,mortality_rate = n_deaths_cum/population*100000
     ) %>%
     dplyr::mutate(
-      confirmed       = confirmed_cum - lag(confirmed_cum,1)
-      ,deaths         = deaths_cum - lag(deaths_cum,1)
-      ,tested         = tested_cum - lag(tested_cum,1)
-      ,hospitalized   = hospitalized_cum - lag(hospitalized_cum,1)
+       n_cases   = n_cases_cum - lag(n_cases_cum,1)
+      ,n_deaths  = n_deaths_cum - lag(n_deaths_cum,1)
     ) %>%
     dplyr::mutate(
-      confirmed_roll_7       = zoo::rollapply(confirmed, 7, mean, align = 'right', fill = NA)
-      ,deaths_roll_7         = zoo::rollapply(deaths, 7, mean, align = 'right', fill = NA)
-      ,tested_roll_7         = zoo::rollapply(tested, 7, mean, align = 'right', fill = NA)
-      ,hospitalized_roll_7   = zoo::rollapply(hospitalized, 7, mean, align = 'right', fill = NA)
+      n_cases_roll_7 = zoo::rollapply(n_cases, 7, mean, align = 'right', fill = NA)
+      ,n_deaths_roll_7 = zoo::rollapply(n_deaths, 7, mean, align = 'right', fill = NA)
+      ,n_cases_roll_7_rate = n_cases_roll_7/population*100000
+      ,n_deaths_roll_7_rate = n_deaths_roll_7/population*100000
     ) %>%
-    ungroup()
-  d1
+    ungroup() %>%
+    select(all_of(c(grouping_vars,names(metric_order))))
+  # d_out %>% glimpse()
+  if(long){
+    var_pivot_longer <- setdiff(names(d_out), grouping_vars)
+    d_out <- d_out %>%
+      tidyr::pivot_longer(cols = var_pivot_longer, names_to = "metric", values_to = "value") %>%
+      mutate(
+        metric = factor(metric, levels = names(metric_order), labels = metric_order)
+      )
+  }
+  return(d_out)
 }
+# Testing
+custom_range <- as_date(c("2020-05-01","2020-05-02","2020-05-03","2020-05-04",
+                          "2020-05-05","2020-05-06","2020-05-07","2020-05-08"))
+d <- ds_usts %>%
+  # filter(province_state %in% c("Florida","Texas")) %>%
+  # filter(province_state %in% c("Florida","Texas","California","New York")) %>%
+  # filter(province_state %in% c("Florida")) %>%
+  # filter(date %in% custom_range ) %>%
+  # select(date, fips, province_state, n_deaths, n_cases, population) %>%
+  # compute_epi(c("province_state","date"), long = T)
+  # compute_epi(c("date"), long = T)
+  compute_epi(c("division","date"), long = T)
+d %>% glimpse()
+d %>%
+  # filter(province_state %in% c("Florida","Texas")) %>%
+  # filter(province_state %in% c("Florida")) %>%
+  # ggplot(aes(x=date, y = value))+
+  # ggplot(aes(x=date, y = value, group = province_state))+
+  ggplot(aes(x=date, y = value, group = division, color = division))+
+  geom_line()+
+  facet_wrap(~metric, scales = "free", ncol = 4)
 
-ds_daily %>% compute_epi(c("fips","date"))
+
+
+
+d <- ds_usts %>%
+  # filter(province_state == "Florida") %>%
+  compute_epi(c("date","province_state"), long = T)
+d %>% glimpse()
+d
+
+# d %>% glimpse()
+d %>%
+  # filter(province_state %in% c("Florida","Texas")) %>%
+  filter(province_state %in% c("Florida")) %>%
+  ggplot(aes(x=date, y = value, group = province_state))+
+  geom_line()+
+  facet_wrap(~metric, scales = "free", ncol = 4)
+
 ds_daily %>% compute_epi(c("fips"))
 
 # ----- by-state ------------------
