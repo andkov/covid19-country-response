@@ -189,7 +189,7 @@ print_tile <- function(d, region, measure, relative_h = c(2,1)){
 # ds_cgrt %>% print_plotly_lines("stringency_index",grouping = "region_code",  default_region = c("USA","GBR","IRL","CAN"))
 
 # ---- load-data -------------------------------------------------------------
-ds_daily <- readr::read_csv(config$path_input_jh_daily)
+ds_daily <- readr::read_csv(config$path_input_jh_daily)# state level, no county level!!
 # ds_daily %>% glimpse()
 ds_usts <- readr::read_csv(config$path_input_jh_usts)
 
@@ -240,6 +240,9 @@ ds_usts <- ds_usts %>%
 
 ds_usts %>% glimpse()
 
+d1 <- ds_usts %>% distinct(fips, province_state)
+d2 <- ds_daily %>% distinct(fips, province_state)
+
 #
 # ds_usts %>% arrange(region, division) %>%  distinct(province_state, division, region)  %>% View()
 # -----inspect ---------------
@@ -285,13 +288,12 @@ compute_epi <- function(d, grouping_vars, var_cases = "n_cases", var_deaths = "n
       ,population     = sum(population, na.rm = T)
       ,incident_rate  = n_cases_cum/population*100000
       ,mortality_rate = n_deaths_cum/population*100000
+      ,.groups = "keep"
     ) %>%
     dplyr::mutate(
        n_cases   = n_cases_cum - lag(n_cases_cum,1)
       ,n_deaths  = n_deaths_cum - lag(n_deaths_cum,1)
-    ) %>%
-    dplyr::mutate(
-      n_cases_roll_7 = zoo::rollapply(n_cases, 7, mean, align = 'right', fill = NA)
+      ,n_cases_roll_7 = zoo::rollapply(n_cases, 7, mean, align = 'right', fill = NA)
       ,n_deaths_roll_7 = zoo::rollapply(n_deaths, 7, mean, align = 'right', fill = NA)
       ,n_cases_roll_7_rate = n_cases_roll_7/population*100000
       ,n_deaths_roll_7_rate = n_deaths_roll_7/population*100000
@@ -349,6 +351,54 @@ d %>%
   facet_wrap(~metric, scales = "free", ncol = 4)
 
 ds_daily %>% compute_epi(c("fips"))
+
+
+# create state-level data frame
+ds_usts_state <- ds_usts %>%
+  compute_epi(grouping_vars = c("date","province_state","division","region" ))
+ds_usts_state %>% glimpse()
+
+
+ds_daily %>% glimpse()
+ds_daily_state <- ds_daily %>%
+  dplyr::arrange(date, province_state) %>%
+  dplyr::group_by(date, province_state) %>%
+  dplyr::summarize(
+    n_tests_cum     = sum(people_tested, na.rm = T)
+    ,population     = sum(population, na.rm = T)
+    ,testing_rate  = n_tests_cum/population*100000
+    ,.groups = "keep"
+  ) %>%
+  dplyr::mutate(
+    n_tests   = n_tests_cum - lag(n_tests_cum,1)
+    ,n_tests_roll_7 = zoo::rollapply(n_tests, 7, mean, align = 'right', fill = NA)
+    ,n_tests_roll_7_rate = n_tests_roll_7/population*100000
+  ) %>%
+  ungroup() %>% select(-population, - n_tests)
+
+  metric_order <- c(
+    "n_tests_roll_7"   = "Tests (7-day average)"
+    ,"n_tests_roll_7_rate" = "Tests (7DA/100K)"
+    ,"n_tests_cum"      = "Tests (cumulative)"
+    ,"testing_rate"    = "Tests (cum/100K)"
+
+  )
+  var_pivot_longer <- setdiff(names(ds_daily_state), c("date","province_state"))
+  ds_daily_state_long <- ds_daily_state %>%
+    tidyr::pivot_longer(cols = var_pivot_longer, names_to = "metric", values_to = "value") %>%
+    mutate(
+      metric = factor(metric, levels = names(metric_order), labels = metric_order)
+    )
+
+  compute_epi(grouping_vars = c("date","province_state"),var_cases = "people_tested", var_deaths = "people_hospitalized", long = F)
+
+
+  ds_daily_state_long %>% glimpse()
+
+ds_covid <- ds_usts_state %>%
+  bind_rows
+
+ds_usts %>% glimpse()
 
 # ----- by-state ------------------
 # ds_daily %>% glimpse()
