@@ -120,7 +120,7 @@ ds_epi %>% glimpse()
 metric_order <- c(
   # "n_cases"           = "Cases (this day)"
   "n_cases_roll_7"   = "Cases (7-day average)"
-  ,"n_cases_roll_7_rate" = "Cases(7DA/1M)"
+  ,"n_cases_roll_7_rate" = "Cases (7DA/1M)"
   ,"n_cases_cum"      = "Cases (cumulative)"
   ,"n_cases_cum_per_1m"    = "Cases (cum/1M)"
   # ,"n_deaths"         = "Deaths (this day)"
@@ -139,8 +139,11 @@ ds1 <- ds_epi %>%
     ds_geo %>% distinct(country_code, country_label)
   )
 
-
 ds1 %>% glimpse()
+
+ds2 <- ds1 %>%
+  filter(metric %in% c("Cases (cum/1M)", "Deaths (cum/1M)"))
+ds2 %>% glimpse()
 # ------ ----------------------
 
 # d %>% glimpse()
@@ -157,13 +160,13 @@ print_epi <- function(d,xvar = "date"){
     geom_line(size = .3)+
     geom_line(size = .3, color = "grey40")+
     geom_line(size = 1.5, alpha = .3, linetype = "solid")+
-    scale_color_viridis_d(option = "plasma", begin = .2, end = .9)+
+    scale_color_viridis_d(option = "plasma", begin = .2, end = .9, name = "Country")+
     # scale_color_viridis_d(option = "viridis", begin = .2, end = .9)+
     # scale_color_manual(values = country_colors, name = "Country")+
     scale_linetype_manual(values = country_linetype, name = "Country")+
     facet_wrap(~metric, scales = "free", ncol = 4)+
     scale_y_continuous(labels = scales::comma_format())+
-    labs(y = NULL, color = "Country")
+    labs(y = NULL)
 
 }
 g1 <- ds1 %>% print_epi() + labs(x = "Date")
@@ -175,6 +178,79 @@ ggsave("./analysis/heap-4-countries/days_since_1case.jpg",g1,"jpg", width = 12, 
 
 g1 <- ds1 %>% print_epi(xvar = "days_since_1death") + labs(x = "Days since 1st death")
 ggsave("./analysis/heap-4-countries/days_since_1death.jpg",g1,"jpg", width = 12, height = 6,dpi = "retina")
+
+# ------ singular -----------------------
+
+# d <- ds1
+country_colors <- c("Ireland" = "#33a02c", "United Kingdom" = "#b2df8a", "United States" = "#a6cee3", "Canada" = "#1f78b4")
+country_linetype <- c("Ireland" = "dotted", "United Kingdom" = "dotdash", "United States" = "solid", "Canada" = "longdash")
+
+
+g2 <- ds1 %>%
+  filter(metric %in% c("Cases (cum/1M)")) %>%
+  ggplot(aes_string(x="date", y = "value", group = "country_label",color = "country_label",linetype = "country_label"))+
+  geom_line(size = .5, color = "grey40")+
+  geom_line(size = .5, alpha = .5)+
+  geom_line(size = 3, alpha = .3, linetype = "solid")+
+  scale_color_viridis_d(option = "plasma", begin = .2, end = .9, name = "Country")+
+  scale_linetype_manual(values = country_linetype, name = "Country")+
+  scale_y_continuous(labels = scales::comma_format(), breaks = seq(0, 30000, 2000), minor_breaks = seq(0,30000, 1000))+
+  scale_x_date(date_breaks = "1 month", date_labels = "%b" )+
+  labs(y = NULL)+
+  labs(y = "Cases (cumulative, per 1 million)", x = "2020", title = "Confirmed cases of COVID-19", subtitle = "Cumulative count per 1 million of population", caption = "Source: European Centre for Disease Prevention and Control")
+# g2
+ggsave("./analysis/heap-4-countries/cases_cum_per1m.jpg",g2,"jpg", width = 8, height = 6,dpi = "retina")
+
+
+
+g3 <- ds1 %>%
+  filter(metric %in% c("Deaths (cum/1M)")) %>%
+  ggplot(aes_string(x="date", y = "value", group = "country_label",color = "country_label",linetype = "country_label"))+
+  geom_line(size = .5, color = "grey40")+
+  geom_line(size = .5, alpha = .5)+
+  geom_line(size = 3, alpha = .3, linetype = "solid")+
+  scale_color_viridis_d(option = "plasma", begin = .2, end = .9, name = "Country")+
+  scale_linetype_manual(values = country_linetype, name = "Country")+
+  scale_y_continuous(labels = scales::comma_format(),breaks = seq(0,600,100))+
+  scale_x_date(date_breaks = "1 month", date_labels = "%b" )+
+  labs(y = "Deaths (cumulative, per 1 million)", x = "2020", title = "Deaths from COVID-19", subtitle = "Cumulative count per 1 million of population", caption = "Source: European Centre for Disease Prevention and Control")
+# g3
+ggsave("./analysis/heap-4-countries/deaths_cum_per1m.jpg",g3,"jpg", width = 8, height = 6,dpi = "retina")
+
+
+
+
+g4 <- ds1 %>%
+  filter(metric %in% c("Cases (7DA/1M)")) %>%
+  ggplot(aes_string(x="date", y = "value", group = "country_label",color = "country_label",linetype = "country_label"))+
+  geom_line(size = .5, color = "grey40")+
+  geom_line(size = .5, alpha = .5)+
+  geom_line(size = 3, alpha = .3, linetype = "solid")+
+  scale_color_viridis_d(option = "plasma", begin = .2, end = .9, name = "Country")+
+  scale_linetype_manual(values = country_linetype, name = "Country")+
+  scale_y_continuous(labels = scales::comma_format(), breaks = seq(0,300, 20), minor_breaks = seq(0,300, 10))+
+  scale_x_date(date_breaks = "1 month", date_labels = "%b" )+
+  labs(y = NULL)+
+  labs(y = "Cases (7-day average, per 1 million)", x = "2020", title = "Confirmed cases of COVID-19", subtitle = "7-day rolling average per 1 million of population", caption = "Source: European Centre for Disease Prevention and Control")
+# g4
+ggsave("./analysis/heap-4-countries/cases_7da_per1m.jpg",g4,"jpg", width = 8, height = 6,dpi = "retina")
+
+
+g5 <- ds1 %>%
+  filter(metric %in% c("Deaths (7DA/1M)")) %>%
+  ggplot(aes_string(x="date", y = "value", group = "country_label",color = "country_label",linetype = "country_label"))+
+  geom_line(size = .5, color = "grey40")+
+  geom_line(size = .5, alpha = .5)+
+  geom_line(size = 3, alpha = .3, linetype = "solid")+
+  scale_color_viridis_d(option = "plasma", begin = .2, end = .9, name = "Country")+
+  scale_linetype_manual(values = country_linetype, name = "Country")+
+  scale_y_continuous(labels = scales::number_format(accuracy = 1), breaks = seq(0,16,2), minor_breaks = seq(0,16, 1))+
+  scale_x_date(date_breaks = "1 month", date_labels = "%b" )+
+  labs(y = NULL)+
+  labs(y = "Deaths (7-day average, per 1 million)", x = "2020", title = "Deaths from COVID-19", subtitle = "7-day rolling average per 1 million of population", caption = "Source: European Centre for Disease Prevention and Control")
+# g5
+ggsave("./analysis/heap-4-countries/death_7da_per1m.jpg",g5,"jpg", width = 8, height = 6,dpi = "retina")
+
 
 
 
