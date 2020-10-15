@@ -38,10 +38,10 @@ library(tidyverse)
 #' # Load Data
 # ---- load-data ---------------------------------------------------------------
 
-ds0_pres <- read_csv("./data-unshared/raw/1976-2016-president.csv")
+ds0_pres <- read_csv("./data-unshared/raw/vote/1976-2016-president.csv")
 
 ds0_state <- read_csv(
-  "./data-unshared/raw/2020_state_political_parties.csv"
+  "./data-unshared/raw/vote/2020_state_political_parties.csv"
   ,skip = 2)
 
 #' # Tweak Data
