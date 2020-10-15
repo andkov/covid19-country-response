@@ -46,12 +46,12 @@ ds0_state <- read_csv(
 
 #' # Tweak Data
 # ---- tweak-data -------------------------------------------------------------
-
+ds0_pres %>% glimpse()
 ds1_pres <- ds0_pres %>%
   filter(year == 2016 & party %in% c("republican", "democrat") & !is.na(candidate)) %>%
   #maryland listed twice, second time only shows 200 votes
   filter(candidatevotes > 300) %>%
-  select(state, state_po, state_fips, party, candidatevotes) %>%
+  select( province_state = state, state_po, state_fips, party, candidatevotes, totalvotes) %>%
   pivot_wider(
     names_from = party
     ,names_prefix = "votes_"
@@ -59,9 +59,9 @@ ds1_pres <- ds0_pres %>%
     ) %>%
   mutate(
     winner_2016 = ifelse(votes_republican > votes_democrat, "republican", "democrat" )
-  ) %>%
-  select(-votes_republican, -votes_democrat)
+  )
 
+ds1_pres %>% glimpse()
 
 
 ds1_state <- ds0_state %>%
@@ -70,7 +70,7 @@ ds1_state <- ds0_state %>%
     ) %>%
   janitor::clean_names() %>%
   select(
-    location
+    province_state = location
     ,governor_political_affiliation
     ,state_senate_majority_political_affiliation
     ,state_house_majority_political_affiliation
@@ -79,11 +79,11 @@ ds1_state <- ds0_state %>%
 
 
 ds2 <- ds1_pres %>%
-  left_join(ds1_state, by = c("state" = "location"))
+  left_join(ds1_state, by = c("province_state"))
 
 
 #' # Save Data
 # ---- save-data ---------------------------------------------------------------
 
-ds2 %>% write_rds("./data-unshared/derived/us-2020-state-political-results.rds"
+ds2 %>% write_rds("./data-public/derived/us-2020-state-political-results.rds"
                   ,compress = "gz")
