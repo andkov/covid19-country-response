@@ -58,7 +58,7 @@ ds1_pres <- ds0_pres %>%
     ,values_from = candidatevotes
     ) %>%
   mutate(
-    winner_2016 = ifelse(votes_republican > votes_democrat, "republican", "democrat" )
+    winner_2016 = ifelse(votes_republican > votes_democrat, "Republican", "Democrat" )
   )
 
 ds1_pres %>% glimpse()
@@ -78,8 +78,35 @@ ds1_state <- ds0_state %>%
     )
 
 
+state_leadership_cols <- c(
+   "governor_political_affiliation"
+  ,"state_senate_majority_political_affiliation"
+  ,"state_house_majority_political_affiliation"
+)
+
+
 ds2 <- ds1_pres %>%
-  left_join(ds1_state, by = c("province_state"))
+  left_join(ds1_state, by = c("province_state")) %>%
+  mutate(
+    state_leadership = if_else(
+      (governor_political_affiliation == state_senate_majority_political_affiliation &
+      governor_political_affiliation == state_house_majority_political_affiliation)
+      ,true = governor_political_affiliation
+      ,false = "Divided"
+    )
+    ,across(
+      c(
+        winner_2016
+        ,governor_political_affiliation
+        ,state_senate_majority_political_affiliation
+        ,state_house_majority_political_affiliation
+        ,state_attorney_general_political_affiliation
+        ,state_leadership
+        )
+      , as.factor
+      )
+    )
+
 
 
 #' # Save Data
