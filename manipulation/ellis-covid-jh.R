@@ -62,8 +62,11 @@ ds_deaths_long <- ds_deaths %>%
   tidyr::pivot_longer(all_of(long_deaths), names_to = "date", values_to = "n_deaths") %>%
   dplyr::mutate(
     date = lubridate::mdy(date)
+    ,across(FIPS, as.character)
+    ,across(FIPS, ~if_else(str_length(.) < 5, paste0("0",.),.))
   )
 ds_deaths_long %>% glimpse()
+
 
 ds_timeseries <-
   left_join(ds_deaths_long, ds_cases_long) %>%
