@@ -146,7 +146,7 @@ political_colors <- c(
   )
 
 
-d <-  ds0 %>%
+d <-  ds_covid_vote %>%
   compute_epi(
     c(
       "date"
@@ -171,7 +171,7 @@ g <-  d %>%
   scale_y_continuous(labels = scales::comma_format())+
   scale_color_manual(values = political_colors) +
   facet_wrap(~metric, scales = "free", ncol = 4)
-g %>% quick_save("state_governor", width = 1600, height = 900, res = 120)
+g %>% quick_save("state_leadership", width = 1600, height = 900, res = 120)
 
 
 
