@@ -57,6 +57,10 @@ ds_us_pop <- readr::read_rds("./data-public/derived/us-pop-estimate.rds")
 ds_vote <- readr::read_rds("./data-public/derived/us-2020-state-political-results.rds")
 # Note: political leadership reflects the state of 2020
 
+ds_state_abb <- readr::read_csv("./data-public/metadata/us/state-abb.csv") %>%
+  select(state, state_abb = abb)
+
+
 # ---- tweak-data --------------------
 
 # To obtain state, division, region
@@ -124,13 +128,15 @@ ds_jh_state <- ds_usts_state %>%
     , by = c("date","province_state")
   ) %>%
   filter(!region %in% c("Territories", "Cruiseship") ) %>%
+  left_join(ds_state_abb, by = c("province_state" = "state")) %>%
   mutate(
     n_tested = people_tested
     ,state   = factor(province_state)
+    ,state_abb = factor(state_abb)
     ,country = factor(country_region)
   ) %>%
-  select(
-    date, state, division, region, country,
+ select(
+    date, state_abb, state, division, region, country,
     n_cases, n_deaths, n_tested,
     population
   )
