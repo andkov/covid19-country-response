@@ -30,7 +30,7 @@ compute_epi <- function(
   ,grouping_vars
   ,var_cases = "n_cases"
   ,var_deaths = "n_deaths"
-  ,var_tests = "people_tested"
+  ,var_tests = "n_tested"
   ,long =FALSE){
   # d <- ds_jh_state %>% filter(province_state == "Florida")
   # grouping_vars <- c("date","province_state")
@@ -109,7 +109,7 @@ quick_save <- function(g,name,...){
     filename = paste0(name,".png"),
     plot     = g,
     device   = png,
-    path     = "./analysis/covid-vote-1/prints/"
+    path     = "./analysis/covid-vote-1/prints/",
     # width    = width,
     # height   = height,
     # units = "cm",
@@ -120,7 +120,19 @@ quick_save <- function(g,name,...){
 }
 
 # ---- load-data ---------------------------------------------------------------
-ds0 <- read_rds("./data-unshared/derived/covid-vote.rds")
+# Produced by `./manipulation/scribe-john-hopkins.R`
+ds_jh_state <- readr::read_rds("./data-unshared/derived/john-hopkins-state.rds")
+
+# Source: Harvard Datavers (presidential) + Kaiser Foundation (state parties)
+# Produced by `./manipulation/ellis-us-election-results-2.R`
+ds_vote <- readr::read_rds("./data-public/derived/us-2020-state-political-results.rds")
+# Note: political leadership reflects the state of 2020
+
+ds_covid_vote <- ds_jh_state %>%
+  left_join(
+    ds_vote %>% select(-c("state_po","state_fips")), by = c("state"= "province_state")
+  )
+ds_covid_vote %>% glimpse()
 
 # ---- tweak-data --------------------------------------------------------------
 
@@ -134,18 +146,14 @@ political_colors <- c(
   )
 
 
-
-
-
-
 d <-  ds0 %>%
   compute_epi(
     c(
       "date"
-      ,"province_state"
+      ,"state"
       ,"division"
       ,"region"
-      ,"country_region"
+      ,"country"
       ,"state_leadership"), long = T)
 
 
