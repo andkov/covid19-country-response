@@ -53,6 +53,7 @@ ds_cases_long <- ds_cases %>%
   tidyr::pivot_longer(all_of(long_cases), names_to = "date", values_to = "n_cases") %>%
   dplyr::mutate(
     date = lubridate::mdy(date)
+    ,FIPS = as.character(FIPS)
   )
 
 ds_cases_long %>% glimpse()
@@ -85,7 +86,8 @@ ds_uspop <- us_pop %>%
   group_by(province_state) %>%
   summarize(
     population = sum(population, na.rm = T)
-  )
+  ) %>%
+  ungroup()
 # add state population
 ds_daily <- ds_daily %>%
   left_join(ds_uspop,by = "province_state")
