@@ -51,6 +51,23 @@ party_colors <- c(
 )
 
 # ---- declare-functions ---------------------------
+metric_order <- c(
+  "n_cases_roll_7"   = "Cases (7-day average)"
+  ,"n_cases_roll_7_rate" = "Cases (7DA/100K)"
+  ,"n_cases_cum"      = "Cases (cumulative)"
+  ,"incident_rate"    = "Cases (cum/100K)"
+
+  ,"n_deaths_roll_7"  = "Deaths (7-day average)"
+  ,"n_deaths_roll_7_rate"  = "Deaths (7DA/100K)"
+  ,"n_deaths_cum"     = "Deaths (cumulative)"
+  ,"mortality_rate"   = "Deaths (cum/100K)"
+
+  ,"n_tests_roll_7"   = "Tests (7-day average)"
+  ,"n_tests_roll_7_rate" = "Tests (7DA/100K)"
+  ,"n_tests_cum"      = "Tests (cumulative)"
+  ,"testing_rate"    = "Tests (cum/100K)"
+
+)
 compute_epi <- function(
   d
   ,grouping_vars
@@ -71,23 +88,7 @@ compute_epi <- function(
   var_cases_enquo  <- rlang::sym(var_cases)
   var_deaths_enquo <- rlang::sym(var_deaths)
   var_tests_enquo  <- rlang::sym(var_tests)
-  metric_order <- c(
-    "n_cases_roll_7"   = "Cases (7-day average)"
-    ,"n_cases_roll_7_rate" = "Cases (7DA/100K)"
-    ,"n_cases_cum"      = "Cases (cumulative)"
-    ,"incident_rate"    = "Cases (cum/100K)"
 
-    ,"n_deaths_roll_7"  = "Deaths (7-day average)"
-    ,"n_deaths_roll_7_rate"  = "Deaths (7DA/100K)"
-    ,"n_deaths_cum"     = "Deaths (cumulative)"
-    ,"mortality_rate"   = "Deaths (cum/100K)"
-
-    ,"n_tests_roll_7"   = "Tests (7-day average)"
-    ,"n_tests_roll_7_rate" = "Tests (7DA/100K)"
-    ,"n_tests_cum"      = "Tests (cumulative)"
-    ,"testing_rate"    = "Tests (cum/100K)"
-
-  )
 
   d_out <- d %>%
     dplyr::arrange(!!!grouping_vars_enquo) %>%
@@ -146,6 +147,23 @@ quick_save <- function(g,name,...){
 }
 
 
+quick_save2 <- function(g,name,...){
+  ggplot2::ggsave(
+    filename = paste0(name,".jpg"),
+    plot     = g,
+    device   = "jpg",
+    path     = "./analysis/covid-vote-1/prints/",
+    # width    = width,
+    # height   = height,
+    # units = "cm",
+    dpi      = 'retina',
+    limitsize = FALSE,
+    ...
+  )
+}
+
+
+
 # ---- load-data ---------------------------------------------------------------
 # Produced by `./manipulation/scribe-john-hopkins.R`
 ds_jh_state <- readr::read_rds("./data-unshared/derived/john-hopkins-state.rds")
@@ -173,8 +191,7 @@ ds_covid_vote %>% glimpse()
 
 # ---- graphing ----------------------------------------------------------------
 
-
-d <-  ds_covid_vote %>%
+d <- ds_covid_vote %>%
   compute_epi(
     c(
       "date"
@@ -245,36 +262,30 @@ g3 %>% quick_save("state_leadership_3", width = 2400, height = 1350, res = 200)
 
 
 # ---- state-scatter -------------
-focus_metric <- c("Cases (7DA/100K)","Deaths (7DA/100K)")
-last_date <- as.Date("2020-10-27")
-# focal_dates <- c(last_date, last_date - 14, last_date - 28, last_date - 42)
-# focal_dates <- c(last_date)
-focal_dates <- as.Date(c("2020-10-26", "2020-08-01", "2020-05-01"))
-d4 <- d %>%
-  filter(date %in% focal_dates) %>%
-  filter(metric %in% focus_metric) %>%
-  tidyr::pivot_wider(names_from = "metric", values_from = "value")
-d4 %>% glimpse()
-d4 %>%
-  ggplot(
-    aes(
-      x=`Cases (7DA/100K)`
-      , y =`Deaths (7DA/100K)`
-      ,label = state_abb
-      ,fill = state_leadership
-      ,color = state_leadership
-    ))+
-  scale_fill_manual(values = config$party_colors)+
-  scale_color_manual(values = config$party_colors)+
-  geom_point(shape = 21, color = "grey30",alpha = .2, size = 7)+
-  geom_text(alpha = .9, size = 3)+
-  facet_wrap(~date)
+metric_order
 
-ds_covid_state %>% distinct(metric)
-focus_metric <- c("Cases (7DA/100K)","Deaths (7DA/100K)")
-# focal_dates <- as.Date(c("2020-10-26", "2020-08-01", "2020-05-01"))
 focal_dates <- as.Date(c("2020-10-26", "2020-08-01", "2020-05-01"))
-ds_covid_vote %>%
+focal_dates <- as.Date(c(
+  "2020-10-26", "2020-09-26", "2020-08-26", "2020-07-26"
+  ,"2020-06-26", "2020-05-26", "2020-04-26", "2020-03-26"
+))
+
+focal_dates <- as.Date(c(
+  "2020-10-27"
+  ,"2020-10-15","2020-10-01"
+  ,"2020-09-15","2020-09-01"
+  ,"2020-08-15","2020-08-01"
+  ,"2020-07-15","2020-07-01"
+  ,"2020-06-15","2020-06-01"
+  ,"2020-05-15","2020-05-01"
+  ,"2020-04-15","2020-04-01"
+  ,"2020-03-15"
+))
+
+political_grouping <- "winner_2016"
+# political_grouping <- "governor_political_affiliation"
+# political_grouping <- "state_leadership"
+d <- ds_covid_vote %>%
   compute_epi(
     c(
       "date"
@@ -282,25 +293,86 @@ ds_covid_vote %>%
       ,"division"
       ,"region"
       ,"country"
-      ,"winner_2016"), long = T)   %>%
+      ,political_grouping
+    ), long = T)
+
+focus_metric <- c("Cases (7DA/100K)","Cases (cum/100K)")
+# focus_metric <- c("Deaths (7DA/100K)","Deaths (cum/100K)")
+
+d4 <- d %>%
   filter(date %in% focal_dates) %>%
   filter(metric %in% focus_metric) %>%
-  tidyr::pivot_wider(names_from = "metric", values_from = "value") %>%
+  mutate(
+    metric = janitor::make_clean_names(as.character(metric))
+    ,metric = str_remove_all(metric, "_\\d+$")
+  ) %>%
+  tidyr::pivot_wider(names_from = "metric", values_from = "value")
+
+d4 %>% glimpse()
+g4 <- d4 %>%
   ggplot(
-    aes(
-      x=`Cases (7DA/100K)`
-      , y =`Deaths (7DA/100K)`
-      ,label = state_abb
-      ,fill = winner_2016
-      ,color = winner_2016
+    aes_string(
+      x=janitor::make_clean_names(focus_metric[1])
+      , y =janitor::make_clean_names(focus_metric[2])
+      ,label = "state_abb"
+      ,fill = political_grouping
+      ,color = political_grouping
     ))+
-  geom_point(shape = 21, color = "grey30",alpha = .2, size = 7)+
   scale_fill_manual(values = config$party_colors)+
   scale_color_manual(values = config$party_colors)+
+  geom_point(shape = 21, color = "grey30",alpha = .2, size = 7)+
   geom_text(alpha = .9, size = 3)+
-  facet_wrap(~date, scales = "free")
+  facet_wrap(~date, scales = "free_y")+
+  labs(x = focus_metric[1], y = focus_metric[2])
+g4 %>% quick_save2("time-snapshots-winner-2016",width = 16, height = 10)
 
 
+
+
+
+grouping <- "region"
+# political_grouping <- "governor_political_affiliation"
+# political_grouping <- "state_leadership"
+d <- ds_covid_vote %>%
+  compute_epi(
+    c(
+      "date"
+      ,"state", "state_abb"
+      ,"division"
+      ,"region"
+      ,"country"
+      # ,grouping
+    ), long = T)
+
+focus_metric <- c("Cases (7DA/100K)","Cases (cum/100K)")
+# focus_metric <- c("Deaths (7DA/100K)","Deaths (cum/100K)")
+
+d4 <- d %>%
+  filter(date %in% focal_dates) %>%
+  filter(metric %in% focus_metric) %>%
+  mutate(
+    metric = janitor::make_clean_names(as.character(metric))
+    ,metric = str_remove_all(metric, "_\\d+$")
+  ) %>%
+  tidyr::pivot_wider(names_from = "metric", values_from = "value")
+
+d4 %>% glimpse()
+g4 <- d4 %>%
+  ggplot(
+    aes_string(
+      x=janitor::make_clean_names(focus_metric[1])
+      , y =janitor::make_clean_names(focus_metric[2])
+      ,label = "state_abb"
+      ,fill = "region"
+      ,color = "region"
+    ))+
+  scale_fill_manual(values = config$region_colors)+
+  scale_color_manual(values = config$region_colors)+
+  geom_point(shape = 21, color = "grey30",alpha = .2, size = 7)+
+  geom_text(alpha = .9, size = 3)+
+  facet_wrap(~date, scales = "free_y")+
+  labs(x = focus_metric[1], y = focus_metric[2])
+g4 %>% quick_save2("time-snapshots-regions",width = 16, height = 10)
 
 # ---- publish ---------------------------------------
 
