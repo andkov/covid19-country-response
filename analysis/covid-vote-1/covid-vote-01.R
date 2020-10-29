@@ -24,6 +24,32 @@ ggplot2::theme_set(
     )
 )
 
+division_levels <- c(
+  "Pacific"
+  ,"Mountain"
+  ,"New England"
+  ,"West North Central"
+  ,"East North Central"
+  ,"Middle Atlantic"
+  ,"West South Central"
+  ,"South Atlantic"
+  ,"East South Central"
+)
+
+region_colors <- c(
+  "West" = "#1B9E77"
+  ,"South" = "#E7298A"
+  ,"NorthEast" = "#7570B3"
+  ,"MidWest" = "#D95F02"
+)
+
+party_colors <- c(
+  "Democrat"    = "#0015BC"
+  ,"Divided"    = "#800080"
+  ,"Republican" = "#E9141D"
+
+)
+
 # ---- declare-functions ---------------------------
 compute_epi <- function(
   d
@@ -47,7 +73,7 @@ compute_epi <- function(
   var_tests_enquo  <- rlang::sym(var_tests)
   metric_order <- c(
     "n_cases_roll_7"   = "Cases (7-day average)"
-    ,"n_cases_roll_7_rate" = "Cases(7DA/100K)"
+    ,"n_cases_roll_7_rate" = "Cases (7DA/100K)"
     ,"n_cases_cum"      = "Cases (cumulative)"
     ,"incident_rate"    = "Cases (cum/100K)"
 
@@ -119,70 +145,156 @@ quick_save <- function(g,name,...){
   )
 }
 
+
 # ---- load-data ---------------------------------------------------------------
 # Produced by `./manipulation/scribe-john-hopkins.R`
 ds_jh_state <- readr::read_rds("./data-unshared/derived/john-hopkins-state.rds")
-
+ds_jh_state %>% glimpse()
 # Source: Harvard Datavers (presidential) + Kaiser Foundation (state parties)
 # Produced by `./manipulation/ellis-us-election-results-2.R`
 ds_vote <- readr::read_rds("./data-public/derived/us-2020-state-political-results.rds")
 # Note: political leadership reflects the state of 2020
-
+ds_vote %>% glimpse()
 ds_covid_vote <- ds_jh_state %>%
   left_join(
     ds_vote %>% select(-c("state_po","state_fips")), by = c("state"= "province_state")
-  )
+  ) %>%
+  mutate(state = factor(state))
 ds_covid_vote %>% glimpse()
 
 # ---- tweak-data --------------------------------------------------------------
 
+
+
+
 # ---- graphing ----------------------------------------------------------------
-
-political_colors <- c(
-  "Democrat"    = "#0015BC"
-  ,"Divided"    = "#800080"
-  ,"Republican" = "#E9141D"
-
-  )
 
 
 d <-  ds_covid_vote %>%
   compute_epi(
     c(
       "date"
-      ,"state"
+      ,"state", "state_abb"
       ,"division"
       ,"region"
       ,"country"
       ,"state_leadership"), long = T)
-
 
 g <-  d %>%
   ggplot(
     aes(
       x  = date
       ,y = value
-      ,group = province_state
+      ,group = state
       ,color = state_leadership
       )
     )+
   geom_line(alpha = .2)+
+  scale_y_continuous(labels = scales::comma_format())+
+  scale_color_manual(values = party_colors) +
+  facet_wrap(~metric, scales = "free", ncol = 4)
+g %>% quick_save("state_leadership", width = 3200, height = 1800, res = 300)
+
+
+
+# split by leadership
+
+d %>% glimpse()
+focus_metric <- c("Cases (cum/100K)","Deaths (cum/100K)","Tests (cum/100K)" )
+g2 <- d %>%
+  filter(metric %in% focus_metric) %>%
+  ggplot(
+  aes(
+    x  = date
+    ,y = value
+    ,group = state
+    ,color = state_leadership
+  )
+)+
+  geom_line(alpha = .2)+
   # geom_smooth(aes(group = country_region))+
   scale_y_continuous(labels = scales::comma_format())+
-  scale_color_manual(values = political_colors) +
-  facet_wrap(~metric, scales = "free", ncol = 4)
-g %>% quick_save("state_leadership", width = 1600, height = 900, res = 120)
+  scale_color_manual(values = party_colors) +
+  facet_grid(metric~state_leadership, scales = "free")
+g2 %>% quick_save("state_leadership_2", width = 1000, height = 1000, dpi = 400)
 
 
+d %>% distinct(metric)
+focus_metric <- c("Cases (7DA/100K)","Deaths (7DA/100K)")#,"Tests (7DA/100K)" )
+g3 <- d %>%
+  filter(metric %in% focus_metric) %>%
+ggplot(
+  aes(
+    x  = date
+    ,y = value
+    ,group = state
+    ,color = state_leadership
+  )
+)+
+  geom_line(alpha = .2)+
+  # geom_smooth(aes(group = country_region))+
+  scale_y_continuous(labels = scales::comma_format())+
+  scale_color_manual(values = party_colors) +
+  facet_grid(metric~state_leadership, scales = "free")+
+  scale_x_date(date_breaks = "1 month", date_labels = "%b" )
+g3 %>% quick_save("state_leadership_3", width = 2400, height = 1350, res = 200)
 
 
+# ---- state-scatter -------------
+focus_metric <- c("Cases (7DA/100K)","Deaths (7DA/100K)")
+last_date <- as.Date("2020-10-27")
+# focal_dates <- c(last_date, last_date - 14, last_date - 28, last_date - 42)
+# focal_dates <- c(last_date)
+focal_dates <- as.Date(c("2020-10-26", "2020-08-01", "2020-05-01"))
+d4 <- d %>%
+  filter(date %in% focal_dates) %>%
+  filter(metric %in% focus_metric) %>%
+  tidyr::pivot_wider(names_from = "metric", values_from = "value")
+d4 %>% glimpse()
+d4 %>%
+  ggplot(
+    aes(
+      x=`Cases (7DA/100K)`
+      , y =`Deaths (7DA/100K)`
+      ,label = state_abb
+      ,fill = state_leadership
+      ,color = state_leadership
+    ))+
+  scale_fill_manual(values = config$party_colors)+
+  scale_color_manual(values = config$party_colors)+
+  geom_point(shape = 21, color = "grey30",alpha = .2, size = 7)+
+  geom_text(alpha = .9, size = 3)+
+  facet_wrap(~date)
 
-
-
-
-
-
-
+ds_covid_state %>% distinct(metric)
+focus_metric <- c("Cases (7DA/100K)","Deaths (7DA/100K)")
+# focal_dates <- as.Date(c("2020-10-26", "2020-08-01", "2020-05-01"))
+focal_dates <- as.Date(c("2020-10-26", "2020-08-01", "2020-05-01"))
+ds_covid_vote %>%
+  compute_epi(
+    c(
+      "date"
+      ,"state", "state_abb"
+      ,"division"
+      ,"region"
+      ,"country"
+      ,"winner_2016"), long = T)   %>%
+  filter(date %in% focal_dates) %>%
+  filter(metric %in% focus_metric) %>%
+  tidyr::pivot_wider(names_from = "metric", values_from = "value") %>%
+  ggplot(
+    aes(
+      x=`Cases (7DA/100K)`
+      , y =`Deaths (7DA/100K)`
+      ,label = state_abb
+      ,fill = winner_2016
+      ,color = winner_2016
+    ))+
+  geom_point(shape = 21, color = "grey30",alpha = .2, size = 7)+
+  scale_fill_manual(values = config$party_colors)+
+  scale_color_manual(values = config$party_colors)+
+  geom_text(alpha = .9, size = 3)+
+  facet_wrap(~date, scales = "free")
 
 
 
