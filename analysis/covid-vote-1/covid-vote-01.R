@@ -165,6 +165,10 @@ ds_covid_vote %>% glimpse()
 # ---- tweak-data --------------------------------------------------------------
 
 
+# ---- map-of-division ------------
+# Kyle, please create a map of US with states colors according to the division
+# also, please think about a graph that could help us remember what state belongs
+# to what division  and to what region.
 
 
 # ---- graphing ----------------------------------------------------------------
