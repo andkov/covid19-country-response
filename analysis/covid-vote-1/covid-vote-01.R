@@ -325,6 +325,7 @@ g4 <- d4 %>%
   facet_wrap(~date, scales = "free_y")+
   labs(x = focus_metric[1], y = focus_metric[2])
 g4 %>% quick_save2("time-snapshots-winner-2016",width = 16, height = 10)
+# Kyle, please take this (g4) graph and create a Shiny app to explore the trends
 
 
 
