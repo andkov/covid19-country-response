@@ -188,11 +188,24 @@ ds_covid_vote %>% glimpse()
 # also, please think about a graph that could help us remember what state belongs
 # to what division  and to what region.
 
+#TODO this is not done, need to work on it
+ds_us_pop <- readr::read_rds("./data-public/derived/us-pop-estimate.rds")
 
+ds_us_pop <- ds_us_pop %>%
+  select(sumlev, region, division, state, county,fips, state_name = stname, county_name = ctyname, popestimate2016, popestimate2019)
 
+# ds_us_pop %>% glimpse()
 
+ds_us_pop_state <- ds_us_pop %>%
+  filter(sumlev == "040") %>%
+  select(-sumlev) %>%
+  left_join(tibble::tibble(state_name = state.name, state_abb = state.abb)) %>%
+  mutate(stabb = ifelse(state_name == "District of Columbia","DC",state_abb)) %>%
+  select("region","division","state_name" ,"state_abb","fips"  )
 
+library(maps)
 
+us_map <- map_data("state")
 
 # ---- graphing ----------------------------------------------------------------
 
