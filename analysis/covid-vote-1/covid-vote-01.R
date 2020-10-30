@@ -375,6 +375,29 @@ g4 <- d4 %>%
   labs(x = focus_metric[1], y = focus_metric[2])
 g4 %>% quick_save2("time-snapshots-regions",width = 16, height = 10)
 
+
+# ---- animated-bubble ---------------------------------------------------------
+
+# TODO need to work on this further - not ready for prime time!
+g5 <- d4 %>%
+  ggplot(
+    aes_string(
+      x=janitor::make_clean_names(focus_metric[1])
+      , y =janitor::make_clean_names(focus_metric[2])
+      ,label = "state_abb"
+      ,fill = "region"
+      ,color = "region"
+    ))+
+  scale_fill_manual(values = config$region_colors)+
+  scale_color_manual(values = config$region_colors)+
+  geom_point(shape = 21, color = "grey30",alpha = .2, size = 7)+
+  geom_text(alpha = .9, size = 3)+
+  # facet_wrap(~date, scales = "free_y")+
+  labs(x = focus_metric[1], y = focus_metric[2]) +
+  gganimate::transition_time(date)
+
+g5
+
 # ---- publish ---------------------------------------
 
 path_report <- "./analysis/covid-vote-1/covid-vote-01.Rmd"
