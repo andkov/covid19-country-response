@@ -189,6 +189,11 @@ ds_covid_vote %>% glimpse()
 # to what division  and to what region.
 
 
+
+
+
+
+
 # ---- graphing ----------------------------------------------------------------
 
 d <- ds_covid_vote %>%
@@ -397,6 +402,8 @@ g5 <- d4 %>%
   gganimate::transition_time(date)
 
 g5
+
+# TODO add animsave
 
 # ---- publish ---------------------------------------
 
