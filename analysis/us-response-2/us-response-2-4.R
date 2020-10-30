@@ -359,7 +359,8 @@ g <-  d %>%
   geom_line(alpha = .1, size = 3)+
   geom_line()+
   scale_y_continuous(labels = scales::comma_format())+
-  facet_wrap(~metric, scales = "free_y", ncol = 1)+
+  # facet_wrap(~metric, scales = "free_y", ncol = 1)+
+  lemon::facet_rep_wrap(~metric,scales = "free_y", ncol = 1,repeat.tick.labels = TRUE)+
   scale_x_date(date_breaks = "1 month", date_labels = "%b" )+
   scale_color_manual(values = c("New York" = "#7570B3", "Florida" = "#E7298A",
                                 "Wisconsin" = "#D95F02" ))+
@@ -367,7 +368,7 @@ g <-  d %>%
        subtitle = "7-day average (7DA) and Cumulative (cum) counts per 100,000 of population (100K)",
        x = "2020", y = NULL, color = NULL)+
   theme(legend.position = "top")
-g %>% quick_save2("03-NY-FL-WI", width = 10, height = 15)
+g %>% quick_save2("03-NY-FL-WI-2", width = 10, height = 15)
 
 
 # ---- publish ---------------------------------------
