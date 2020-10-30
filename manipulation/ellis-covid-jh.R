@@ -53,7 +53,8 @@ ds_cases_long <- ds_cases %>%
   tidyr::pivot_longer(all_of(long_cases), names_to = "date", values_to = "n_cases") %>%
   dplyr::mutate(
     date = lubridate::mdy(date)
-    ,FIPS = as.character(FIPS)
+    ,across(FIPS, as.character)
+    ,across(FIPS, ~if_else(str_length(.) < 5, paste0("0",.),.))
   )
 
 ds_cases_long %>% glimpse()
