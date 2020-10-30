@@ -13,3 +13,5 @@ default:
 
     oced_genders      : !expr c("MEN", "WOMEN")
     oced_ages         : !expr c("1519", "2024", "2554", "5564", "6599")
+    party_colors : !expr c("Democrat"= "#0015BC","Divided"= "#800080","Republican" = "#E9141D")
+    region_colors: !expr c("West" = "#1B9E77" ,"South" = "#E7298A" ,"NorthEast" = "#7570B3" ,"MidWest" = "#D95F02")
