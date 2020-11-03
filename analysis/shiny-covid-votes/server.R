@@ -6,19 +6,22 @@ cat("\f") # clear console when working in RStudio
 library(shiny)
 library(tidyverse)
 
-#---- load-sources ------------------------------------------------------------
-config <- config::get()
-# Use 2nd line for local testing
-source("../../scripts/common-functions.R")  # reporting functions and quick views
-# source("./scripts/common-functions.R")  # reporting functions and quick views
-
-
-# ---- declare-globals --------------------
+# ---- dir-path ----------------------------------------------------------------
 # for running app
 dir_path <- "../../"
 
 # for local testing
 # dir_path <- "./"
+
+
+#---- load-sources ------------------------------------------------------------
+config <- config::get()
+# Use 2nd line for local testing
+source(paste0(dir_path,"scripts/common-functions.R"))  # reporting functions and quick views
+
+
+
+# ---- declare-globals --------------------
 
 ggplot2::theme_set(
     ggplot2::theme_bw(

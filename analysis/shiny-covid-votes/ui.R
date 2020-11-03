@@ -15,5 +15,18 @@ shinyUI(fluidPage(
     # Application title
     titlePanel("COVID-19 Votes"),
 
-    plotOutput("plot1")
+    sidebarLayout(
+        sidebarPanel(
+            dateRangeInput(
+                inputId = "data-range"
+                ,label = "Chose Date Range"
+                ,start = "2020-03-15"
+                ,end = Sys.Date()
+            )
+        )
+        ,mainPanel(plotOutput("plot1"))
+
+    )
+
+
 ))
