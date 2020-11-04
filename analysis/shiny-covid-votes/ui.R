@@ -13,17 +13,19 @@ library(shiny)
 shinyUI(fluidPage(
 
     # Application title
-    titlePanel("COVID-19 Votes"),
+    titlePanel("COVID-19 Votes")
 
-    sidebarLayout(
-        sidebarPanel(
-            dateRangeInput(
+
+    ,fluidRow(
+            column(6,
+                dateRangeInput(
                 inputId = "date1"
                 ,label = "Chose Date Range"
                 ,start = "2020-03-15"
                 ,end = Sys.Date()
-            ),
-            selectInput(
+            ))
+            ,column(6,
+                selectInput(
                 inputId = "grouping"
                 ,label = "Grouping"
                 ,choices = c(
@@ -35,12 +37,11 @@ shinyUI(fluidPage(
                     ,"state_attorney_general_political_affiliation"
                     ,"state_leadership"
                     )
-                )
-
-        )
-        ,mainPanel(plotOutput("plot1"))
+                ))
 
     )
+
+    ,plotOutput("plot1")
 
 
 ))
