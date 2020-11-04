@@ -18,7 +18,7 @@ shinyUI(fluidPage(
     sidebarLayout(
         sidebarPanel(
             dateRangeInput(
-                inputId = "data-range"
+                inputId = "date1"
                 ,label = "Chose Date Range"
                 ,start = "2020-03-15"
                 ,end = Sys.Date()

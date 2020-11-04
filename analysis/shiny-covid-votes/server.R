@@ -162,6 +162,15 @@ ds_covid_vote <- ds_jh_state %>%
 # ---- shiny-server ------------------------------------------------------------
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
+# browser()
+
+
+
+    # test_dates <- renderPrint({seq.Date(input$date1[1], input$date1[2], 7)})
+    #
+    # cat(file = stderr(), seq.Date(input$date1[1], input$date1[2], 7))
+
+
     # TODO update to allow user input
     focal_dates <- as.Date(c(
         "2020-10-27"
@@ -175,49 +184,56 @@ shinyServer(function(input, output) {
         ,"2020-03-15"
     ))
 
-    political_grouping <- "winner_2016"
-
-    d <- ds_covid_vote %>%
-        compute_epi(
-            c(
-                "date"
-                ,"state", "state_abb"
-                ,"division"
-                ,"region"
-                ,"country"
-                ,political_grouping
-            ), long = T)
-
-    # TODO update to allow user to chose focus
-    focus_metric <- c("Cases (7DA/100K)","Cases (cum/100K)")
-
-    d4 <- d %>%
-        filter(date %in% focal_dates) %>%
-        filter(metric %in% focus_metric) %>%
-        mutate(
-            metric = janitor::make_clean_names(as.character(metric))
-            ,metric = str_remove_all(metric, "_\\d+$")
-        ) %>%
-        tidyr::pivot_wider(names_from = "metric", values_from = "value")
-
-    g4 <- d4 %>%
-        ggplot(
-            aes_string(
-                x=janitor::make_clean_names(focus_metric[1])
-                , y =janitor::make_clean_names(focus_metric[2])
-                ,label = "state_abb"
-                ,fill = political_grouping
-                ,color = political_grouping
-            ))+
-        scale_fill_manual(values = config$party_colors)+
-        scale_color_manual(values = config$party_colors)+
-        geom_point(shape = 21, color = "grey30",alpha = .2, size = 7)+
-        geom_text(alpha = .9, size = 3)+
-        facet_wrap(~date, scales = "free_y")+
-        labs(x = focus_metric[1], y = focus_metric[2])
 
 
-    output$plot1 <- renderPlot(g4)
+    output$plot1 <- renderPlot({
+                               # TODO update to allow user to chose focus
+        cat(file = stderr(), format(seq(input$date1[1],input$date1[2], 7)))
+
+
+        political_grouping <- "winner_2016"
+
+        d <- ds_covid_vote %>%
+            compute_epi(
+                c(
+                    "date"
+                    ,"state", "state_abb"
+                    ,"division"
+                    ,"region"
+                    ,"country"
+                    ,political_grouping
+                ), long = T)
+
+        focus_metric <- c("Cases (7DA/100K)","Cases (cum/100K)")
+
+
+                               d4 <- d %>%
+                                   filter(date %in% as_date(format(seq(input$date1[1],input$date1[2], 7)))) %>%
+                                   filter(metric %in% focus_metric) %>%
+                                   mutate(
+                                       metric = janitor::make_clean_names(as.character(metric))
+                                       ,metric = str_remove_all(metric, "_\\d+$")
+                                   ) %>%
+                                   tidyr::pivot_wider(names_from = "metric", values_from = "value")
+
+                               g4 <- d4 %>%
+                                   ggplot(
+                                       aes_string(
+                                           x=janitor::make_clean_names(focus_metric[1])
+                                           , y =janitor::make_clean_names(focus_metric[2])
+                                           ,label = "state_abb"
+                                           ,fill = political_grouping
+                                           ,color = political_grouping
+                                       ))+
+                                   scale_fill_manual(values = config$party_colors)+
+                                   scale_color_manual(values = config$party_colors)+
+                                   geom_point(shape = 21, color = "grey30",alpha = .2, size = 7)+
+                                   geom_text(alpha = .9, size = 3)+
+                                   facet_wrap(~date, scales = "free_y")+
+                                   labs(x = focus_metric[1], y = focus_metric[2])
+                               return(g4)
+
+    })
 
 
 
