@@ -5,6 +5,7 @@ cat("\f") # clear console when working in RStudio
 
 library(shiny)
 library(tidyverse)
+library(lubridate)
 
 # ---- dir-path ----------------------------------------------------------------
 # for running app
@@ -191,7 +192,13 @@ shinyServer(function(input, output) {
         cat(file = stderr(), format(seq(input$date1[1],input$date1[2], 7)))
 
 
-        political_grouping <- "winner_2016"
+        political_grouping <- input$grouping
+# FIXME
+        if(input$grouping == "region"){
+            color_fill <- region_colors
+        } else {
+            color_fill <- party_colors
+        }
 
         d <- ds_covid_vote %>%
             compute_epi(
@@ -199,7 +206,7 @@ shinyServer(function(input, output) {
                     "date"
                     ,"state", "state_abb"
                     ,"division"
-                    ,"region"
+                    # ,"region"
                     ,"country"
                     ,political_grouping
                 ), long = T)
@@ -225,8 +232,8 @@ shinyServer(function(input, output) {
                                            ,fill = political_grouping
                                            ,color = political_grouping
                                        ))+
-                                   scale_fill_manual(values = config$party_colors)+
-                                   scale_color_manual(values = config$party_colors)+
+                                   scale_fill_manual(values = color_fill)+
+                                   scale_color_manual(values = color_fill)+
                                    geom_point(shape = 21, color = "grey30",alpha = .2, size = 7)+
                                    geom_text(alpha = .9, size = 3)+
                                    facet_wrap(~date, scales = "free_y")+

@@ -22,7 +22,21 @@ shinyUI(fluidPage(
                 ,label = "Chose Date Range"
                 ,start = "2020-03-15"
                 ,end = Sys.Date()
-            )
+            ),
+            selectInput(
+                inputId = "grouping"
+                ,label = "Grouping"
+                ,choices = c(
+                    "region"
+                    ,"winner_2016"
+                    ,"governor_political_affiliation"
+                    ,"state_senate_majority_political_affiliation"
+                    ,"state_house_majority_political_affiliation"
+                    ,"state_attorney_general_political_affiliation"
+                    ,"state_leadership"
+                    )
+                )
+
         )
         ,mainPanel(plotOutput("plot1"))
 
