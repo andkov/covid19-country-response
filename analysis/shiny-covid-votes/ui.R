@@ -17,14 +17,15 @@ shinyUI(fluidPage(
 
 
     ,fluidRow(
-            column(6,
+            column(4,
                 dateRangeInput(
                 inputId = "date1"
                 ,label = "Chose Date Range"
                 ,start = "2020-03-15"
                 ,end = Sys.Date()
+                ,min = "2020-03-15"
             ))
-            ,column(6,
+            ,column(4,
                 selectInput(
                 inputId = "grouping"
                 ,label = "Grouping"
@@ -38,10 +39,50 @@ shinyUI(fluidPage(
                     ,"state_leadership"
                     )
                 ))
+            ,column(4,
+                    selectInput(
+                        inputId = "xaxis"
+                        ,label = "Choose X-Axis"
+                        ,choices = c(
+                            "Cases (7-day average)"
+                            ,"Cases (7DA/100K)"
+                            ,"Cases (cumulative)"
+                            ,"Cases (cum/100K)"
+                            ,"Deaths (7-day average)"
+                            ,"Deaths (7DA/100K)"
+                            ,"Deaths (cumulative)"
+                            ,"Deaths (cum/100K)"
+                            ,"Tests (7-day average)"
+                            ,"Tests (7DA/100K)"
+                            ,"Tests (cumulative)"
+                            ,"Tests (cum/100K)"
+                        )
+                        ,selected = "Cases (7DA/100K)"
+                    )
+                    ,selectInput(
+                        inputId = "yaxis"
+                        ,label = "Choose Y-Axis"
+                        ,choices = c(
+                            "Cases (7-day average)"
+                            ,"Cases (7DA/100K)"
+                            ,"Cases (cumulative)"
+                            ,"Cases (cum/100K)"
+                            ,"Deaths (7-day average)"
+                            ,"Deaths (7DA/100K)"
+                            ,"Deaths (cumulative)"
+                            ,"Deaths (cum/100K)"
+                            ,"Tests (7-day average)"
+                            ,"Tests (7DA/100K)"
+                            ,"Tests (cumulative)"
+                            ,"Tests (cum/100K)"
+                        )
+                        ,selected = "Cases (cum/100K)"
+                    )
+                    )
 
     )
 
-    ,plotOutput("plot1")
+    ,plotOutput("plot1", height = "1000px")
 
 
 ))

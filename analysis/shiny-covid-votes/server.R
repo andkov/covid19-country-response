@@ -211,7 +211,8 @@ shinyServer(function(input, output) {
                     ,political_grouping
                 ), long = T)
 
-        focus_metric <- c("Cases (7DA/100K)","Cases (cum/100K)")
+        # focus_metric <- c("Cases (7DA/100K)","Cases (cum/100K)")
+        focus_metric <- c(input$xaxis, input$yaxis)
 
 
                                d4 <- d %>%
