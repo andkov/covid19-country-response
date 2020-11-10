@@ -61,7 +61,11 @@ ds1 <- ds0 %>% filter(year == 2016, party %in% c("democrat", "republican")) %>%
   )
 
 
+#' # Save Data
+# ---- save-data ---------------------------------------------------------------
 
+ds1 %>% write_rds("./data-public/derived/us-2016-county-political-results.rds"
+                  ,compress = "gz")
 
 
 
