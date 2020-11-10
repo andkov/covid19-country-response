@@ -43,4 +43,31 @@ ds0 <- read_csv("./data-unshared/raw/vote/countypres_2000-2016.csv")
 # ---- tweak-data -------------------------------------------------------------
 
 
-ds1 <- ds0 %>% filter(year == 2016, party %in% c("democrat", "republican"))
+ds1 <- ds0 %>% filter(year == 2016, party %in% c("democrat", "republican")) %>%
+  select(year,state,county,FIPS,party,candidatevotes) %>%
+  pivot_wider(
+    names_from    = party
+    ,names_prefix = "votes_"
+    ,values_from  = candidatevotes
+    ) %>%
+  mutate(
+    county_winner_2016 = if_else(
+      votes_republican > votes_democrat
+      ,"Republican"
+      ,"Democrat"
+      )
+    ,across(FIPS, as.character)
+    ,across(FIPS, ~if_else(str_length(.) < 5, paste0("0",.),.))
+  )
+
+
+
+
+
+
+
+
+
+
+
+
