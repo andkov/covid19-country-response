@@ -1,25 +1,14 @@
 rm(list=ls(all=TRUE)) #Clear the memory of variables from previous run.
 # This is not called by knitr, because it's above the first chunk.
 cat("\f") # clear console when working in RStudio
+
+# must run data-prep.R before uploading to shinyapps.io
 # ---- load-packages -----------------------------------------------------------
 
 library(shiny)
 library(tidyverse)
 library(lubridate)
-
-# ---- dir-path ----------------------------------------------------------------
-# for running app
-dir_path <- "../../"
-
-# for local testing
-# dir_path <- "./"
-
-
 #---- load-sources ------------------------------------------------------------
-config <- config::get()
-# Use 2nd line for local testing
-source(paste0(dir_path,"scripts/common-functions.R"))  # reporting functions and quick views
-
 
 
 # ---- declare-globals --------------------
@@ -138,27 +127,8 @@ compute_epi <- function(
 }
 
 # ---- load-data ---------------------------------------------------------------
-# Produced by `./manipulation/scribe-john-hopkins.R`
-ds_jh_state <- readr::read_rds(
-    paste0(dir_path,"data-unshared/derived/john-hopkins-state.rds")
-    )
-# Source: Harvard Datavers (presidential) + Kaiser Foundation (state parties)
-# Produced by `./manipulation/ellis-us-election-results-2.R`
-ds_vote <- readr::read_rds(
-    paste0(dir_path,"data-public/derived/us-2020-state-political-results.rds")
-    )
-# Note: political leadership reflects the state of 2020
 
-ds_covid_vote <- ds_jh_state %>%
-    left_join(
-        ds_vote %>% select(-c("state_po","state_fips"))
-        ,by = c("state"= "province_state")
-    ) %>%
-    mutate(state = factor(state))
-
-
-
-
+app_data <- read_rds(paste0("./data/app-data.rds"))
 
 # ---- shiny-server ------------------------------------------------------------
 # Define server logic required to draw a histogram
