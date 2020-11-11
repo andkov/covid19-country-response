@@ -38,7 +38,12 @@ shinyUI(fluidPage(
                     ,"state_attorney_general_political_affiliation"
                     ,"state_leadership"
                     )
-                ))
+                )
+                ,downloadButton(
+                    "downloadplot"
+                    ,label = "Download Plot"
+                )
+                )
             ,column(4,
                     selectInput(
                         inputId = "xaxis"

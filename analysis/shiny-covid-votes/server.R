@@ -187,7 +187,7 @@ shinyServer(function(input, output) {
 
 
 
-    output$plot1 <- renderPlot({
+    graph <- function(){
                                # TODO update to allow user to chose focus
         cat(file = stderr(), format(seq(input$date1[1],input$date1[2], 7)))
 
@@ -241,7 +241,24 @@ shinyServer(function(input, output) {
                                    labs(x = focus_metric[1], y = focus_metric[2])
                                return(g4)
 
+    }
+
+
+    output$plot1 <- renderPlot({
+        graph()
     })
+
+
+
+    output$downloadplot <- downloadHandler(
+        filename = function() {
+            paste("plot-", Sys.Date(), ".png", sep="")
+        }
+        ,content = function(file) {
+            ggsave(file, plot = graph() , device = "png"
+                   ,width = 15, height = 10, units = 'in', dpi = 300)
+        }
+    )
 
 
 
