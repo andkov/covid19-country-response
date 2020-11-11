@@ -166,34 +166,10 @@ shinyServer(function(input, output) {
 # browser()
 
 
-
-    # test_dates <- renderPrint({seq.Date(input$date1[1], input$date1[2], 7)})
-    #
-    # cat(file = stderr(), seq.Date(input$date1[1], input$date1[2], 7))
-
-
-    # TODO update to allow user input
-    focal_dates <- as.Date(c(
-        "2020-10-27"
-        ,"2020-10-15","2020-10-01"
-        ,"2020-09-15","2020-09-01"
-        ,"2020-08-15","2020-08-01"
-        ,"2020-07-15","2020-07-01"
-        ,"2020-06-15","2020-06-01"
-        ,"2020-05-15","2020-05-01"
-        ,"2020-04-15","2020-04-01"
-        ,"2020-03-15"
-    ))
-
-
-
-    graph <- function(){
-                               # TODO update to allow user to chose focus
-        cat(file = stderr(), format(seq(input$date1[1],input$date1[2], 7)))
-
-
+    create_graph <- function(){
         political_grouping <- input$grouping
-# FIXME
+        focus_metric <- c(input$xaxis, input$yaxis)
+
         if(input$grouping == "region"){
             color_fill <- region_colors
         } else {
@@ -204,58 +180,54 @@ shinyServer(function(input, output) {
             compute_epi(
                 c(
                     "date"
-                    ,"state", "state_abb"
+                    ,"state"
+                    ,"state_abb"
                     ,"division"
-                    # ,"region"
                     ,"country"
                     ,political_grouping
-                ), long = T)
+                    )
+                ,long = T
+            ) %>% filter(
+                date %in% as_date(format(seq(input$date1[1],input$date1[2], 7)))
+                ) %>%
+            filter(metric %in% focus_metric) %>%
+            mutate(
+                metric  = janitor::make_clean_names(as.character(metric))
+                ,metric = str_remove_all(metric, "_\\d+$")
+            ) %>%
+            tidyr::pivot_wider(names_from = "metric", values_from = "value")
 
-        # focus_metric <- c("Cases (7DA/100K)","Cases (cum/100K)")
-        focus_metric <- c(input$xaxis, input$yaxis)
-
-
-                               d4 <- d %>%
-                                   filter(date %in% as_date(format(seq(input$date1[1],input$date1[2], 7)))) %>%
-                                   filter(metric %in% focus_metric) %>%
-                                   mutate(
-                                       metric = janitor::make_clean_names(as.character(metric))
-                                       ,metric = str_remove_all(metric, "_\\d+$")
-                                   ) %>%
-                                   tidyr::pivot_wider(names_from = "metric", values_from = "value")
-
-                               g4 <- d4 %>%
-                                   ggplot(
-                                       aes_string(
-                                           x=janitor::make_clean_names(focus_metric[1])
-                                           , y =janitor::make_clean_names(focus_metric[2])
-                                           ,label = "state_abb"
-                                           ,fill = political_grouping
-                                           ,color = political_grouping
-                                       ))+
-                                   scale_fill_manual(values = color_fill)+
-                                   scale_color_manual(values = color_fill)+
-                                   geom_point(shape = 21, color = "grey30",alpha = .2, size = 7)+
-                                   geom_text(alpha = .9, size = 3)+
-                                   facet_wrap(~date, scales = "free_y")+
-                                   labs(x = focus_metric[1], y = focus_metric[2])
-                               return(g4)
+           g4 <- d %>%
+               ggplot(
+                   aes_string(
+                       x      = janitor::make_clean_names(focus_metric[1])
+                       ,y     = janitor::make_clean_names(focus_metric[2])
+                       ,label = "state_abb"
+                       ,fill  =  political_grouping
+                       ,color = political_grouping
+                   ))+
+               scale_fill_manual(values = color_fill) +
+               scale_color_manual(values = color_fill) +
+               geom_point(shape = 21, color = "grey30", alpha = .2, size = 7)+
+               geom_text(alpha = .9, size = 3)+
+               facet_wrap(.~date, scales = "free_y")+
+               labs(x = focus_metric[1], y = focus_metric[2])
+           return(g4)
 
     }
 
 
     output$plot1 <- renderPlot({
-        graph()
+        create_graph()
     })
-
 
 
     output$downloadplot <- downloadHandler(
         filename = function() {
-            paste("plot-", Sys.Date(), ".png", sep="")
+            paste0("plot-", Sys.Date(), ".png")
         }
         ,content = function(file) {
-            ggsave(file, plot = graph() , device = "png"
+            ggsave(file, plot = create_graph() , device = "png"
                    ,width = 15, height = 10, units = 'in', dpi = 300)
         }
     )
