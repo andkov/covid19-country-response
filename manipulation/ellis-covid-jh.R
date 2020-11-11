@@ -109,6 +109,9 @@ ds_daily <- ds_daily %>%
 # TODO: please create a `ds_timeseries_global` that would include US and list population for each country
 # Note: the `./manipulation/ellis-covid.R` get the population number, or add new
 
+# Please confirm to the names of the variables
+# `n_cases`, `n_deaths`, `n_deaths_cum`, `n_cases_cum`, `country_code`, `country_label`
+
 # ---- save-to-disk --------------------
 ds_daily %>% readr::write_csv(config$path_input_jh_daily)
 ds_timeseries %>% readr::write_csv(config$path_input_jh_usts)
