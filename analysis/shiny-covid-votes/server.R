@@ -146,7 +146,7 @@ shinyServer(function(input, output) {
             color_fill <- party_colors
         }
 
-        d <- ds_covid_vote %>%
+        d <- app_data %>%
             compute_epi(
                 c(
                     "date"
