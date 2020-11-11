@@ -24,6 +24,9 @@ config <- config::get()
 folder_daily_reports <- "../COVID-19/csse_covid_19_data/csse_covid_19_daily_reports_us/"
 path_timeseries_cases_us <- "../COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv"
 path_timeseries_deaths_us <- "../COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv"
+
+path_timeseries_cases_global <- "../COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
+path_timeseries_deaths_global <- "../COVID-19/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"
 # ---- load-data ---------------------------------------------------------------
 daily_reports <- list.files(folder_daily_reports,pattern = "*.csv", full.names = T)
 ls_daily <- list()
@@ -38,8 +41,16 @@ for(i in seq_along(daily_reports)){
 ds_cases <- readr::read_csv(path_timeseries_cases_us)
 ds_deaths <- readr::read_csv(path_timeseries_deaths_us)
 
-ds_cases %>% glimpse()
-ds_deaths %>% glimpse()
+ds_cases_global <- readr::read_csv(path_timeseries_cases_global)
+ds_deaths_global <- readr::read_csv(path_timeseries_deaths_global)
+
+ds_cases[1:13] %>% glimpse()
+ds_deaths[1:13] %>% glimpse()
+
+ds_cases_global[1:13] %>% glimpse()
+ds_deaths_global[1:13] %>% glimpse()
+
+
 # ---- tweak-data -------------------
 
 (stem_cases <- names(ds_cases)[1:11])
@@ -94,7 +105,9 @@ ds_daily <- ds_daily %>%
   left_join(ds_uspop,by = "province_state")
 
 
-
+# ----- global-timeseries ------------
+# TODO: please create a `ds_timeseries_global` that would include US and list population for each country
+# Note: the `./manipulation/ellis-covid.R` get the population number, or add new
 
 # ---- save-to-disk --------------------
 ds_daily %>% readr::write_csv(config$path_input_jh_daily)
