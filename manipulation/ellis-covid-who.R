@@ -46,6 +46,10 @@ column_names <- c(
 ds_who <- read_csv(path_source_who)
 
 ds_world_pop <-  read_csv(path_source_pop)
+
+# For adding 3-letter codes (and potentially more)
+ds_geo <- readr::read_csv("./data-public/metadata/world-geography.csv")
+
 # ---- tweak-data -------------------
 
 ds_who1 <- ds_who %>% rename(all_of(column_names)) %>%
@@ -65,12 +69,19 @@ ds_world_pop1 <- ds_world_pop %>%
 ds_who_combined <- ds_who1 %>%
   left_join(ds_world_pop1, by = c("country_label" = "Location")) %>%
   select(-Time, -LocID) %>%
-  rename(population = PopTotal)
+  rename(population = PopTotal) %>%
+  left_join(
+    ds_geo %>% distinct(iso2=country_code2, country_code)
+    , by = "iso2"
+  ) %>%
+  select(date, iso2, country_code, everything())
 
 
+# inspect
+ds_who_combined %>% glimpse()
 # ---- save-to-disk ------------------------------------------------------------
+ds_who_combined %>% readr::write_csv(config$path_input_who)
 
-# TODO: Where to save?
 
 
 

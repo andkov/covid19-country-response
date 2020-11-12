@@ -3,6 +3,7 @@ default:
     path_country      : "data-public/metadata/oecd/country.csv"
     path_input_oecd   : !expr strftime(Sys.Date(), "data-unshared/derived/oedc-%Y-%m-%d.csv")
     path_input_covid  : !expr strftime(Sys.Date(), "data-unshared/derived/covid-%Y-%m-%d.csv")
+    path_input_who    : "data-unshared/derived/covid-who.csv"
     path_input_jh_daily: !expr strftime(Sys.Date(), "data-unshared/derived/jh_daily-%Y-%m-%d.csv")
     path_input_jh_usts: !expr strftime(Sys.Date(), "data-unshared/derived/jh_usts-%Y-%m-%d.csv")
     path_input_cgrt:     !expr strftime(Sys.Date(), "data-unshared/derived/cgrt-%Y-%m-%d.rds")
