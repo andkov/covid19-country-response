@@ -55,30 +55,40 @@ ds_geo <- readr::read_csv("./data-public/metadata/world-geography.csv")
 ds_who1 <- ds_who %>% rename(all_of(column_names)) %>%
   mutate(
     across(date, ~ymd(.))
+  )  %>%
+  mutate(
+    country_label = ifelse(country_label == "The United Kingdom","United Kingdom",country_label)
   )
+
+# ds_who1 %>% filter(iso2 == "GB") %>% pull(country_label) %>% unique()
 
 # need to multiply pop by 1000 to move the decimal over, not sure why
 # file downloads with oddly placed decimal
 ds_world_pop1 <- ds_world_pop %>%
-  filter(Time == 2020, VarID == 2) %>%
+  filter(Time == 2018, VarID == 2) %>%
   select(LocID,Location,Time,PopTotal) %>%
   mutate(across(PopTotal, ~.*1000))
 
+# ds_world_pop1 %>% filter(Location == "United Kingdom")
 
 
 ds_who_combined <- ds_who1 %>%
   left_join(ds_world_pop1, by = c("country_label" = "Location")) %>%
   select(-Time, -LocID) %>%
   rename(population = PopTotal) %>%
+  select(-country_label) %>%
   left_join(
-    ds_geo %>% distinct(iso2=country_code2, country_code)
+    ds_geo %>% distinct(iso2=country_code2, country_code, country_label)
     , by = "iso2"
   ) %>%
-  select(date, iso2, country_code, everything())
+  select(date, iso2, country_code, country_label, everything())
 
+
+ds_who_combined %>% filter(iso2 == "GB") %>% select(date, iso2,country_label, population)
 
 # inspect
 ds_who_combined %>% glimpse()
+ds_who_combined %>% distinct(country_code, country_label, population) %>% View()
 
 
 # stem to have the complete timeline
