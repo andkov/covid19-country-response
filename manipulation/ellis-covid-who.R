@@ -19,6 +19,7 @@ cat("\f") # clear console when working in RStudio
 # Attach these packages so their functions don't need to be qualified:
 # http://r-pkgs.had.co.nz/namespace.html#search-path
 library(tidyverse)
+library(lubridate)
 
 # ---- declare-globals ---------------------------------------------------------
 config <- config::get()
