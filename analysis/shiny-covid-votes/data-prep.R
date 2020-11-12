@@ -10,6 +10,12 @@ cat("\f") # clear console when working in RStudio
 library(shiny)
 library(tidyverse)
 library(lubridate)
+# ---- load-sources ------------------------------------------------------------
+
+# updates local data prior to creating app_data
+source("./manipulation/ellis-covid-jh.R")
+source("./manipulation/scribe-john-hopkins.R")
+
 
 # ---- declare-globals ---------------------------------------------------------
 
