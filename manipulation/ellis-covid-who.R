@@ -79,6 +79,28 @@ ds_who_combined <- ds_who1 %>%
 
 # inspect
 ds_who_combined %>% glimpse()
+
+
+# stem to have the complete timeline
+# dates     <- min(ds_who_combined$date):max(ds_who_combined$date)
+# countries <- unique(ds_who_combined$country_code) %>% na.omit()
+# ds_dates   <- tibble::as_tibble(
+#   expand.grid(dates, countries, stringsAsFactors = F)
+# )
+# names(ds_dates) <- c("date", "country_code")
+# ds_dates <- ds_dates %>%
+#   dplyr::mutate(
+#     date = lubridate::as_date(date)
+#   )
+# ds_dates %>% glimpse()
+# ds_who_combined %>% glimpse()
+#
+# d <- ds_who_combined %>%
+#   dplyr::left_join(ds_dates,by = c("date","country_code") ) %>%
+#   tidyr::fill(population) %>%
+#   dplyr::arrange(country_code, date)
+
+
 # ---- save-to-disk ------------------------------------------------------------
 ds_who_combined %>% readr::write_csv(config$path_input_who)
 
