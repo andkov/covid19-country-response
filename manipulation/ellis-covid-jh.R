@@ -153,19 +153,24 @@ ds_timeseries_global <-
 
 ds_timeseries_global %>% glimpse()
 
-ds_timeseries_global %>% filter(country_region == "United Kingdom")
+# ds_timeseries_global %>% filter(country_region == "United Kingdom")
 
 # The population adds the country_region level, but not province_state
-d <- ds_timeseries_global %>%
-  left_join(
-    ds_world_pop1 %>% select(Location, population = PopTotal)
-    , by = c("country_region" = "Location")) %>%
-
-
 # d <- ds_timeseries_global %>%
 #   left_join(
-#     ds_timeseries %>% distinct(date, province_state, country_region, long, lat)
-#   )
+#     ds_world_pop1 %>% select(Location, population = PopTotal)
+#     , by = c("country_region" = "Location")) %>%
+
+# Add US
+# d <- ds_timeseries_global %>%
+#   bind_rows(
+#     ds_timeseries %>% distinct(date, province_state, country_region, long, lat, n_cases, n_deaths)
+#   ) %>%
+#   filter(date == as.Date("2020-04-15"))
+#
+# ds_timeseries %>%
+#   distinct(date, province_state, country_region, long, lat, n_cases, n_deaths) %>%
+#   filter(date == as.Date("2020-04-15"))
 # ds_timeseries_global %>% distinct(province_state, country_region) %>% View()
 
 # ----- global-timeseries ------------
@@ -178,6 +183,7 @@ d <- ds_timeseries_global %>%
 # ---- save-to-disk --------------------
 ds_daily %>% readr::write_csv(config$path_input_jh_daily)
 ds_timeseries %>% readr::write_csv(config$path_input_jh_usts)
+ds_timeseries_global %>% readr::write_csv(config$path_input_jh_glts)
 # ds_daily %>% readr::write_csv("./data-unshared/derived/js_daily.rds")
 
 
