@@ -42,6 +42,16 @@ ds0 <- read_csv("./data-unshared/raw/vote/president_county_candidate_2020.csv")
 #' # Tweak Data
 # ---- tweak-data --------------------------------------------------------------
 
+ds_total_votes <- ds0 %>%
+  group_by(state, county) %>%
+  summarise(
+    total_votes_cast = sum(total_votes)
+    ,.groups         = "keep"
+    ) %>%
+  ungroup()
+
+
+
 ds_county <- ds0 %>% filter(party %in% c("DEM", "REP")) %>%
   select(-won, -candidate) %>%
   pivot_wider(
@@ -56,7 +66,8 @@ ds_county <- ds0 %>% filter(party %in% c("DEM", "REP")) %>%
       ,"Republican"
       ,"Democrat"
       )
-    )
+    ) %>%
+  left_join(ds_total_votes, by = c("state", "county"))
 
 
 
@@ -73,7 +84,14 @@ ds_state <- ds_county %>%
       ,"Republican"
       ,"Democrat"
     )
-  )
+  ) %>%
+  left_join(
+    ds_total_votes %>%
+      group_by(state) %>%
+      summarise(across(total_votes_cast, sum)
+                )
+    ,by = "state"
+    )
 
 
 #' # Save Data
