@@ -40,7 +40,7 @@ ds0 <- read_csv("./data-unshared/raw/vote/president_county_candidate_2020.csv")
 
 
 #' # Tweak Data
-# ---- tweak-data -------------------------------------------------------------
+# ---- tweak-data --------------------------------------------------------------
 
 ds_county <- ds0 %>% filter(party %in% c("DEM", "REP")) %>%
   select(-won, -candidate) %>%
@@ -76,6 +76,18 @@ ds_state <- ds_county %>%
   )
 
 
+#' # Save Data
+# ---- save-data ---------------------------------------------------------------
+
+ds_county %>% write_rds(
+  "./data-public/derived/us-2020-county-pres-results.rds"
+  ,compress = "gz"
+  )
+
+ds_state %>% write_rds(
+  "./data-public/derived/us-2020-state-pres-results.rds"
+  ,compress = "gz"
+)
 
 
 
