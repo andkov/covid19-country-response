@@ -32,6 +32,7 @@ shinyUI(fluidPage(
                 ,choices = c(
                     "region"
                     ,"winner_2016"
+                    ,"winner_2020_pres"
                     ,"governor_political_affiliation"
                     ,"state_senate_majority_political_affiliation"
                     ,"state_house_majority_political_affiliation"

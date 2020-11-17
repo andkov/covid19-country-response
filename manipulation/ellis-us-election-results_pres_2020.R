@@ -42,10 +42,11 @@ ds0 <- read_csv("./data-unshared/raw/vote/president_county_candidate_2020.csv")
 #' # Tweak Data
 # ---- tweak-data --------------------------------------------------------------
 
+
 ds_total_votes <- ds0 %>%
   group_by(state, county) %>%
   summarise(
-    total_votes_cast = sum(total_votes)
+    total_votes_cast_2020 = sum(total_votes)
     ,.groups         = "keep"
     ) %>%
   ungroup()
@@ -61,7 +62,7 @@ ds_county <- ds0 %>% filter(party %in% c("DEM", "REP")) %>%
     ) %>%
   janitor::clean_names() %>%
   mutate(
-    winner = if_else(
+    winner_2020_pres = if_else(
       votes_rep > votes_dem
       ,"Republican"
       ,"Democrat"
@@ -72,14 +73,14 @@ ds_county <- ds0 %>% filter(party %in% c("DEM", "REP")) %>%
 
 
 ds_state <- ds_county %>%
-  select(-winner) %>%
+  select(-winner_2020_pres) %>%
   group_by(state) %>%
   summarise(
     votes_dem = sum(votes_dem)
     ,votes_rep = sum(votes_rep)
     ) %>%
   mutate(
-    winner = if_else(
+    winner_2020_pres = if_else(
       votes_rep > votes_dem
       ,"Republican"
       ,"Democrat"
@@ -88,7 +89,7 @@ ds_state <- ds_county %>%
   left_join(
     ds_total_votes %>%
       group_by(state) %>%
-      summarise(across(total_votes_cast, sum)
+      summarise(across(total_votes_cast_2020, sum)
                 )
     ,by = "state"
     )

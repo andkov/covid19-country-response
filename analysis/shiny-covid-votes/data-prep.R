@@ -34,11 +34,18 @@ ds_vote <- readr::read_rds(
 )
 # Note: political leadership reflects the state of 2020
 
+ds_vote_pres_2020 <-  read_rds(
+  paste0(dir_path, "data-public/derived/us-2020-state-pres-results.rds")
+  )
+
+# ---- merge-data --------------------------------------------------------------
+
 ds_covid_vote <- ds_jh_state %>%
   left_join(
     ds_vote %>% select(-c("state_po","state_fips"))
     ,by = c("state"= "province_state")
   ) %>%
+  left_join(ds_vote_pres_2020, by = "state") %>%
   mutate(state = factor(state))
 
 
