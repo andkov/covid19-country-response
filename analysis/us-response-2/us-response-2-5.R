@@ -359,7 +359,7 @@ g <-  d %>%
 g %>% quick_save2("02-covid-by-regions", width = 10, height = 6)
 
 
-# ----- graph-3-------
+# ----- g3-------
 focus_metrics <- c(
 
   "Cases (7DA/100K)"
@@ -405,7 +405,7 @@ g %>% quick_save2("03-NY-FL-WI-2", width = 10, height = 15)
 
 
 
-# ----- graph-4-------
+# ----- g4-------
 focus_metrics <- c(
   "Cases (7DA/100K)"
   ,"Tests (7DA/100K)"
