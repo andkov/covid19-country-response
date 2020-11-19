@@ -40,6 +40,7 @@ rsconnect/
 /data-unshared/*
 /data/unshared/*
 
+
 # Dataset Exceptions
 !utility/package-dependency-list.csv
 
@@ -115,3 +116,9 @@ analysis/0-greeter/0-greeter-gls.md
 *.png
 analysis/gls-activity/gls-activity-2-coverage.md
 
+analysis/oecd-variables/oecd-variables.html
+analysis/response-stringency-2/response-stringency-2.html
+analysis/us-response-2/us-response-2-1.html
+analysis/us-response/covid-response-oxcgrt-4countries.html
+analysis/us-response/covid-usa-john-hopkins.html
+analysis/us-response-2/tests-by-state.jpg
