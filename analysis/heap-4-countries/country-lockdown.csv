@@ -1,13 +1,13 @@
-country_code,date,lockdown_type,lockdown_label
-CAN,2020-03-23,Voluntary or stay home,Voluntary go home and stay home request
-DEN,2020-03-13,Mandatory,National lockdown implemented
-DEU,2020-03-22,Voluntary or stay home,Ban on meeting people from different households
-ESP,2020-03-14,Mandatory,National lockdown implemented
-FRA,2020-03-17,Mandatory,National lockdown implemented
-GBR,2020-03-23,Mandatory,National lockdown implemented
-ITA,2020-03-10,Mandatory,National lockdown implemented
-NOR,2020-03-12,Mandatory,National lockdown implemented
-USA,2020-03-16,Voluntary or stay home,National voluntary lockdown
-BEL,2020-03-18,Mandatory,National lockdown implemented
-IRL,2020-03-27,Mandatory,National lockdown implemented
+country_code,date,letter_code, lockdown_type,lockdown_label
+CAN,2020-03-23,V,Voluntary or stay home,Voluntary go home and stay home request
+USA,2020-03-16,V,Voluntary or stay home,National voluntary lockdown
+IRL,2020-03-27,M,Mandatory,National lockdown implemented
+GBR,2020-03-23,M,Mandatory,National lockdown implemented
+DEN,2020-03-13,M,Mandatory,National lockdown implemented
+DEU,2020-03-22,V,Voluntary or stay home,Ban on meeting people from different households
+ESP,2020-03-14,M,Mandatory,National lockdown implemented
+FRA,2020-03-17,M,Mandatory,National lockdown implemented
+ITA,2020-03-10,M,Mandatory,National lockdown implemented
+NOR,2020-03-12,M,Mandatory,National lockdown implemented
+BEL,2020-03-18,M,Mandatory,National lockdown implemented
 
