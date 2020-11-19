@@ -47,15 +47,15 @@ division_levels <- c(
 )
 
 division_levels_display <- c(
-"Pacific\nAK,CA,HI,OR,WA"
-,"Mountain\nAZ,CO,ID,MT,NV,NM,UT,WY"
-,"New England\nCT,ME,MA,NH,RI,VT"
-,"West North Central\nIA,KS,MN,MO,NE,ND,SD"
-,"East North Central\nIL,IN,MI,OH,WI"
-,"Middle Atlantic\nNJ,NY,PA"
-,"West South Central\nAR,LA,OK,TX"
-,"East South Central\nAL,KY,MS,TN"
-,"South Atlantic\nDE,DC,FL,GA,MD,NC,SC,VA,WV"
+  "Pacific\nAK,CA,HI,OR,WA"
+  ,"Mountain\nAZ,CO,ID,MT,NV,NM,UT,WY"
+  ,"New England\nCT,ME,MA,NH,RI,VT"
+  ,"West North Central\nIA,KS,MN,MO,NE,ND,SD"
+  ,"East North Central\nIL,IN,MI,OH,WI"
+  ,"Middle Atlantic\nNJ,NY,PA"
+  ,"West South Central\nAR,LA,OK,TX"
+  ,"East South Central\nAL,KY,MS,TN"
+  ,"South Atlantic\nDE,DC,FL,GA,MD,NC,SC,VA,WV"
 )
 
 region_colors <- c(
@@ -241,7 +241,7 @@ ds_vote %>% glimpse()
 # ds_vote2 %>% glimpse()
 
 ds_events <- readr::read_delim("analysis/us-response-2/key-dates.csv",
-                        "|", escape_double = FALSE, trim_ws = TRUE)
+                               "|", escape_double = FALSE, trim_ws = TRUE)
 # ---- tweak-data --------------------
 ds_jh_state <- ds_jh_state %>%
   mutate(
@@ -293,11 +293,11 @@ d <- ds_jh_state %>%
   filter(metric %in% focus_metrics) %>%
   mutate(
     metric = fct_recode(metric
-                         ,"Cases" =  "Cases (7-day average)"
-                         ,"Deaths"=  "Deaths (7-day average)"
-                         # ,"Tests" = "Tests (7-day average)"
-                         ) %>% fct_drop()
-    ) %>%
+                        ,"Cases" =  "Cases (7-day average)"
+                        ,"Deaths"=  "Deaths (7-day average)"
+                        # ,"Tests" = "Tests (7-day average)"
+    ) %>% fct_drop()
+  ) %>%
   left_join(
     ds_events, by = c("date" = "date", "country" = "area")
   )
@@ -319,7 +319,7 @@ g %>% quick_save2("01-us-cases-deaths", width = 10, height = 4)
 
 
 # ---- g2 -------
-metric_order
+# metric_order
 focus_metrics <- c(
   "Cases (7DA/100K)"
   ,"Deaths (7DA/100K)"
@@ -336,14 +336,18 @@ d <- ds_jh_state %>%
   filter(metric %in% focus_metrics) %>%
   mutate(
     metric = fct_relevel(metric, focus_metrics) %>% fct_drop()
+  ) %>%
+  filter(
+    date >= as.Date("2020-03-01"), date <= as.Date("2020-11-08") # because gives negative numbers after this date
   )
+
 
 d$metric %>% levels()
 g <-  d %>%
   ggplot(aes(x=date, y = value, group = region, color=region))+
   geom_line(size=2, alpha = .5)+
   geom_line(size = .5, alpha = 1)+
-  scale_color_viridis_d(option = "plasma", begin = .2, end = .9, name = "Region")+
+  # scale_color_viridis_d(option = "plasma", begin = .2, end = .9, name = "Region")+
   scale_y_continuous(labels = scales::comma_format())+
   scale_x_date(date_breaks = "1 month", date_labels = "%b" )+
   facet_wrap(~metric, scales = "free", ncol = 3)+
@@ -401,7 +405,7 @@ g %>% quick_save2("03-NY-FL-WI-2", width = 10, height = 15)
 
 
 
-# ----- graph-4 -------
+# ----- graph-4-------
 focus_metrics <- c(
   "Cases (7DA/100K)"
   ,"Tests (7DA/100K)"
