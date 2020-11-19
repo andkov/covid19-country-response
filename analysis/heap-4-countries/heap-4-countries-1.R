@@ -50,8 +50,8 @@ compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
       # this solution might be vulnerable to cases where some intermediate dates are missed
       n_deaths_cum         = cumsum(tidyr::replace_na(n_deaths,0))
       ,n_cases_cum         = cumsum(tidyr::replace_na(n_cases,0))
-      ,n_deaths_cum_per_1m = n_deaths_cum/n_population_2018*1000000
-      ,n_cases_cum_per_1m  = n_cases_cum/ n_population_2018*1000000
+      ,n_deaths_cum_per_1m = n_deaths_cum/n_population*1000000
+      ,n_cases_cum_per_1m  = n_cases_cum/ n_population*1000000
 
       ,cutoff_death        = n_deaths_cum >= 1
       ,cutoff_case         = n_cases_cum >= 1
@@ -76,8 +76,8 @@ compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
 
       ,n_cases_roll_7 = zoo::rollapply(n_cases, 7, mean, align = 'right', fill = NA)
       ,n_deaths_roll_7 = zoo::rollapply(n_deaths, 7, mean, align = 'right', fill = NA)
-      ,n_cases_roll_7_rate = n_cases_roll_7/n_population_2018*1000000
-      ,n_deaths_roll_7_rate = n_deaths_roll_7/n_population_2018*1000000
+      ,n_cases_roll_7_rate = n_cases_roll_7/n_population*1000000
+      ,n_deaths_roll_7_rate = n_deaths_roll_7/n_population*1000000
 
 
     ) %>%
@@ -113,17 +113,22 @@ ds_geo %>% glimpse()
 ds_covid <- readr::read_csv(config$path_input_covid)
 ds_covid %>% glimpse()
 
+ds_who <- readr::read_csv(config$path_input_who)
+ds_who %>% glimpse()
+
 ds_lockdown <- readr::read_csv("./analysis/heap-4-countries/country-lockdown.csv")
+ds_lockdown
 # ---- tweak-data --------------------
 
+focus_4_countries <- c("USA","GBR", "IRL","CAN")
 # ds_covid %>% select(country_code) %>%
 #   left_join(ds_geo %>% select(country_code, country_name) ) %>%
 #   distinct() %>% arrange(country_name) %>% View()
 ds_covid <- ds_covid %>%
-  # rename(population = n_population_2018) %>%
+  rename(n_population = n_population_2018) %>%
   filter(
-    # country_code %in% c("USA","GBR", "IRL","CAN")
-    country_code %in% c("BEL", "CAN", "DEN", "DEU", "ESP", "FRA", "GBR", "IRL", "ITA", "NOR", "USA")
+    country_code %in% focus_4_countries
+    # country_code %in% c("BEL", "CAN", "DEN", "DEU", "ESP", "FRA", "GBR", "IRL", "ITA", "NOR", "USA")
   )
 
 ds_epi <- ds_covid %>%
@@ -131,6 +136,23 @@ ds_epi <- ds_covid %>%
   select(-n_cases, -n_deaths)
 
 ds_epi %>% glimpse()
+
+
+ds_who <- ds_who %>%
+  filter(
+    country_code %in% focus_4_countries
+  ) %>%
+  select(date,country_code, country_label, n_cases, n_deaths, n_population = population)
+
+ds_who %>% glimpse()
+
+ds_epi_who <- ds_who %>%
+  compute_epi_timeline() %>%
+  select(-n_cases, -n_deaths)
+
+ds_epi_who %>% glimpse()
+
+ds_epi %>% distinct(country_code, country_label)
 
 
 metric_order <- c(
@@ -146,25 +168,55 @@ metric_order <- c(
   ,"n_deaths_cum_per_1m"   = "Deaths (cum/1M)"
 )
 
-ds1a <- ds_epi %>%
+ds1 <- ds_epi %>%
   tidyr::pivot_longer(cols = names(metric_order), names_to = "metric", values_to = "value") %>%
   mutate(
     metric = factor(metric, levels = names(metric_order), labels = metric_order)
   ) %>%
   left_join(
     ds_geo %>% distinct(country_code, country_label)
+  ) %>%
+  left_join(
+    ds_lockdown, by = c("date","country_code")
+  ) %>%
+  mutate_at(
+    .vars = c("lockdown_type","lockdown_label")
+    ,.funs = factor
   )
-ds1a %>% glimpse()
+ds1 %>% glimpse()
 
-ds1a %>% distinct(country_code)
-ds1 <- ds1a %>%
-  filter(country_code %in% c("USA","GBR", "IRL","CAN"))
+ds1 %>% distinct(country_label)
 
+# ds1a %>% distinct(country_code)
+# ds1 <- ds1a %>%
+#   filter(country_code %in% c("USA","GBR", "IRL","CAN"))
+#
 
 ds2 <- ds1 %>%
   filter(metric %in% c("Cases (cum/1M)", "Deaths (cum/1M)"))
 ds2 %>% glimpse()
-# ------ ----------------------
+
+
+ds1_who <- ds_epi_who %>%
+  tidyr::pivot_longer(cols = names(metric_order), names_to = "metric", values_to = "value") %>%
+  mutate(
+    metric = factor(metric, levels = names(metric_order), labels = metric_order)
+  ) %>%
+  left_join(
+    ds_geo %>% distinct(country_code, country_label)
+  ) %>%
+  left_join(
+    ds_lockdown, by = c("date","country_code")
+  ) %>%
+  mutate_at(
+    .vars = c("lockdown_type","lockdown_label")
+    ,.funs = factor
+  )
+ds1_who %>% glimpse()
+ds1_who %>% distinct(country_label)
+
+
+# ------ facet-graphs ----------------------
 
 # d %>% glimpse()
 print_epi <- function(d,xvar = "date"){
@@ -294,42 +346,41 @@ names(country_colors) <- country_visuals %>%  pull(country_label)
 country_linetype <- country_visuals %>% pull(country_linetype)
 names(country_linetype) <- country_visuals %>%  pull(country_label)
 
-# ds1a %>%
-#   filter(metric == "Cases (cumulative)") %>%
-#   ggplot
+ds_lockdown
+d6 <-
+  ds1 %>% # ECCD
+  # ds1_who %>%
+  # filter(days_since_100case <= 50) %>%
+  filter(metric %in% c("Cases (cumulative)"))
 
-ds1a %>%
-  # filter(country_label == "United States") %>%
-  filter(country_label == "Canada") %>%
-  filter(days_since_100case %in% c(0, 8, 10, 20, 35, 50)) %>%
-  filter(metric %in% c("Cases (cumulative)")) %>%
-  select(country_label, date, value)
-
-
-# g6 <-
-  ds1a %>%
-  filter(metric %in% c("Cases (cumulative)")) %>%
-  # mutate(value = log(value)) %>%
+g6 <- d6 %>%
   ggplot(aes_string(x="days_since_100case", y = "value", group = "country_label",color = "country_label",linetype = "country_label"))+
   geom_line(size = .5, color = "grey40")+
   geom_line(size = .5, alpha = .5)+
   geom_line(size = 3, alpha = .3, linetype = "solid")+
+  geom_point(shape = 21,size =3, data = d6 %>% filter(!is.na(lockdown_type)) )+
+  # geom_point(aes(fill = country_label),shape = 21,size =2.5, alpha =.4, color = "black",data = d6 %>% filter(!is.na(lockdown_type)) )+
+  # geom_point(aes(shape = lockdown_type))+
   # scale_color_viridis_d(option = "plasma", begin = .2, end = .9, name = "Country")+
   scale_linetype_manual(values = country_linetype, name = "Country")+
   scale_color_manual(values = country_colors, name = "Country")+
+  scale_fill_manual(values = country_colors, name = "Country")+
   scale_y_log10(
     breaks = c(100,1000, 10000, 100000, 1000000)
     ,labels = comma
     ,limits = c(100, 10000000)
   ) +
-
-
-
   scale_x_continuous(limits = c(0,250))+
-  labs(y = NULL)+
-  labs(y = "Cases (cumulative, per 1 million)", x = "2020", title = "Confirmed cases of COVID-19", subtitle = "Cumulative count per 1 million of population", caption = "Source: European Centre for Disease Prevention and Control")
+# g6
+  labs(y = "Cases (cumulative)", x = "Days since 100th case", title = "Confirmed cases of COVID-19", subtitle = "Cumulative count "
+       # , caption = "Source: World Health Organization"
+       , caption = "Source: European Centre for Disease Control"
+       )
 # g2
-ggsave("./analysis/heap-4-countries/2020-11-11/cases_cum_log.jpg",g6,"jpg", width = 8, height = 6,dpi = "retina")
+ggsave(
+  # "./analysis/heap-4-countries/2020-11-12/cases_cum_log-WHO.jpg"
+  "./analysis/heap-4-countries/2020-11-12/cases_cum_log-ECDC.jpg"
+  ,g6,"jpg", width = 9, height = 6,dpi = "retina")
 
 
 # ---- publish ---------------------------------------
