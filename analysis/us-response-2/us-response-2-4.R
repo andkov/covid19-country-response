@@ -371,6 +371,49 @@ g <-  d %>%
 g %>% quick_save2("03-NY-FL-WI-2", width = 10, height = 15)
 
 
+<<<<<<< Updated upstream
+=======
+
+# ----- -------
+focus_metrics <- c(
+  "Cases (7DA/100K)"
+  ,"Tests (7DA/100K)"
+)
+
+
+d <- ds_jh_state %>%
+  compute_epi(c("date","state","region", "country"), long = T) %>%
+  filter(metric %in% focus_metrics) %>%
+  filter(state %in% c("New York","Florida","Wisconsin")) %>%
+  filter(date < as.Date("2020-10-26") & date > as.Date("2020-03-01")) %>%
+  filter( !(metric %in% c("Tests (7DA/100K)","Tests (cum/100K)" ) & date < as.Date("2020-04-19"))) %>%
+  mutate(
+    metric = fct_drop(metric)
+    ,value = case_when(metric == "Tests (7DA/100K)" ~ value/10, TRUE ~ value)
+    ,metric = fct_recode(metric, "Tests (7DA/1m)" = "Tests (7DA/100K)")
+    ,state_metric = paste0(state,metric)
+  )
+d %>% group_by(metric) %>% summarize(n = n())
+
+g <-  d %>%
+  ggplot(aes(x=date, y = value, group = state_metric, color = state, linetype = metric))+
+  geom_line(alpha = .1, size = 3, linetype= "solid")+
+  geom_line()+
+  scale_y_continuous(labels = scales::comma_format())+
+  scale_linetype_manual(values = c("Cases (7DA/100K)"="solid","Tests (7DA/1m)" = "dotted"))+
+  # facet_wrap(~metric, scales = "free_y", ncol = 1)+
+  # lemon::facet_rep_wrap(~metric,scales = "free_y", ncol = 1,repeat.tick.labels = TRUE)+
+  scale_x_date(date_breaks = "1 month", date_labels = "%b" )+
+  scale_y_continuous(breaks = seq(0,70,10))+
+  scale_color_manual(values = c("New York" = "#7570B3", "Florida" = "#E7298A",
+                                "Wisconsin" = "#D95F02" ))+
+  labs(title = "COVID-19 Cases and Tests for 3 US States",
+       x = "2020", y = NULL, color = NULL, linetype=NULL)+
+  theme(legend.position = "top")
+g %>% quick_save2("03-NY-FL-WI-3", width = 10, height = 6)
+
+
+>>>>>>> Stashed changes
 # ---- publish ---------------------------------------
 path_report <- "./analysis/us-response/us-response-2.Rmd"
 rmarkdown::render(
