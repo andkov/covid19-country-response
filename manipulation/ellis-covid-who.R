@@ -89,7 +89,7 @@ ds_who_combined %>% filter(iso2 == "GB") %>% select(date, iso2,country_label, po
 
 # inspect
 ds_who_combined %>% glimpse()
-ds_who_combined %>% distinct(country_code, country_label, population) %>% View()
+# ds_who_combined %>% distinct(country_code, country_label, population) %>% View()
 
 
 # stem to have the complete timeline
