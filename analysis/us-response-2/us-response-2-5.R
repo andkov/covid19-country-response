@@ -365,11 +365,12 @@ g %>% quick_save2("02-covid-by-regions", width = 10, height = 6)
 # ----- g3-------
 focus_metrics <- c(
 
-  "Cases (7DA/100K)"
-  ,"Cases (cum/100K)"
-  ,"Deaths (7DA/100K)"
+  # "Cases (7DA/100K)"
+  # ,"Deaths (7DA/100K)"
+  # ,"Tests (7DA/100K)"
+
+  "Cases (cum/100K)"
   ,"Deaths (cum/100K)"
-  ,"Tests (7DA/100K)"
   ,"Tests (cum/100K)"
 )
 
@@ -378,7 +379,15 @@ d <- ds_jh_state %>%
   compute_epi(c("date","state","region", "country"), long = T) %>%
   filter(metric %in% focus_metrics) %>%
   filter(state %in% c("New York","Florida","Wisconsin")) %>%
-  filter(date < as.Date("2020-10-26") & date > as.Date("2020-03-01")) %>%
+  # filter(date < as.Date("2020-10-26") & date > as.Date("2020-03-01")) %>%
+  filter(
+    (date < as.Date("2020-11-19") & date > as.Date("2020-03-01") & metric %in% c("Cases (7DA/100K)","Cases (cum/100K)") )
+    |
+    (date < as.Date("2020-11-19") & date > as.Date("2020-03-01") & metric %in% c("Deaths (7DA/100K)","Deaths (cum/100K)") )
+    |
+    (date < as.Date("2020-10-26") & date > as.Date("2020-03-01") & metric %in% c("Tests (7DA/100K)","Tests (cum/100K)") )
+
+  ) %>%
   filter( !(metric %in% c("Tests (7DA/100K)","Tests (cum/100K)" ) & date < as.Date("2020-04-19"))) %>%
   mutate(
     metric = fct_drop(metric)
@@ -403,7 +412,10 @@ g <-  d %>%
        subtitle = "7-day average (7DA) and Cumulative (cum) counts per 100,000 of population (100K)",
        x = "2020", y = NULL, color = NULL)+
   theme(legend.position = "top")
-g %>% quick_save2("03-NY-FL-WI-2", width = 10, height = 15)
+# g %>% quick_save2("03-NY-FL-WI", width = 10, height = 15)
+# g %>% quick_save2("03-NY-FL-WI-7da", width = 10, height = 8)
+g %>% quick_save2("03-NY-FL-WI-cum", width = 10, height = 8)
+
 
 
 
