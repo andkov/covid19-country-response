@@ -315,7 +315,8 @@ g <-  d %>%
   geom_text(aes(label = event_n),size =2,data = d %>% filter(!is.na(event_n)),color ="white" )+
   labs(title = "Confirmed Cases and Deaths from COVID-19 in the United States",
        subtitle = "7-day average",
-       x = "2020", y = NULL)
+       x = "2020", y = NULL,
+       caption = "(1) - Voluntary national shutdown instituted, limiting mass gatherings to 10 or less people, advising against discretionary travel,\n and recommending closure of schools, restaurants, gyms, and other indoor or outdoor venues. Extended through April 30.\n(2) - The White House released guidelines for state governors and local authorities to reopen the country. ")
 g %>% quick_save2("01-us-cases-deaths", width = 10, height = 4)
 
 
@@ -340,13 +341,14 @@ d <- ds_jh_state %>%
   ) %>%
   filter(
     date >= as.Date("2020-03-01"), date <= as.Date("2020-11-08") # because gives negative numbers after this date
+  # date < as.Date("2020-10-26") & date > as.Date("2020-03-01")
   )
 
 
 d$metric %>% levels()
 g <-  d %>%
   ggplot(aes(x=date, y = value, group = region, color=region))+
-  geom_line(size=2, alpha = .5)+
+  geom_line(size=2, alpha = .3)+
   geom_line(size = .5, alpha = 1)+
   # scale_color_viridis_d(option = "plasma", begin = .2, end = .9, name = "Region")+
   scale_y_continuous(labels = scales::comma_format())+
@@ -417,7 +419,12 @@ d <- ds_jh_state %>%
   compute_epi(c("date","state","region", "country"), long = T) %>%
   filter(metric %in% focus_metrics) %>%
   filter(state %in% c("New York","Florida","Wisconsin")) %>%
-  filter(date < as.Date("2020-10-26") & date > as.Date("2020-03-01")) %>%
+  filter(
+    (date < as.Date("2020-10-26") & date > as.Date("2020-03-01") & metric == "Tests (7DA/100K)")
+    |
+    (date < as.Date("2020-11-19") & date > as.Date("2020-03-01") & metric ==  "Cases (7DA/100K)")
+
+    ) %>%
   filter( !(metric %in% c("Tests (7DA/100K)","Tests (cum/100K)" ) & date < as.Date("2020-04-19"))) %>%
   mutate(
     metric = fct_drop(metric)
@@ -441,11 +448,11 @@ g <-  d %>%
   # facet_wrap(~metric, scales = "free_y", ncol = 1)+
   # lemon::facet_rep_wrap(~metric,scales = "free_y", ncol = 1,repeat.tick.labels = TRUE)+
   scale_x_date(date_breaks = "1 month", date_labels = "%b" )+
-  scale_y_continuous(breaks = seq(0,70,10))+
+  scale_y_continuous(breaks = seq(0,120,10))+
   scale_color_manual(values = c("New York" = "#7570B3", "Florida" = "#E7298A",
                                 "Wisconsin" = "#D95F02" ))+
   labs(title = "COVID-19 Cases and Tests for 3 US States",
-       x = "2020", y = NULL, color = NULL, linetype=NULL)+
+       x = "2020", y = NULL, color = NULL, linetype=NULL, caption = "Testing data are unreliable after Oct 26")+
   theme(legend.position = "top")
 g %>% quick_save2("04-NY-FL-WI", width = 10, height = 6)
 
