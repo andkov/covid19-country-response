@@ -12,6 +12,7 @@ library(knitr) # dynamic documents
 library(rmarkdown) # dynamic
 library(kableExtra) # enhanced tables, see http://haozhu233.github.io/kableExtra/awesome_table_in_html.html
 library(plotly)
+library(gt) # tables
 # library(TabularManifest) # exploratory data analysis, see https://github.com/Melinae/TabularManifest
 requireNamespace("knitr", quietly=TRUE)
 requireNamespace("scales", quietly=TRUE) #For formating values in graphs
@@ -448,6 +449,60 @@ g <-  d %>%
   theme(legend.position = "top")
 g %>% quick_save2("04-NY-FL-WI", width = 10, height = 6)
 
+# ---- create-description-table ------------------------------------------------
+
+
+table_d <- readr::read_csv("./analysis/us-response-2/key-dates-short.csv") %>%
+  filter(area != "US") %>%
+  select(-event_descriptions) %>%
+  group_by(area) %>%
+  mutate(
+    event_n = dplyr::row_number()
+  ) %>% ungroup() %>%
+  relocate(event_n) %>%
+  as_tibble()
+
+table1 <- table_d %>%
+  gt() %>%
+  cols_label(
+    event_n                  = "Event Num"
+    ,area                    = "State"
+    ,date                    = "Data"
+    ,event_description_short = "Description"
+  ) %>%
+  tab_style(
+    style = list(
+      cell_fill(color = "#7570B3")
+      ,cell_text(color = "white", weight = "bold")
+      )
+    ,locations = cells_body(
+      columns = vars(event_n)
+      ,rows = area == "New York"
+    )
+  ) %>%
+  tab_style(
+    style = list(
+      cell_fill(color = "#E7298A")
+      ,cell_text(color = "white", weight = "bold")
+    )
+    ,locations = cells_body(
+      columns = vars(event_n)
+      ,rows = area == "Florida"
+    )
+  ) %>%
+  tab_style(
+    style = list(
+      cell_fill(color = "#D95F02")
+      ,cell_text(color = "white", weight = "bold")
+    )
+    ,locations = cells_body(
+      columns = vars(event_n)
+      ,rows = area == "Wisconsin"
+    )
+  )
+
+
+table1
 
 
 # ---- publish ---------------------------------------
