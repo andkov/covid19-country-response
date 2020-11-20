@@ -499,10 +499,14 @@ table1 <- table_d %>%
       columns = vars(event_n)
       ,rows = area == "Wisconsin"
     )
-  )
+  ) %>%
+  tab_options(table.font.size = "10px") %>%
+  opt_table_lines("all")
 
 
-table1
+table1 %>% gtsave("./analysis/us-response-2/prints-5/descrip-table.png")
+
+
 
 
 # ---- publish ---------------------------------------
