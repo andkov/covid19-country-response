@@ -1,17 +1,36 @@
-area| date| event_descriptions
-New York|2020-03-12|The Governor prohibited gatherings larger than 500 people. Schools and non-essential businesses were instructed to close in the following days.
-New York|2020-03-20|The Governor issued a stay-at-home order, which was subsequently extended until May 15.
-New York|2020-04-15|The Governor instituted a mask mandate.
-New York|2020-05-15|Five regions began reopening. New York City, however, started reopening on June 8.
-Florida|2020-03-17|The Governor closed bars, nightclubs, and schools and added social distancing and capacity restrictions for restaurants.
-Florida|2020-04-01|The Governor issued a statewide stay-at-home order, which lasted for 30 days. A partial stay-at-home order was previously implemented on March 30.
-Florida|2020-05-04|Florida began reopening some businesses and parts of the state. Florida entered Full Phase 1 of reopening on May 18.
-Florida|2020-06-26|The Governor ordered bars to be closed due to recent spikes.
-Florida|2020-09-25|The Governor lifted all statewide COVID-19 restrictions, including allowing bars and restaurants to return to 100% capacity.
-Wisconsin|2020-03-14|The Governor closed schools. Restrictions on restaurants and bars and mass gatherings were implemented in the following days.
-Wisconsin|2020-03-24|The Department of Health Services issued a stay-at-home order, which was subsequently extended until May 26.
-Wisconsin|2020-05-13|Wisconsin Supreme Court overturned the state’s stay-at-home order. Some businesses (e.g. bars) began reopening shortly thereafter.
-Wisconsin|2020-07-30|The Governor instituted a mask mandate. A new mask mandate was issued on Sept. 22 that will last until Nov. 21.
-Wisconsin|2020-10-06|The Governor ordered the Department of Health Services to limit indoor public gatherings.
-US|2020-03-16|Voluntary national shutdown instituted, limiting mass gatherings to 10 or less people, advising against discretionary travel, and recommending closure of schools, restaurants, gyms, and other indoor or outdoor venues. This shutdown was extended through April 30.
-US|2020-04-16|The White House released guidelines for state governors and local authorities to reopen the country.
+area| date| event_descriptions| event_description_short
+New York|2020-03-12|The Governor prohibited gatherings larger than 500 people. Schools and non-essential businesses were instructed to close in the following days.|No gathering for 500+, schools & non-essential businesses to close shortly
+
+New York|2020-03-20|The Governor issued a stay-at-home order, which was subsequently extended until May 15.|Stay-at-home (SAH) order issued
+
+New York|2020-04-15|The Governor instituted a mask mandate.|Governer institutes mask mandate
+
+New York|2020-05-15|Five regions began reopening. New York City, however, started reopening on June 8.|Five regions begin to reopen, NYC follows only on Jun 8
+
+Florida|2020-03-17|The Governor closed bars, nightclubs, and schools and added social distancing and capacity restrictions for restaurants.|Bars, clubs, schools closed + social distancing
+
+Florida|2020-04-01|The Governor issued a statewide stay-at-home order, which lasted for 30 days. A partial stay-at-home order was previously implemented on March 30.|Statewide SAH instituted
+
+Florida|2020-05-04|Florida began reopening some businesses and parts of the state. Florida entered Full Phase 1 of reopening on May 18.|Some businesses start to reopen, full phase 1 on May 18
+
+Florida|2020-06-26|The Governor ordered bars to be closed due to recent spikes.|Bars ordered to close due to spikes
+
+Florida|2020-09-25|The Governor lifted all statewide COVID-19 restrictions, including allowing bars and restaurants to return to 100% capacity.|Governor lifts all statewide restrictions
+
+Wisconsin|2020-03-14|The Governor closed schools. Restrictions on restaurants and bars and mass gatherings were implemented in the following days.|Schools closed, other restrictions followed shortly
+
+Wisconsin|2020-03-24|The Department of Health Services issued a stay-at-home order, which was subsequently extended until May 26.|DoHS issues SAH order
+
+Wisconsin|2020-05-13|Wisconsin Supreme Court overturned the state’s stay-at-home order. Some businesses (e.g. bars) began reopening shortly thereafter.|SAH overturned by Wis Supreme Court, bars open shortly after
+
+Wisconsin|2020-07-30|The Governor instituted a mask mandate. A new mask mandate was issued on Sept. 22 that will last until Nov. 21.|Mask mandate instituted, renewed on Sep 27 until Nov 21
+
+Wisconsin|2020-10-06|The Governor ordered the Department of Health Services to limit indoor public gatherings.|DoHS order to limit indoor public gatherings
+
+Wisconsin|2020-08-07|Sturgis biker rally|Sturgis biker rally
+
+Wisconsin|2020-08-16|First of 5 Trump rallies|First of 5 Trump rallies
+
+US|2020-03-16|Voluntary national shutdown instituted, limiting mass gatherings to 10 or less people, advising against discretionary travel, and recommending closure of schools, restaurants, gyms, and other indoor or outdoor venues. This shutdown was extended through April 30.|Voluntary national lockdown
+
+US|2020-04-16|The White House released guidelines for state governors and local authorities to reopen the country.|Guidelines to reopen the country released
