@@ -459,7 +459,7 @@ d <- ds_jh_state %>%
 fontsize <- 5
 g <-  d %>%
   ggplot(aes(x=date, y = value, group = state_metric, color = state, linetype = metric))+
-  geom_line(alpha = .1, size = 3, linetype= "solid")+
+  geom_line(alpha = .2, size = 3, linetype= "solid")+
   geom_line()+
   geom_point(shape = 19, size = 3,data = d %>% filter(!is.na(event_n)) %>% filter(metric == "Cases (7DA/100K)"))+
   geom_text(aes(label = event_n),size =2,data = d %>% filter(!is.na(event_n))%>% filter(metric == "Cases (7DA/100K)"),color ="white" )+
@@ -477,7 +477,7 @@ g <-  d %>%
   geom_text(aes(label = event_description_short,y = seq(125,95,-5), x = as.Date("2020-08-02")),size =3,data = d %>% filter(!is.na(event_n), state=="Wisconsin", metric == "Cases (7DA/100K)"),color ="black",hjust=0)+
 
 
-  scale_linetype_manual(values = c("Cases (7DA/100K)"="solid","Tests (7DA/1m)" = "dotted"))+
+  scale_linetype_manual(values = c("Cases (7DA/100K)"="solid","Tests (7DA/1m)" = "dashed"))+
   # facet_wrap(~metric, scales = "free_y", ncol = 1)+
   # lemon::facet_rep_wrap(~metric,scales = "free_y", ncol = 1,repeat.tick.labels = TRUE)+
   scale_x_date(date_breaks = "1 month", date_labels = "%b" )+
