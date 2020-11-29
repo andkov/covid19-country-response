@@ -35,6 +35,10 @@ ggplot2::theme_set(
     )
 )
 
+prints_folder <- paste0("./analysis/heap-4-countries/", strftime(Sys.Date()),"/")
+if(!file.exists(prints_folder)){
+  dir.create(file.path(prints_folder))
+}
 # ---- declare-functions ---------------------------
 compute_epi_timeline <- function(d, n_deaths_first_day = 1) { #}, d_country ){
   # browser()
@@ -243,7 +247,29 @@ ds1 <- ds1 %>%
 
 
 # ------ facet-graphs ----------------------
+# see https://personal.sron.nl/~pault/#sec:qualitative
+pal_bright <- c(
+  "blue" = "#4477AA"
+  ,"cyan" = "#66CCEE"
+  ,"green" = "#228833"
+  ,"yellow" = "#CCBB44"
+  ,"red" = "#EE6677"
+  ,"purple" = "#AA3377"
+  ,"grey" = "#BBBBBB"
+)
 
+country_colors <- c(
+  "Ireland"         = pal_bright[["green"]]
+  ,"United Kingdom" = pal_bright[["blue"]]
+  ,"United States"  = pal_bright[["yellow"]]
+  ,"Canada"         = pal_bright[["purple"]]
+)
+country_linetype <- c(
+  "Ireland"         = "longdash"
+  ,"United Kingdom" = "dotdash"
+  ,"United States"  = "solid"
+  ,"Canada"         = "dotted"
+)
 
 # ------ singular -----------------------
 
@@ -253,23 +279,136 @@ d4 <- ds1 %>%
   filter(source == "ecdc") %>%
   filter(metric %in% c("Cases (7DA/1M)")) %>%
   filter(date >= as.Date("2020-03-01"))
-
+scale_label <- "                                                           Country"
+d4_legend <- d4 %>% distinct(letter_code, lockdown_label) %>% na.omit() %>%
+  mutate(
+    lockdown_label = fct_relevel(lockdown_label,
+                                 "Voluntary lockdown or stay home request",
+                                 "Mandatory national lockdown",
+                                 "Country reopens"),
+    letter_code = fct_relevel(letter_code, "V","M","R")
+    ) %>%
+  mutate(
+    country_label = NA
+  )
+yseq <- seq(200,260,30)
+xpos <- as.Date("2020-04-25")
 g4 <- d4 %>%
-  ggplot(aes_string(x="date", y = "value", group = "country_label",color = "country_label",linetype = "country_label"))+
-  geom_line(size = .5, color = "grey40")+
-  geom_line(size = .5, alpha = .8)+
-  geom_line(size = 3, alpha = .3, linetype = "solid")+
-  geom_point(shape = 21,size =4, data = d4 %>% filter(!is.na(lockdown_type)) )+
+  ggplot(aes_string(x="date", y = "value" ,group = "country_label", color = "country_label",linetype = "country_label"))+
+  # geom_line(size = .5, color = "grey40")+
+  geom_line(size = 3, alpha = .6, linetype = "solid")+ # think color
+  geom_line(size = .5, alpha = 1, color = "black")+ # thin black
+  geom_point(shape = 21,size =5, data = d4 %>% filter(!is.na(lockdown_type)),alpha=.9,aes(fill=country_label), color = "black", show.legend = FALSE)+
   geom_text(aes(label = letter_code), size = 3, color = "black")+
-  # scale_color_viridis_d(option = "plasma", begin = .2, end = .9, name = "Country")+
-  scale_linetype_manual(values = country_linetype, name = "Country")+
-  scale_color_manual(values = country_colors, name = "Country")+
-  scale_y_continuous(labels = scales::comma_format(), breaks = seq(0,550, 50), minor_breaks = seq(0,550, 10))+
-  scale_x_date(date_breaks = "1 month", date_labels = "%b" )+
-  labs(y = NULL)+
-  labs(y = "Cases (7-day average, per 1 million)", x = "2020", title = "Confirmed cases of COVID-19", subtitle = "7-day rolling average per 1 million of population", caption = "Source: European Centre for Disease Prevention and Control\nM - Mandatory national lockdown \nV - Voluntary lockdown or stay home request")
-# g4
-ggsave("./analysis/heap-4-countries/2020-11-25/cases_7da_per1m.jpg",g4,"jpg", width = 10, height = 6,dpi = "retina")
+  # inset text legend
+  geom_point(aes(x = xpos,y = yseq), shape = 21,size =5,color = "black",data = d4_legend)+
+  geom_text(aes(label = letter_code, x = xpos,y = yseq), color = "black", size = 3,data = d4_legend)+
+  geom_text(aes(label = paste0(" - ",lockdown_label), x = xpos+3,y = yseq), color = "black", size = 3,data = d4_legend , hjust=0)+
+  # rest of the plot
+  scale_linetype_manual(values = country_linetype, name = scale_label)+
+  scale_color_manual(values = country_colors, name = scale_label)+
+  scale_fill_manual(values = country_colors, name = scale_label)+
+  scale_y_continuous(
+    labels = scales::comma_format()
+    , breaks = seq(0,550, 100)
+    , minor_breaks = seq(0,550, 20)
+    ,sec.axis = sec_axis(~ . * 1,breaks = seq(50,550, 100))
+    )+
+  scale_x_date(date_breaks = "1 month", date_labels = "%b" ,
+               expand = expansion(mult = c(0,.01)))+
+  guides(fill = guide_legend(nrow = 1))+
+  guides(color = guide_legend(nrow = 1))+
+  guides(linetype = guide_legend(nrow = 1))+
+
+  labs(y = "Cases (7-day average, per 1 million)", x = "2020", title = "Confirmed cases of COVID-19", subtitle = "7-day rolling average per 1 million of population", caption = "Source: European Centre for Disease Prevention and Control")+
+  theme(
+     legend.position = c(0.70, 1.05)
+    ,legend.background = element_rect(colour=NA, fill=NA)
+    ,legend.box.just = "bottom"
+    ,legend.spacing.y =unit(.2, 'cm')
+    ,text = element_text(size = 10)
+    ,plot.caption = element_text(vjust = 5)
+    # ,plot.title = element_text(vjust = - 15, hjust = .01)
+    # ,plot.subtitle = element_text(vjust = - 19, hjust = .01)
+    ,legend.key.width = unit(15,"mm")
+
+  )
+# g4a
+ggsave(paste0(prints_folder,"cases_7da_per1m.jpg"),g4,"jpg", width = 10, height = 6,dpi = "retina")
+
+
+
+
+d5 <- ds1 %>%
+  filter(source == "ecdc") %>%
+  filter(metric %in% c("Deaths (7DA/1M)")) %>%
+  filter(date >= as.Date("2020-03-01"))
+scale_label <- "                                                           Country"
+d5_legend <- d4 %>% distinct(letter_code, lockdown_label) %>% na.omit() %>%
+  mutate(
+    lockdown_label = fct_relevel(lockdown_label,
+                                 "Voluntary lockdown or stay home request",
+                                 "Mandatory national lockdown",
+                                 "Country reopens"),
+    letter_code = fct_relevel(letter_code, "V","M","R")
+  ) %>%
+  mutate(
+    country_label = NA
+  )
+yseq <- seq(7,8.4,.7)
+xpos <- as.Date("2020-05-25")
+g5 <- d5 %>%
+  ggplot(aes_string(x="date", y = "value" ,group = "country_label", color = "country_label",linetype = "country_label"))+
+  # geom_line(size = .5, color = "grey40")+
+  geom_line(size = 3, alpha = .6, linetype = "solid")+ # think color
+  geom_line(size = .5, alpha = 1, color = "black")+ # thin black
+  geom_point(shape = 21,size =5, data = d5 %>% filter(!is.na(lockdown_type)),alpha=.9,aes(fill=country_label), color = "black", show.legend = FALSE)+
+  geom_text(aes(label = letter_code), size = 3, color = "black")+
+  # inset text legend
+  geom_point(aes(x = xpos,y = yseq), shape = 21,size =5,color = "black",data = d4_legend)+
+  geom_text(aes(label = letter_code, x = xpos,y = yseq), color = "black", size = 3,data = d4_legend)+
+  geom_text(aes(label = paste0(" - ",lockdown_label), x = xpos+3,y = yseq), color = "black", size = 3,data = d4_legend , hjust=0)+
+  # rest of the plot
+  scale_linetype_manual(values = country_linetype, name = scale_label)+
+  scale_color_manual(values = country_colors, name = scale_label)+
+  scale_fill_manual(values = country_colors, name = scale_label)+
+  scale_y_continuous(
+    labels = scales::number_format(accuracy = 1)
+    , breaks = seq(0,16,2), minor_breaks = seq(0,16, .5)
+    ,sec.axis = sec_axis(~ . * 1,breaks = seq(1,16,2) )
+  )+
+  scale_x_date(date_breaks = "1 month", date_labels = "%b" ,
+               expand = expansion(mult = c(0,.01)))+
+  guides(fill = guide_legend(nrow = 1))+
+  guides(color = guide_legend(nrow = 1))+
+  guides(linetype = guide_legend(nrow = 1))+
+
+  labs(y = "Deaths (7-day average, per 1 million)", x = "2020", title = "Deaths from COVID-19", subtitle = "7-day rolling average per 1 million of population", caption = "Source: European Centre for Disease Prevention and Control")+
+  theme(
+    legend.position = c(0.70, 1.05)
+    ,legend.background = element_rect(colour=NA, fill=NA)
+    ,legend.box.just = "bottom"
+    ,legend.spacing.y =unit(.2, 'cm')
+    ,text = element_text(size = 10)
+    ,plot.caption = element_text(vjust = 5)
+    # ,plot.title = element_text(vjust = - 15, hjust = .01)
+    # ,plot.subtitle = element_text(vjust = - 19, hjust = .01)
+    ,legend.key.width = unit(15,"mm")
+
+  )
+# g4a
+ggsave(paste0(prints_folder,"death_7da_per1m.jpg"),g5,"jpg", width = 10, height = 6,dpi = "retina")
+
+
+
+
+
+
+
+
+
+
+
 
 d5 <- ds1 %>%
   filter(source == "ecdc") %>%
@@ -291,7 +430,7 @@ g5 <- d5 %>%
   labs(y = NULL)+
   labs(y = "Deaths (7-day average, per 1 million)", x = "2020", title = "Deaths from COVID-19", subtitle = "7-day rolling average per 1 million of population", caption = "Source: European Centre for Disease Prevention and Control\nM - Mandatory national lockdown \nV - Voluntary lockdown or stay home request")
 # g5
-ggsave("./analysis/heap-4-countries/2020-11-25/death_7da_per1m.jpg",g5,"jpg", width = 10, height = 6,dpi = "retina")
+ggsave(paste0(prints_folder,"death_7da_per1m.jpg"),g5,"jpg", width = 10, height = 6,dpi = "retina")
 
 
 
