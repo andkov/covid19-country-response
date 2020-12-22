@@ -285,7 +285,7 @@ d4_legend <- d4 %>% distinct(letter_code, lockdown_label) %>% na.omit() %>%
     lockdown_label = fct_relevel(lockdown_label,
                                  "Voluntary lockdown or stay home request",
                                  "Mandatory national lockdown",
-                                 "Country reopens"),
+                                 "Country begins reopening"),
     letter_code = fct_relevel(letter_code, "V","M","R")
     ) %>%
   mutate(
@@ -349,7 +349,7 @@ d5_legend <- d4 %>% distinct(letter_code, lockdown_label) %>% na.omit() %>%
     lockdown_label = fct_relevel(lockdown_label,
                                  "Voluntary lockdown or stay home request",
                                  "Mandatory national lockdown",
-                                 "Country reopens"),
+                                 "Country begins reopening"),
     letter_code = fct_relevel(letter_code, "V","M","R")
   ) %>%
   mutate(
