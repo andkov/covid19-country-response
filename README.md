@@ -28,13 +28,13 @@ Analytic Reports
 [HEAP1]:analysis/heap-4-countries/2020-11-30/cases_7da_per1m.jpg
 [HEAP2]:analysis/heap-4-countries/2020-11-30/death_7da_per1m.jpg
 
-- [HEPL FIgures](analysis/hepl-3-states/hepl-3-states.R)
+- [HEPL Figures](analysis/hepl-3-states/hepl-3-states.R) ( [PDF](analysis/hepl-3-states/prints/2020-11-27/Alexander-Unruh-Koval-2020-HEPL-figures.pdf)) 
 
 |Country|Regions| States|   
 |---|---|---|  
 |![][HEPL1]|![][HEPL2]| ![][HEPL3]| 
 
-[PDF](analysis/hepl-3-states/prints/2020-11-27/Alexander-Unruh-Koval-2020-HEPL-figures.pdf)
+
 
 
 
