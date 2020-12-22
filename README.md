@@ -1,6 +1,14 @@
 # covid19-country-response
 Combines data  from OECD database and other source to examine countries' responses to COVID-19 and factors shaping it.
 
+COVID-19 Data Sources
+-------------
+See [./manipulation/](manipulation/) for the scripts that wrangle the data sets and create analysis-ready forms  
+- [European CDC](https://www.ecdc.europa.eu/en/publications-data/download-todays-data-geographic-distribution-covid-19-cases-worldwide)  
+- [John Hopkins](https://github.com/CSSEGISandData/COVID-19)  
+- [World Health Organization](https://covid19.who.int/table)
+- [Oxford COVID-19 Government Response Tracker](https://github.com/OxCGRT/covid-policy-tracker)
+
 Analytic Reports
 ----------------------
 - [EDA-1][eda-1] - general trends of the COVID-19 spread and Stringency Index 
