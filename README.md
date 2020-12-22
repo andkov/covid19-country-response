@@ -11,6 +11,36 @@ Analytic Reports
 [eda-2]:https://raw.githack.com/andkov/covid19-country-response/master/analysis/eda-2/eda-2.html
 [eda-3]:https://raw.githack.com/andkov/covid19-country-response/master/analysis/eda-3/eda-3.html
 
+- [HEAP Figures](master/analysis/heap-4-countries/heap-4-countries-2.R)
+
+|Cases|Deaths|  
+|---|---|  
+|![][HEAP1]|![][HEAP2]|  
+
+[HEAP1]:analysis/heap-4-countries/2020-11-30/cases_7da_per1m.jpg
+[HEAP2]:analysis/heap-4-countries/2020-11-30/death_7da_per1m.jpg
+
+- [HEPL FIgures](analysis/hepl-3-states/hepl-3-states.R)
+
+|Country|Regions| States|   
+|---|---|---|  
+|![][HEPL1]|![][HEPL2]| ![][HEPL3]| 
+
+[PDF](analysis/hepl-3-states/prints/2020-11-27/Alexander-Unruh-Koval-2020-HEPL-figures.pdf)
+
+
+
+
+[HEPL1]:analysis/hepl-3-states/prints/2020-11-27/01-us-cases-deaths.jpg
+[HEPL2]:analysis/hepl-3-states/prints/2020-11-27/02-covid-by-regions.jpg
+[HEPL3]:analysis/hepl-3-states/prints/2020-11-27/03-NY-FL-WI.jpg
+
+
+Dashboards 
+------------------
+- [COVID explorer](https://kyleb.shinyapps.io/covid-explorer/) links COVID metrics with the results of the US presidential elections in 2016 and 2020.  
+- [Since Metrics](https://andkov.shinyapps.io/shiny-since-metric/) exploration tool for relating two given COVID metrics among OECD countries
+
 
 Potential data sources
 ----------------------------------
