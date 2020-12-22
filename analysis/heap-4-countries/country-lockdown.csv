@@ -10,7 +10,7 @@ FRA,2020-03-17,M,Mandatory,Mandatory national lockdown
 ITA,2020-03-10,M,Mandatory,Mandatory national lockdown
 NOR,2020-03-12,M,Mandatory,Mandatory national lockdown
 BEL,2020-03-18,M,Mandatory,Mandatory national lockdown
-CAN,2020-05-16,R,Reopen, Country reopens
-IRL,2020-05-18,R,Reopen, Country reopens
-GBR,2020-05-13,R,Reopen, Country reopens
-USA,2020-04-30,R,Reopen, Country reopens
+CAN,2020-05-16,R,Reopen, Country begins reopening
+IRL,2020-05-18,R,Reopen, Country begins reopening
+GBR,2020-05-13,R,Reopen, Country begins reopening
+USA,2020-04-30,R,Reopen, Country begins reopening
