@@ -402,6 +402,71 @@ g <-  d %>%
 # g %>% quick_save("04-allmetrics-by-region", width = 2400, height = 1350, res = 200)
 # g %>% quick_save2("02-covid-by-regions", width = 10, height = 6, units = "in")
 g %>% quick_save2("02-covid-by-regions", width = 190, height = 120, units = "mm")
+# ---- g2-monochrome -------
+# metric_order
+focus_metrics <- c(
+  "Cases (7DA/100K)"
+  ,"Deaths (7DA/100K)"
+  ,"Tests (7DA/100K)"
+  ,"Cases (cum/100K)"
+  ,"Deaths (cum/100K)"
+  ,"Tests (cum/100K)"
+)
+
+latest_date <- "2020-11-25"
+latest_date_test <- "2020-11-09"
+
+# Region level
+d <- ds_jh_state %>%
+  compute_epi(c("date", "region", "country"), long = T) %>%
+  filter(metric %in% focus_metrics) %>%
+  mutate(
+    metric = fct_relevel(metric, focus_metrics) %>% fct_drop()
+  ) %>%
+  filter(
+    (date < as.Date(latest_date) & date > as.Date("2020-03-01") & metric %in% c("Cases (7DA/100K)","Cases (cum/100K)") )
+    |
+      (date < as.Date(latest_date) & date > as.Date("2020-03-01") & metric %in% c("Deaths (7DA/100K)","Deaths (cum/100K)") )
+    |
+      (date < as.Date(latest_date_test) & date > as.Date("2020-03-01") & metric %in% c("Tests (7DA/100K)","Tests (cum/100K)") )
+
+  ) %>%
+  filter(
+    !(metric %in% c("Tests (7DA/100K)","Tests (cum/100K)" ) & date < as.Date("2020-04-19"))
+    )
+
+# region_linetype <- c("South" = "dotted", "West" = "dotdash", "Northeast" = "solid", "Midwest" = "longdash")
+# region_linetype <- c("South" = "dotted", "West" = "dashed", "Northeast" = "solid", "Midwest" = "1F")
+region_linetype <- c("South" = "dotted", "West" = "dashed", "Northeast" = "solid", "Midwest" = "dotdash")
+
+d$metric %>% levels()
+g <-  d %>%
+  # ggplot(aes(x=date, y = value, group = region, color=region, linetype=region))+
+  ggplot(aes(x=date, y = value, group = region, linetype=region))+
+  geom_line(size=1.3, alpha = .08, color = "black", linetype = "solid")+
+  geom_line(size = .4, alpha = 1)+
+  scale_y_continuous(labels = scales::comma_format())+
+  scale_x_date(date_breaks = "1 month", date_labels = "%b" )+
+  facet_wrap(~metric, scales = "free", ncol = 3)+
+  scale_color_manual(values = region_colors)+
+  scale_linetype_manual(values = region_linetype, name = "                                            Region")+
+  guides(linetype = guide_legend(nrow=1))+
+  # guides(color = guide_legend(nrow = 1))+
+  labs(title = "COVID-19 Cases, Deaths, and Tests by US regions",
+       subtitle = "7-day average (7DA) and Cumulative (cum) counts per 100,000 of population (100K)"
+       ,x = "2020", y = NULL, color = "                                   Region"
+       ,caption = "Source: JHU CSSE COVID-19 Data (https://github.com/CSSEGISandData/COVID-19)")+
+  theme(
+    legend.position = c(0.78, 1.125)
+    , legend.background = element_rect(colour=NA, fill=NA)
+    , legend.spacing.y =unit(-.85, 'cm')
+    ,text = element_text(size = 8)
+    ,legend.key.width = unit(10,"mm")
+  )
+
+# g %>% quick_save("04-allmetrics-by-region", width = 2400, height = 1350, res = 200)
+# g %>% quick_save2("02-covid-by-regions", width = 10, height = 6, units = "in")
+g %>% quick_save2("02-covid-by-regions-monochrome", width = 190, height = 120, units = "mm")
 
 # ----- g3-------
 focus_metrics <- c(
@@ -481,7 +546,134 @@ g <-  d %>%
     , legend.spacing.y =unit(-.2, 'cm')
     , text = element_text(size = 8)
   )
-g %>% quick_save2("03-NY-FL-WI", width = 190, height = 120, units = "mm")
+g %>% quick_save2("03-NY-FL-WI", width = 190, height = 150, units = "mm")
+# ----- g3-monochrome -------
+focus_metrics <- c(
+  "Cases (7DA/100K)"
+  ,"Tests (7DA/100K)"
+)
+
+latest_date <- "2020-11-25"
+latest_date_test <- "2020-10-26"
+
+
+d <- ds_jh_state %>%
+  compute_epi(c("date","state","region", "country"), long = T) %>%
+  filter(metric %in% focus_metrics) %>%
+  filter(state %in% c("New York","Florida","Wisconsin")) %>%
+  filter(
+    (date < as.Date(latest_date_test) & date > as.Date("2020-03-01") & metric == "Tests (7DA/100K)")
+    |
+    (date < as.Date(latest_date) & date > as.Date("2020-03-01") & metric ==  "Cases (7DA/100K)")
+
+    ) %>%
+  filter( !(metric %in% c("Tests (7DA/100K)","Tests (cum/100K)" ) & date < as.Date("2020-04-19"))) %>%
+  mutate(
+    metric = fct_drop(metric)
+    # ,value = case_when(metric == "Tests (7DA/100K)" ~ value/10, TRUE ~ value)
+    # ,metric = fct_recode(metric, "Tests (7DA/1m)" = "Tests (7DA/100K)")
+    ,state_metric = paste0(state,metric))%>%
+  left_join(
+    ds_events, by = c("date" = "date", "state" = "area")
+  ) %>%
+  mutate(
+    state = factor(state,levels = c("New York", "Florida", "Wisconsin"))
+  )
+# d %>% glimpse()
+# d %>% group_by(metric) %>% summarize(n = n())
+# state_colors <- c("New York" = "#7570B3", "Florida" = "#E7298A", "Wisconsin" = "#D95F02" )
+# state_colors <- c("New York" = "#7570B3", "Florida" = "#E7298A", "Wisconsin" = "#D95F02" )
+metric_colors <- c("Cases (7DA/100K)" = "grey80","Tests (7DA/1m)" = "grey20" )
+state_shapes <- c("New York" = 21, "Florida" = 22, "Wisconsin" = 23 )
+# state_linetypes <- c("New York" = "dotted", "Florida" = "dotdash", "Wisconsin" ="dashed" )
+state_linetypes <- c("New York" = "solid", "Florida" = "dotted", "Wisconsin" ="dashed" )
+
+
+# region_linetype <- c("South" = "dotted", "West" = "dotdash", "Northeast" = "solid", "Midwest" = "longdash")
+
+
+fontsize <- 2
+g1 <-  d %>%
+  filter(metric == "Cases (7DA/100K)") %>%
+  ggplot(aes(x=date, y = value, group = state_metric, linetype = state))+
+  # geom_line(alpha = .2, size = 3, linetype= "solid")+
+  # geom_line(alpha = .2, size = 3)+
+  geom_line()+
+  # geom_point(aes(shape = state),size = 3,data = d %>% filter(!is.na(event_n)) %>% filter(metric == "Cases (7DA/100K)"))+
+  geom_point(aes(shape = state), size = 4,data = d %>% filter(!is.na(event_n)) %>% filter(metric == "Cases (7DA/100K)"), fill = "white", alpha = .5)+
+  geom_text(aes(label = event_n),size =2,data = d %>% filter(!is.na(event_n))%>% filter(metric == "Cases (7DA/100K)"),color ="black" )+
+  # legend for New York
+  geom_point(shape = 21, size = 3,data = d %>% filter(!is.na(event_n), state=="New York", metric == "Cases (7DA/100K)"), aes(y = seq(65,50,-5), x = as.Date("2020-03-01")) )+
+  geom_text(aes(label = event_n,y = seq(65,50,-5), x = as.Date("2020-03-01")),size =2,data = d %>% filter(!is.na(event_n), state=="New York", metric == "Cases (7DA/100K)"),color ="black")+
+  geom_text(aes(label = event_description_short,y = seq(65,50,-5), x = as.Date("2020-03-05")),size =fontsize,data = d %>% filter(!is.na(event_n), state=="New York", metric == "Cases (7DA/100K)"),color ="black",hjust=0)+
+  # legend for Florida
+  geom_point(shape = 22, size = 3,data = d %>% filter(!is.na(event_n), state=="Florida", metric == "Cases (7DA/100K)"), aes(y = seq(95,75,-5), x = as.Date("2020-04-30")) )+
+  geom_text(aes(label = event_n,y = seq(95,75,-5), x = as.Date("2020-04-30")),size =2,data = d %>% filter(!is.na(event_n), state=="Florida", metric == "Cases (7DA/100K)"),color ="black")+
+  geom_text(aes(label = event_description_short,y = seq(95,75,-5), x = as.Date("2020-05-04")),size =fontsize,data = d %>% filter(!is.na(event_n), state=="Florida", metric == "Cases (7DA/100K)"),color ="black",hjust=0)+
+  # legend for Wisconsin
+  geom_point(shape = 23, size = 3,data = d %>% filter(!is.na(event_n), state=="Wisconsin", metric == "Cases (7DA/100K)"), aes(y = seq(125,95,-5), x = as.Date("2020-07-28")) )+
+  geom_text(aes(label = event_n,y = seq(125,95,-5), x = as.Date("2020-07-28")),size =2,data = d %>% filter(!is.na(event_n), state=="Wisconsin", metric == "Cases (7DA/100K)"),color ="black")+
+  geom_text(aes(label = event_description_short,y = seq(125,95,-5), x = as.Date("2020-08-02")),size =fontsize,data = d %>% filter(!is.na(event_n), state=="Wisconsin", metric == "Cases (7DA/100K)"),color ="black",hjust=0)+
+
+
+  # scale_linetype_manual(values = c("Cases (7DA/100K)"="solid","Tests (7DA/1m)" = "dashed"))+
+  # facet_wrap(~metric, scales = "free_y", ncol = 1)+
+  # lemon::facet_rep_wrap(~metric,scales = "free_y", ncol = 1,repeat.tick.labels = TRUE)+
+  scale_x_date(date_breaks = "1 month", date_labels = "%b", limits = as.Date(c("2020-03-01", "2020-11-25")) )+
+  scale_y_continuous(breaks = seq(0,120,20),labels = scales::comma_format(),sec.axis = sec_axis(~ . * 1,breaks = seq(10,130,20) ))+
+  # scale_color_manual(values = metric_colors)+
+  scale_shape_manual(values = state_shapes      , name = "                         State")+
+  scale_linetype_manual(values = state_linetypes, name = "                         State")+
+  labs(
+    title = "COVID-19 in New York, Florida, and Wisconsin: Confirmed Cases and Reported Tests",
+
+       x = "    2020", y = "Cases (7DA/100K)", color = NULL, linetype=NULL
+       # ,caption = "Source: JHU CSSE COVID-19 Data (https://github.com/CSSEGISandData/COVID-19)"
+       )+
+  # guides(color = guide_legend(nrow = 1))+
+  guides(linetype = guide_legend(nrow = 1), shape = guide_legend(nrow =1))+
+  # guides(shape = guide_legend(nrow = 1))+
+  theme(
+    # legend.position = c(0.11, 0.80)
+    legend.position = c(0.25, 0.90)
+    ,legend.background = element_rect(colour=NA, fill=NA)
+    , legend.box.just = "bottom"
+    , legend.spacing.y =unit(.15, 'cm')
+    , text = element_text(size = 8)
+    ,legend.key.width = unit(15,"mm")
+    ,axis.text.x = element_text(vjust =-6.5)
+  )
+# g1 %>% quick_save2("03-NY-FL-WI-monochrome-top", width = 190, height = 120, units = "mm")
+
+
+g2 <-  d %>%
+  filter(metric == "Tests (7DA/100K)") %>%
+  ggplot(aes(x=date, y = value, group = state_metric, linetype = state))+
+  geom_line()+
+  scale_x_date(date_breaks = "1 month", date_labels = "%b", limits = as.Date(c("2020-03-01", "2020-11-25")), position = "top" )+
+  # scale_x_date(date_breaks = "1 month", date_labels = "%b")+
+  scale_y_continuous(breaks = seq(0,600,100),labels = scales::comma_format(),sec.axis = sec_axis(~ . * 1,breaks = seq(50,650,100) ))+
+  scale_linetype_manual(values = state_linetypes, name = "                                               State")+
+  guides(linetype = guide_legend(nrow = 1), shape = guide_legend(nrow =1))+
+  labs(y = "Tests (7DA/100K)"
+       , x = NULL
+       ,caption = "Source: JHU CSSE COVID-19 Data (https://github.com/CSSEGISandData/COVID-19)")+
+  theme(
+    # legend.position = c(0.11, 0.80)
+    legend.position = c(0.25, 0.75)
+    ,legend.background = element_rect(colour=NA, fill=NA)
+    , legend.box.just = "bottom"
+    , legend.spacing.y =unit(.15, 'cm')
+    , text = element_text(size = 8)
+    ,legend.key.width = unit(15,"mm")
+    ,axis.text.x = element_blank()
+  )
+
+# g2 %>% quick_save2("03-NY-FL-WI-monochrome-bottom", width = 190, height = 50, units = "mm")
+
+
+g3 <- cowplot::plot_grid(g1, g2, ncol =1, rel_heights = c(9,4))
+g3 %>%  quick_save2("03-NY-FL-WI-monochrome", width = 190, height = 150, units = "mm")
 
 # ---- fig1 ---------------------
 file_paths <- c(
